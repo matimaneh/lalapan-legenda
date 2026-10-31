@@ -224,6 +224,15 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
  nav#nav .more-menu .nav-label{font-size:12px;line-height:1.4}
 }
 
+
+/* V5.3.2 mobile more-menu visibility and touch fix */
+@media(max-width:850px){
+ nav#nav{overflow:visible!important;overflow-x:visible!important;overflow-y:visible!important;isolation:isolate}
+ nav#nav .more-tab{position:relative;z-index:2;touch-action:manipulation}
+ nav#nav .more-menu{position:fixed!important;right:12px!important;left:auto!important;bottom:calc(78px + env(safe-area-inset-bottom))!important;z-index:9999!important;max-height:min(65vh,420px);overflow-y:auto;overscroll-behavior:contain;pointer-events:auto}
+ nav#nav .more-menu.open{display:flex!important;visibility:visible!important;opacity:1!important}
+}
+
 </style></head><body>
 <header class="app-header"><div class="brand-mark">LL</div><div class="brand-copy"><h1>LALAPAN LEGENDA</h1><p>Ruang kendali usaha · HPP · Stok · Penjualan · Keuangan</p></div><div class="header-meta"><span class="live-dot"></span><span class="cloud-status" id="cloudStatus">Belum login</span><button id="logoutBtn" class="secondary smallbtn hidden" style="margin-left:5px">Keluar</button></div></header>
 <nav id="nav"><button class="tab active" data-page="dashboard"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-label">Dashboard</span></button><button class="tab" data-page="sales"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Penjualan</span></button><button class="tab" data-page="hpp"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">HPP & Menu</span></button><button class="tab" data-page="inventory"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-label">Persediaan</span></button><button class="tab more-tab" type="button" data-more><span class="nav-icon" aria-hidden="true">⋯</span><span class="nav-label">Lainnya</span></button><div class="more-menu" id="moreMenu" aria-label="Menu lainnya"><button class="tab" data-page="purchases"><span class="nav-icon">＋</span><span class="nav-label">Pembelian</span></button><button class="tab" data-page="expenses"><span class="nav-icon">−</span><span class="nav-label">Pengeluaran</span></button><button class="tab" data-page="reports"><span class="nav-icon">▥</span><span class="nav-label">Laporan</span></button><button class="tab" data-page="calendar"><span class="nav-icon">▣</span><span class="nav-label">Kalender</span></button><button class="tab" data-page="settings"><span class="nav-icon">⚙</span><span class="nav-label">Pengaturan</span></button></div></nav>
