@@ -234,6 +234,38 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
  </form>
 </div>
 
+
+<div id="stockCorrectionModal" class="app-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="stockCorrectionTitle">
+ <form id="stockCorrectionForm" class="app-modal">
+  <div class="app-modal-head"><small>PERSEDIAAN BAHAN</small><h3 id="stockCorrectionTitle">Koreksi Stok</h3><p>Masukkan hasil hitung fisik agar catatan stok sesuai kondisi sebenarnya.</p></div>
+  <div class="app-modal-body">
+   <div class="field"><label for="stockIngredientSelect">Bahan baku</label><select id="stockIngredientSelect" required style="width:100%;padding:13px;border:1px solid #dcded3;border-radius:11px;background:#fff;color:#203d30"></select></div>
+   <div class="field"><label for="stockCurrentDisplay">Stok tercatat saat ini</label><input id="stockCurrentDisplay" type="text" readonly></div>
+   <div class="field"><label for="stockPhysicalInput">Stok fisik hasil perhitungan</label><input id="stockPhysicalInput" type="number" min="0" step="any" required></div>
+   <div class="field"><label for="stockMinimumInput">Batas minimum stok</label><input id="stockMinimumInput" type="number" min="0" step="any" required></div>
+   <div class="field"><label for="stockCorrectionNote">Catatan (opsional)</label><input id="stockCorrectionNote" type="text" maxlength="120" placeholder="Contoh: hitung stok akhir hari"></div>
+  </div>
+  <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelStockCorrection">Batal</button><button type="submit" class="modal-save">Simpan Koreksi</button></div>
+ </form>
+</div>
+
+
+<div id="ingredientModal" class="app-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="ingredientModalTitle">
+ <form id="ingredientForm" class="app-modal">
+  <div class="app-modal-head"><small>KELOLA BAHAN BAKU</small><h3 id="ingredientModalTitle">Tambah Bahan Baku</h3><p id="ingredientModalSubtitle">Lengkapi identitas dan harga bahan baku.</p></div>
+  <div class="app-modal-body">
+   <div class="field"><label for="ingredientNameInput">Nama bahan</label><input id="ingredientNameInput" type="text" maxlength="80" required placeholder="Contoh: Cabai"></div>
+   <div class="field"><label for="ingredientUnitInput">Satuan</label><input id="ingredientUnitInput" type="text" maxlength="20" required placeholder="gram, ml, pcs, kg"></div>
+   <div class="field"><label for="ingredientCostInput">Harga per satuan (Rp)</label><input id="ingredientCostInput" type="number" min="0" step="any" required inputmode="decimal" placeholder="0"></div>
+   <div id="ingredientNewStockFields">
+    <div class="field"><label for="ingredientInitialStockInput">Stok awal (opsional)</label><input id="ingredientInitialStockInput" type="number" min="0" step="any" value="0"></div>
+    <div class="field"><label for="ingredientMinStockInput">Batas minimum stok</label><input id="ingredientMinStockInput" type="number" min="0" step="any" value="0"></div>
+   </div>
+  </div>
+  <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelIngredient">Batal</button><button type="submit" class="modal-save" id="saveIngredientButton">Simpan Bahan</button></div>
+ </form>
+</div>
+
 <script>
 'use strict';
 const KEY='lalapanLegendaBusinessV3', OLD='lalapanLegendaHPP', VERSION=4, CLOUD_META_KEY='lalapanLegendaCloudMetaV1';
@@ -363,8 +395,59 @@ $('editMenuForm').addEventListener('submit',e=>{
 });
 function renderHPP(){$('menuList').innerHTML=db.menus.map(m=>`<div class="item"><div class="row"><div><h3>${esc(m.name)}</h3><span class="badge ${m.active===false?'gold':''}">${m.active===false?'Diarsipkan':'Aktif'}</span></div><b>${fmt(cost(m))}</b></div><div class="line"><span>Harga jual</span><b>${fmt(m.price)}</b></div><div class="line"><span>Margin sebelum operasional</span><b>${fmt(m.price-cost(m))}</b></div><p class="muted">${(m.recipe||[]).map(l=>{const i=ing(l[0]);return i?`${esc(i.name)} ${l[1]} ${esc(i.unit)}`:''}).filter(Boolean).join(' · ')||'Resep kosong'}</p><div class="actions"><button class="secondary smallbtn" data-action="recipe" data-id="${m.id}">Edit resep</button><button class="secondary smallbtn" data-action="menu" data-id="${m.id}">Edit menu</button><button class="warn smallbtn" data-action="archive" data-id="${m.id}">${m.active===false?'Aktifkan':'Arsipkan'}</button></div></div>`).join('');$('ingredientList').innerHTML=db.ingredients.map(i=>`<div class="line"><span><b>${esc(i.name)}</b><small class="muted">${esc(i.unit)} · stok ${n(i.stock)}</small></span><span><b>${fmt(i.cost)}/${esc(i.unit)}</b> <button class="secondary smallbtn" data-action="ingredient" data-id="${i.id}">Edit</button></span></div>`).join('');$('defaultOps').innerHTML=db.ops.map(o=>`<div class="field"><label>${esc(o.name)}</label><input type="number" min="0" data-op="${o.id}" value="${n(o.value)}"></div>`).join('')}
 $('menuList').addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const m=db.menus.find(x=>x.id===b.dataset.id);if(!m)return;if(b.dataset.action==='archive'){m.active=m.active===false;save();renderHPP()}if(b.dataset.action==='menu'){openMenuEditModal(m)}if(b.dataset.action==='recipe')editRecipe(m)});
-$('ingredientList').addEventListener('click',e=>{const b=e.target.closest('[data-action=ingredient]');if(!b)return;const i=ing(b.dataset.id);const name=prompt('Nama bahan',i.name);if(name===null)return;const unit=prompt('Satuan',i.unit);if(unit===null)return;const price=prompt('Harga per satuan (Rp)',i.cost);if(price===null)return;const p=n(price);if(p!==n(i.cost))db.priceHistory.push({id:uid(),ingredientId:i.id,name:i.name,date:today(),oldCost:n(i.cost),newCost:p});i.name=name.trim()||i.name;i.unit=unit.trim()||i.unit;i.cost=p;save();renderHPP()});$('defaultOps').addEventListener('change',e=>{const id=e.target.dataset.op;if(id){const o=db.ops.find(x=>x.id===id);o.value=n(e.target.value);save()}});
-$('addIngredient').onclick=()=>{const name=prompt('Nama bahan');if(!name?.trim())return;const unit=prompt('Satuan: gram, ml, pcs, potong, porsi','gram');if(!unit?.trim())return;const p=n(prompt('Harga per satuan (Rp)','0'));db.ingredients.push({id:uid(),name:name.trim(),unit:unit.trim(),cost:p,stock:0,minStock:0});save();renderHPP();renderInventory()};$('addMenu').onclick=()=>{const name=prompt('Nama menu');if(!name?.trim())return;const price=n(prompt('Harga jual standar (Rp)','25000'));db.menus.push({id:uid(),name:name.trim(),price,active:true,recipe:[],extra:0});save();renderHPP()};
+$('ingredientList').addEventListener('click',e=>{const b=e.target.closest('[data-action=ingredient]');if(!b)return;openIngredientModal('edit',b.dataset.id)});$('defaultOps').addEventListener('change',e=>{const id=e.target.dataset.op;if(id){const o=db.ops.find(x=>x.id===id);o.value=n(e.target.value);save()}});
+$('addIngredient').onclick=()=>openIngredientModal('add');
+let ingredientModalMode='add',editingIngredientId=null;
+function openIngredientModal(mode,id){
+ ingredientModalMode=mode;
+ editingIngredientId=id||null;
+ const item=mode==='edit'?ing(id):null;
+ if(mode==='edit'&&!item)return;
+ $('ingredientModalTitle').textContent=mode==='edit'?'Edit Bahan Baku':'Tambah Bahan Baku';
+ $('ingredientModalSubtitle').textContent=mode==='edit'?'Perbarui nama, satuan, atau harga bahan baku.':'Lengkapi identitas, harga, dan stok awal bahan baku.';
+ $('saveIngredientButton').textContent=mode==='edit'?'Simpan Perubahan':'Simpan Bahan';
+ $('ingredientNameInput').value=item?.name||'';
+ $('ingredientUnitInput').value=item?.unit||'gram';
+ $('ingredientCostInput').value=n(item?.cost);
+ $('ingredientInitialStockInput').value=0;
+ $('ingredientMinStockInput').value=0;
+ $('ingredientNewStockFields').style.display=mode==='edit'?'none':'block';
+ $('ingredientModal').classList.add('open');
+}
+function closeIngredientModal(){
+ $('ingredientModal').classList.remove('open');
+ editingIngredientId=null;
+}
+$('cancelIngredient').addEventListener('click',closeIngredientModal);
+$('ingredientModal').addEventListener('click',e=>{if(e.target===$('ingredientModal'))closeIngredientModal()});
+$('ingredientForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const name=$('ingredientNameInput').value.trim();
+ const unit=$('ingredientUnitInput').value.trim();
+ const price=Number($('ingredientCostInput').value);
+ if(!name){$('ingredientNameInput').focus();return}
+ if(!unit){$('ingredientUnitInput').focus();return}
+ if(!Number.isFinite(price)||price<0){$('ingredientCostInput').focus();return}
+ if(ingredientModalMode==='edit'){
+  const item=ing(editingIngredientId);
+  if(!item)return closeIngredientModal();
+  if(price!==n(item.cost))db.priceHistory.push({id:uid(),ingredientId:item.id,name:item.name,date:today(),oldCost:n(item.cost),newCost:price});
+  item.name=name;
+  item.unit=unit;
+  item.cost=price;
+ }else{
+  const initial=Number($('ingredientInitialStockInput').value),minimum=Number($('ingredientMinStockInput').value);
+  if(!Number.isFinite(initial)||initial<0||!Number.isFinite(minimum)||minimum<0)return;
+  const item={id:uid(),name,unit,cost:price,stock:initial,minStock:minimum};
+  db.ingredients.push(item);
+  if(initial>0)db.stockMoves.push({id:uid(),date:today(),ingredientId:item.id,name:item.name,qty:initial,unit:item.unit,source:'initial',note:'Stok awal bahan baku'});
+ }
+ save();
+ closeIngredientModal();
+ renderHPP();
+ renderInventory();
+});
+$('addMenu').onclick=()=>{const name=prompt('Nama menu');if(!name?.trim())return;const price=n(prompt('Harga jual standar (Rp)','25000'));db.menus.push({id:uid(),name:name.trim(),price,active:true,recipe:[],extra:0});save();renderHPP()};
 
 let editingRecipeMenuId=null,recipeDraft=[],recipeExtraDraft=0;
 function renderRecipeRows(){
@@ -427,8 +510,58 @@ $('editRecipeForm').addEventListener('submit',e=>{
 function renderSales(){const date=$('saleDate').value||today(),old=db.records[date];$('dailyOps').innerHTML=db.ops.map(o=>`<div class="field"><label>${esc(o.name)}</label><input class="daily-op" data-id="${o.id}" type="number" min="0" value="${old?.ops?.[o.id]??o.value}"></div>`).join('');$('dailyExtra').value=old?.dailyExtra||0;$('salesInputs').innerHTML=activeMenus().map(m=>{const saved=recItems(old||{}).find(x=>x.id===m.id);return `<div class="item"><div class="row"><b>${esc(m.name)}</b><span class="badge">HPP ${fmt(cost(m))}</span></div><div class="grid"><div><label>Jumlah terjual</label><input class="sale-qty" data-id="${m.id}" type="number" min="0" step="1" value="${saved?.qty||0}"></div><div><label>Harga jual / porsi</label><input class="sale-price" data-id="${m.id}" type="number" min="0" value="${saved?.price??m.price}"></div></div></div>`}).join('')||'<div class="empty">Belum ada menu aktif.</div>';document.querySelectorAll('#sales input').forEach(x=>x.addEventListener('input',previewSale));previewSale()}
 $('saleDate').addEventListener('change',renderSales);function saleItems(){return activeMenus().map(m=>({id:m.id,name:m.name,qty:n(document.querySelector(`.sale-qty[data-id="${m.id}"]`)?.value),price:n(document.querySelector(`.sale-price[data-id="${m.id}"]`)?.value??m.price),hpp:cost(m),recipeSnapshot:(m.recipe||[]).map(l=>{const i=ing(l[0]);return {ingredientId:l[0],name:i?.name||l[0],unit:i?.unit||'',qty:n(l[1]),unitCost:n(i?.cost),lineCost:n(i?.cost)*n(l[1])}})}))}function saleOps(){const o={};document.querySelectorAll('.daily-op').forEach(x=>o[x.dataset.id]=n(x.value));return o}function previewSale(){if(!$('salePreview'))return;const items=saleItems(),portions=items.reduce((s,x)=>s+x.qty,0),rev=items.reduce((s,x)=>s+x.qty*x.price,0),hpp=items.reduce((s,x)=>s+x.qty*x.hpp,0),ops=totalOps(saleOps())+n($('dailyExtra').value);$('salePreview').innerHTML=`<div class="line"><span>Total porsi</span><b>${portions}</b></div><div class="line"><span>Omzet</span><b>${fmt(rev)}</b></div><div class="line"><span>HPP resep</span><b>${fmt(hpp)}</b></div><div class="line"><span>Operasional + biaya tambahan</span><b>${fmt(ops)}</b></div><div class="line"><b>Estimasi laba bersih</b><b>${fmt(rev-hpp-ops)}</b></div><p class="muted">Alokasi operasional rata-rata: ${portions?fmt(ops/portions):fmt(0)} per porsi.</p>`}
 document.addEventListener('input',e=>{if(e.target.closest('#sales'))previewSale()});$('saveSale').onclick=()=>{const date=$('saleDate').value;if(!date)return alert('Pilih tanggal.');const items=saleItems().filter(x=>x.qty>0);if(!items.length)return alert('Masukkan minimal satu menu terjual.');if(db.records[date]&&!confirm('Tanggal ini sudah memiliki transaksi. Ganti transaksi tersimpan dengan data form sekarang?'))return;const portions=items.reduce((s,x)=>s+x.qty,0),revenue=items.reduce((s,x)=>s+x.qty*x.price,0),recipeCost=items.reduce((s,x)=>s+x.qty*x.hpp,0),ops=saleOps(),opsTotal=totalOps(ops),dailyExtra=n($('dailyExtra').value),profit=revenue-recipeCost-opsTotal-dailyExtra;const previous=db.records[date];const record={date,items:items.map(x=>({...x,profitBeforeOps:x.qty*(x.price-x.hpp)})),portions,revenue,recipeCost,ops,opsTotal,dailyExtra,profit,createdAt:previous?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString(),snapshotVersion:2};db.records[date]=record;const oldMoves=db.stockMoves.filter(x=>x.source==='sale'&&x.date===date);db.stockMoves=db.stockMoves.filter(x=>!(x.source==='sale'&&x.date===date));const oldDeductions={};oldMoves.forEach(x=>oldDeductions[x.ingredientId]=(oldDeductions[x.ingredientId]||0)-x.qty);Object.entries(oldDeductions).forEach(([id,v])=>{const i=ing(id);if(i)i.stock=n(i.stock)-v});items.forEach(item=>item.recipeSnapshot.forEach(line=>{const q=line.qty*item.qty,i=ing(line.ingredientId);if(i){i.stock=n(i.stock)-q;db.stockMoves.push({id:uid(),date,ingredientId:i.id,name:i.name,qty:-q,unit:i.unit,source:'sale',note:`Penjualan ${item.name} (${item.qty} porsi)`})}}));save();$('saleStatus').textContent='Transaksi tersimpan. Snapshot HPP dan mutasi stok tercatat.';renderSales();renderDashboard()};$('clearSale').onclick=()=>{document.querySelectorAll('.sale-qty').forEach(x=>x.value=0);$('dailyExtra').value=0;previewSale()};
-function renderInventory(){$('stockList').innerHTML=`<div class="tablewrap"><table><thead><tr><th>Bahan</th><th>Stok saat ini</th><th>Minimum</th><th>Nilai stok*</th><th></th></tr></thead><tbody>${db.ingredients.map(i=>`<tr><td>${esc(i.name)}<small class="muted">${esc(i.unit)}</small></td><td>${n(i.stock)}</td><td>${n(i.minStock)}</td><td>${fmt(n(i.stock)*n(i.cost))}</td><td><button class="secondary smallbtn" data-stock="${i.id}">Atur</button></td></tr>`).join('')}</tbody></table></div><p class="muted">*Nilai estimasi berdasarkan harga bahan saat ini, bukan nilai historis.</p>`;$('stockHistory').innerHTML=db.stockMoves.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,60).map(x=>`<div class="line"><span>${esc(x.date)} · ${esc(x.name)}<small class="muted">${esc(x.note||x.source)}</small></span><b class="${x.qty<0?'bad':'good'}">${x.qty>0?'+':''}${x.qty} ${esc(x.unit)}</b></div>`).join('')||'<div class="empty">Belum ada mutasi stok.</div>'}
-$('stockList').addEventListener('click',e=>{const b=e.target.closest('[data-stock]');if(!b)return;const i=ing(b.dataset.stock),v=prompt(`Stok fisik ${i.name} (${i.unit})`,i.stock);if(v===null)return;const min=prompt('Batas minimum stok',i.minStock);if(min===null)return;const next=n(v),delta=next-n(i.stock);i.stock=next;i.minStock=n(min);if(delta)db.stockMoves.push({id:uid(),date:today(),ingredientId:i.id,name:i.name,qty:delta,unit:i.unit,source:'adjustment',note:'Koreksi stok manual'});save();renderInventory();renderDashboard()});$('stockAdjust').onclick=()=>{const i=db.ingredients[0];if(!i)return;const list=db.ingredients.map((x,k)=>`${k+1}. ${x.name} (${x.unit})`).join('\n'),ix=Number(prompt(list+'\nPilih nomor bahan'));const item=db.ingredients[ix-1];if(!item)return;const v=prompt(`Stok fisik ${item.name}`,item.stock);if(v===null)return;const min=prompt('Batas minimum stok',item.minStock);if(min===null)return;const delta=n(v)-n(item.stock);item.stock=n(v);item.minStock=n(min);if(delta)db.stockMoves.push({id:uid(),date:today(),ingredientId:item.id,name:item.name,qty:delta,unit:item.unit,source:'adjustment',note:'Koreksi stok manual'});save();renderInventory();renderDashboard()};
+
+let editingStockIngredientId=null;
+function populateStockIngredientSelect(selectedId){
+ $('stockIngredientSelect').innerHTML=db.ingredients.map(i=>`<option value="${esc(i.id)}">${esc(i.name)} (${esc(i.unit)})</option>`).join('');
+ if(selectedId&&db.ingredients.some(i=>i.id===selectedId))$('stockIngredientSelect').value=selectedId;
+}
+function updateStockCorrectionFields(){
+ const item=ing($('stockIngredientSelect').value);
+ if(!item)return;
+ editingStockIngredientId=item.id;
+ $('stockCurrentDisplay').value=`${n(item.stock)} ${item.unit}`;
+ $('stockPhysicalInput').value=n(item.stock);
+ $('stockMinimumInput').value=n(item.minStock);
+}
+function openStockCorrectionModal(selectedId){
+ populateStockIngredientSelect(selectedId||db.ingredients[0]?.id);
+ updateStockCorrectionFields();
+ $('stockCorrectionNote').value='';
+ $('stockCorrectionModal').classList.add('open');
+}
+function closeStockCorrectionModal(){
+ $('stockCorrectionModal').classList.remove('open');
+ editingStockIngredientId=null;
+}
+$('stockIngredientSelect').addEventListener('change',updateStockCorrectionFields);
+$('cancelStockCorrection').addEventListener('click',closeStockCorrectionModal);
+$('stockCorrectionModal').addEventListener('click',e=>{if(e.target===$('stockCorrectionModal'))closeStockCorrectionModal()});
+$('stockCorrectionForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const item=ing(editingStockIngredientId);
+ if(!item)return closeStockCorrectionModal();
+ const physical=Number($('stockPhysicalInput').value),minimum=Number($('stockMinimumInput').value);
+ if(!Number.isFinite(physical)||physical<0||!Number.isFinite(minimum)||minimum<0)return;
+ const delta=physical-n(item.stock),note=$('stockCorrectionNote').value.trim()||'Koreksi stok manual';
+ item.stock=physical;
+ item.minStock=minimum;
+ if(delta)db.stockMoves.push({id:uid(),date:today(),ingredientId:item.id,name:item.name,qty:delta,unit:item.unit,source:'adjustment',note});
+ save();
+ closeStockCorrectionModal();
+ renderInventory();
+ renderDashboard();
+});
+function renderInventory(){
+ $('stockList').innerHTML=`<div class="tablewrap"><table><thead><tr><th>Bahan</th><th>Stok saat ini</th><th>Minimum</th><th>Nilai stok*</th><th></th></tr></thead><tbody>${db.ingredients.map(i=>`<tr><td>${esc(i.name)}<small class="muted">${esc(i.unit)}</small></td><td>${n(i.stock)}</td><td>${n(i.minStock)}</td><td>${fmt(n(i.stock)*n(i.cost))}</td><td><button class="secondary smallbtn" data-stock="${esc(i.id)}">Atur</button></td></tr>`).join('')}</tbody></table></div><p class="muted">*Nilai estimasi berdasarkan harga bahan saat ini, bukan nilai historis.</p>`;
+ $('stockHistory').innerHTML=db.stockMoves.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,60).map(x=>`<div class="line"><span>${esc(x.date)} · ${esc(x.name)}<small class="muted">${esc(x.note||x.source)}</small></span><b class="${x.qty<0?'bad':'good'}">${x.qty>0?'+':''}${x.qty} ${esc(x.unit)}</b></div>`).join('')||'<div class="empty">Belum ada mutasi stok.</div>';
+}
+$('stockList').addEventListener('click',e=>{
+ const button=e.target.closest('[data-stock]');
+ if(!button)return;
+ openStockCorrectionModal(button.dataset.stock);
+});
+$('stockAdjust').onclick=()=>openStockCorrectionModal(db.ingredients[0]?.id);
 function renderPurchases(){ $('purchaseIngredient').innerHTML=db.ingredients.map(i=>`<option value="${i.id}">${esc(i.name)} (${esc(i.unit)})</option>`).join('');$('purchaseList').innerHTML=db.purchases.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(p=>`<div class="line"><span>${esc(p.date)} · ${esc(p.name)}<small class="muted">${p.qty} ${esc(p.unit)} · ${esc(p.supplier||'Tanpa pemasok')}</small></span><b>${fmt(p.total)}</b></div>`).join('')||'<div class="empty">Belum ada pembelian.</div>'}
 $('savePurchase').onclick=()=>{const i=ing($('purchaseIngredient').value),qty=n($('purchaseQty').value),total=n($('purchaseTotal').value),date=$('purchaseDate').value;if(!i||!qty||!date||!total)return alert('Lengkapi tanggal, bahan, jumlah, dan total harga.');const unitCost=total/qty;db.purchases.push({id:uid(),date,ingredientId:i.id,name:i.name,qty,unit:i.unit,total,unitCost,supplier:$('purchaseSupplier').value,note:$('purchaseNote').value});i.stock=n(i.stock)+qty;if(unitCost!==n(i.cost)){db.priceHistory.push({id:uid(),ingredientId:i.id,name:i.name,date,oldCost:n(i.cost),newCost:unitCost,source:'purchase'});i.cost=unitCost}db.stockMoves.push({id:uid(),date,ingredientId:i.id,name:i.name,qty,unit:i.unit,source:'purchase',note:`Pembelian ${$('purchaseSupplier').value||''}`});save();$('purchaseQty').value='';$('purchaseTotal').value='';$('purchaseNote').value='';renderPurchases();renderInventory();renderHPP();renderDashboard();alert('Pembelian tersimpan, stok bertambah, dan harga bahan diperbarui.')};
 function renderExpenses(){$('expenseList').innerHTML=db.expenses.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<div class="line"><span>${esc(x.date)} · ${esc(x.category)}<small class="muted">${esc(x.note||'')}</small></span><b>${fmt(x.amount)}</b></div>`).join('')||'<div class="empty">Belum ada pengeluaran tambahan.</div>'}
