@@ -1,0 +1,16 @@
+{
+  "id": "./",
+  "name": "Lalapan Legenda - Manajemen Usaha",
+  "short_name": "Lalapan Legenda",
+  "description": "Sistem manajemen usaha, HPP, stok, penjualan, pembelian, dan laporan Lalapan Legenda.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f3f5f2",
+  "theme_color": "#173f35",
+  "lang": "id",
+  "icons": [
+    { "src": "icons/icon.jpeg", "sizes": "1024x1024", "type": "image/jpeg", "purpose": "any" }
+  ]
+}
