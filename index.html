@@ -1,0 +1,379 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173f35">
+  <meta name="description" content="Kalkulator HPP dan keuntungan Lalapan Legenda">
+  <title>Kalkulator HPP - Lalapan Legenda</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      --green:#173f35;
+      --green2:#245c4b;
+      --bg:#f3f5f2;
+      --card:#fff;
+      --text:#202923;
+      --muted:#718078;
+      --line:#e3e9e4;
+      --red:#b43b32;
+    }
+    * { box-sizing:border-box }
+    body {
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:Arial,Helvetica,sans-serif;
+    }
+    header {
+      background:var(--green); color:white;
+      padding:26px 18px 30px;
+    }
+    .head { max-width:1000px; margin:auto }
+    header h1 { margin:0 0 7px; font-size:25px }
+    header p { margin:0; opacity:.8; font-size:13px }
+    main { max-width:1000px; margin:20px auto; padding:0 14px 35px }
+    .grid {
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:15px; align-items:start;
+    }
+    .card {
+      background:var(--card); border:1px solid var(--line);
+      border-radius:13px; padding:17px; margin-bottom:15px;
+    }
+    h2 { font-size:16px; margin:0 0 15px }
+    .field {
+      display:grid; grid-template-columns:minmax(0,1fr) 125px;
+      gap:10px; align-items:center; padding:9px 0;
+      border-bottom:1px solid var(--line);
+    }
+    .field:last-child { border-bottom:0 }
+    .field label { font-size:13px; font-weight:600 }
+    .field small {
+      display:block; color:var(--muted); font-size:11px;
+      font-weight:400; margin-top:4px; line-height:1.4;
+    }
+    input {
+      width:100%; min-width:0; border:1px solid #d7dfd9;
+      border-radius:8px; padding:9px 8px; font-size:14px;
+      color:var(--text); background:#fff;
+    }
+    input:focus { outline:2px solid #9ac6b2; border-color:var(--green2) }
+    .unit { display:flex; gap:5px; align-items:center }
+    .unit span { color:var(--muted); font-size:11px; white-space:nowrap }
+    .result {
+      background:var(--green); color:white; border-radius:13px;
+      padding:20px; margin-bottom:15px;
+    }
+    .result .eyebrow { opacity:.75; font-size:12px }
+    .big { font-size:30px; font-weight:700; margin:5px 0 17px }
+    .stats {
+      display:grid; grid-template-columns:1fr 1fr; gap:12px;
+    }
+    .stat {
+      background:#ffffff17; border-radius:9px; padding:12px;
+    }
+    .stat small { display:block; opacity:.75; font-size:11px; margin-bottom:5px }
+    .stat strong { font-size:17px }
+    .summary-row {
+      display:flex; justify-content:space-between; gap:10px;
+      padding:9px 0; border-bottom:1px solid var(--line); font-size:13px;
+    }
+    .summary-row:last-child { border:0 }
+    .summary-row strong { text-align:right }
+    .note { color:var(--muted); font-size:11px; line-height:1.5 }
+    .actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px }
+    button {
+      border:0; border-radius:8px; padding:10px 13px;
+      font-weight:700; cursor:pointer; font-size:12px;
+    }
+    .primary { background:var(--green2); color:white }
+    .secondary { background:#e9efeb; color:var(--green) }
+    .danger { background:#faeae8; color:var(--red) }
+    .status { font-size:11px; color:var(--muted); margin-top:10px }
+    @media(max-width:700px) {
+      .grid { grid-template-columns:1fr }
+      header h1 { font-size:22px }
+      main { margin-top:14px }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="head">
+    <h1>LALAPAN LEGENDA</h1>
+    <p>Kalkulator HPP · Harga Pokok Penjualan · Kontrol Keuntungan</p>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+    <section>
+      <div class="card">
+        <h2>1. Harga bahan baku</h2>
+        <div id="prices"></div>
+      </div>
+
+      <div class="card">
+        <h2>2. Takaran bahan per porsi</h2>
+        <div id="quantities"></div>
+        <p class="note">Takaran sambal, sayuran, minyak, dan bahan tambahan di bawah merupakan estimasi awal. Sesuaikan dengan pemakaian nyata saat memasak.</p>
+      </div>
+
+      <div class="card">
+        <h2>3. Biaya operasional</h2>
+        <div id="operations"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="result">
+        <div class="eyebrow">TOTAL HPP PER PORSI</div>
+        <div class="big" id="hpp">Rp0</div>
+        <div class="stats">
+          <div class="stat">
+            <small>Keuntungan per porsi</small>
+            <strong id="profit">Rp0</strong>
+          </div>
+          <div class="stat">
+            <small>Margin keuntungan</small>
+            <strong id="margin">0%</strong>
+          </div>
+          <div class="stat">
+            <small>Harga jual</small>
+            <strong id="sellingDisplay">Rp20.000</strong>
+          </div>
+          <div class="stat">
+            <small>Target keuntungan harian</small>
+            <strong id="dailyProfit">Rp0</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>4. Pengaturan penjualan</h2>
+        <div class="field">
+          <label for="sellingPrice">Harga jual per porsi</label>
+          <div class="unit"><input id="sellingPrice" type="number" min="0" step="500"><span>Rp</span></div>
+        </div>
+        <div class="field">
+          <label for="targetPortions">Target penjualan harian</label>
+          <div class="unit"><input id="targetPortions" type="number" min="1" step="1"><span>porsi</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>5. Rincian HPP per porsi</h2>
+        <div id="breakdown"></div>
+        <div class="summary-row">
+          <strong>Total HPP</strong><strong id="totalBreakdown">Rp0</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>6. Simulasi usaha harian</h2>
+        <div class="summary-row"><span>Omzet harian</span><strong id="dailyRevenue">Rp0</strong></div>
+        <div class="summary-row"><span>Total biaya HPP harian</span><strong id="dailyCost">Rp0</strong></div>
+        <div class="summary-row"><span>Estimasi laba harian</span><strong id="dailyNet">Rp0</strong></div>
+        <p class="note">Simulasi menggunakan target porsi yang Anda masukkan. Laba belum memperhitungkan pajak atau biaya tak terduga yang belum dicatat.</p>
+      </div>
+
+      <div class="card">
+        <h2>Pengelolaan data</h2>
+        <div class="actions">
+          <button class="secondary" id="resetBtn">Kembalikan data awal</button>
+          <button class="primary" id="printBtn">Cetak rincian</button>
+        </div>
+        <div class="status" id="saveStatus">Data tersimpan otomatis di perangkat ini.</div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+const defaults = {
+  prices: {
+    chicken:60000, chickenPieces:8,
+    paru:58000, rice10kg:200000, riceYield:2.4,
+    chili:70000, tomato:25000, redOnion:45000,
+    garlic:45000, basil:5000, cucumber:20000,
+    tofu20:8000, eggplant:25000, oil2L:47000,
+    plastic100:53000, mica25:31000
+  },
+  qty: {
+    chicken:1, paru:107, rice:180,
+    chili:15, tomato:10, redOnion:5, garlic:5,
+    basil:0, cucumber:50, tofu:0, eggplant:0,
+    oil:50, seasoning:500, gas:500,
+    plastic:1, mica:0
+  },
+  ops: { electricity:0, water:0, labor:0, rent:0, transport:0, other:0 },
+  sellingPrice:20000,
+  targetPortions:30
+};
+
+let data;
+try {
+  data = JSON.parse(localStorage.getItem("lalapanLegendaHPP")) || structuredClone(defaults);
+} catch(e) {
+  data = JSON.parse(JSON.stringify(defaults));
+}
+
+const priceFields = [
+  ["chicken","Ayam 1 ekor","Rp/ekor"],
+  ["chickenPieces","Jumlah potongan ayam per ekor","potong"],
+  ["paru","Paru 1 kg","Rp/kg"],
+  ["rice10kg","Beras 10 kg","Rp/10 kg"],
+  ["riceYield","Hasil nasi matang dari 1 kg beras","kg matang"],
+  ["chili","Cabai/lombok 1 kg","Rp/kg"],
+  ["tomato","Tomat 1 kg","Rp/kg"],
+  ["redOnion","Bawang merah 1 kg","Rp/kg"],
+  ["garlic","Bawang putih 1 kg","Rp/kg"],
+  ["basil","Kemangi 1 ikat","Rp/ikat"],
+  ["cucumber","Timun 1 kg","Rp/kg"],
+  ["tofu20","Tahu 20 potong","Rp/20 pcs"],
+  ["eggplant","Terong 1 kg","Rp/kg"],
+  ["oil2L","Minyak goreng 2 liter","Rp/2 liter"],
+  ["plastic100","Plastik box 100 pcs","Rp/100 pcs"],
+  ["mica25","Mika 25 pcs","Rp/25 pcs"]
+];
+
+const qtyFields = [
+  ["chicken","Ayam per porsi","potong"],
+  ["paru","Paru per porsi","gram"],
+  ["rice","Nasi matang per porsi","gram"],
+  ["chili","Cabai untuk sambal","gram"],
+  ["tomato","Tomat untuk sambal","gram"],
+  ["redOnion","Bawang merah","gram"],
+  ["garlic","Bawang putih","gram"],
+  ["basil","Kemangi","ikat"],
+  ["cucumber","Timun","gram"],
+  ["tofu","Tahu","potong"],
+  ["eggplant","Terong","gram"],
+  ["oil","Minyak terpakai","ml"],
+  ["seasoning","Bumbu dasar lainnya","Rp"],
+  ["gas","Gas per porsi","Rp"],
+  ["plastic","Kemasan plastik box","pcs"],
+  ["mica","Kemasan mika","pcs"]
+];
+
+const opFields = [
+  ["electricity","Listrik harian","Rp/hari"],
+  ["water","Air harian","Rp/hari"],
+  ["labor","Tenaga kerja harian","Rp/hari"],
+  ["rent","Sewa tempat harian","Rp/hari"],
+  ["transport","Transportasi harian","Rp/hari"],
+  ["other","Biaya lain-lain harian","Rp/hari"]
+];
+
+const rupiah = n => "Rp" + Math.round(n || 0).toLocaleString("id-ID");
+const number = n => Number(n) || 0;
+
+function makeFields(target, fields, group, suffix) {
+  target.innerHTML = fields.map(([key,label,unit]) => `
+    <div class="field">
+      <label for="${group}-${key}">${label}</label>
+      <div class="unit">
+        <input id="${group}-${key}" type="number" min="0" step="any"
+          value="${data[group][key] ?? 0}" data-group="${group}" data-key="${key}">
+        <span>${unit}</span>
+      </div>
+    </div>`).join("");
+}
+
+function calculate() {
+  const p=data.prices, q=data.qty, o=data.ops;
+  const portions=Math.max(1,number(data.targetPortions));
+
+  const costs = {
+    Ayam: q.chicken * (p.chicken / Math.max(1,p.chickenPieces)),
+    Paru: q.paru * p.paru / 1000,
+    Nasi: q.rice * (p.rice10kg / 10 / 1000 / Math.max(.01,p.riceYield)),
+    Cabai: q.chili * p.chili / 1000,
+    Tomat: q.tomato * p.tomato / 1000,
+    "Bawang merah": q.redOnion * p.redOnion / 1000,
+    "Bawang putih": q.garlic * p.garlic / 1000,
+    Kemangi: q.basil * p.basil,
+    Timun: q.cucumber * p.cucumber / 1000,
+    Tahu: q.tofu * p.tofu20 / 20,
+    Terong: q.eggplant * p.eggplant / 1000,
+    Minyak: q.oil * p.oil2L / 2000,
+    "Bumbu dasar": q.seasoning,
+    Gas: q.gas,
+    "Plastik box": q.plastic * p.plastic100 / 100,
+    Mika: q.mica * p.mica25 / 25
+  };
+
+  const dailyOps=Object.values(o).reduce((a,b)=>a+number(b),0);
+  const opsPerPortion=dailyOps/portions;
+  const rawCost=Object.values(costs).reduce((a,b)=>a+b,0);
+  const hpp=rawCost+opsPerPortion;
+  const selling=number(data.sellingPrice);
+  const profit=selling-hpp;
+  const margin=selling>0 ? profit/selling*100 : 0;
+  const dailyRevenue=selling*portions;
+  const dailyCost=hpp*portions;
+  const dailyNet=dailyRevenue-dailyCost;
+
+  document.getElementById("hpp").textContent=rupiah(hpp);
+  document.getElementById("profit").textContent=rupiah(profit);
+  document.getElementById("margin").textContent=margin.toFixed(1)+"%";
+  document.getElementById("sellingDisplay").textContent=rupiah(selling);
+  document.getElementById("dailyProfit").textContent=rupiah(dailyNet);
+  document.getElementById("dailyRevenue").textContent=rupiah(dailyRevenue);
+  document.getElementById("dailyCost").textContent=rupiah(dailyCost);
+  document.getElementById("dailyNet").textContent=rupiah(dailyNet);
+  document.getElementById("totalBreakdown").textContent=rupiah(hpp);
+
+  const rows=Object.entries(costs).filter(([,v])=>v>0)
+    .map(([k,v])=>`<div class="summary-row"><span>${k}</span><strong>${rupiah(v)}</strong></div>`);
+  rows.push(`<div class="summary-row"><span>Operasional harian / porsi</span><strong>${rupiah(opsPerPortion)}</strong></div>`);
+  document.getElementById("breakdown").innerHTML=rows.join("");
+
+  document.getElementById("profit").style.color=profit<0 ? "#ffb6ae" : "#d6f4df";
+  document.getElementById("dailyNet").style.color=dailyNet<0 ? "var(--red)" : "var(--green)";
+}
+
+function save() {
+  localStorage.setItem("lalapanLegendaHPP",JSON.stringify(data));
+  document.getElementById("saveStatus").textContent="Tersimpan otomatis pada perangkat ini.";
+  calculate();
+}
+
+makeFields(document.getElementById("prices"),priceFields,"prices");
+makeFields(document.getElementById("quantities"),qtyFields,"qty");
+makeFields(document.getElementById("operations"),opFields,"ops");
+
+document.addEventListener("input",e=>{
+  const el=e.target;
+  if(el.dataset.group) {
+    data[el.dataset.group][el.dataset.key]=number(el.value);
+    save();
+  }
+  if(el.id==="sellingPrice") { data.sellingPrice=number(el.value); save(); }
+  if(el.id==="targetPortions") { data.targetPortions=Math.max(1,number(el.value)); save(); }
+});
+
+document.getElementById("sellingPrice").value=data.sellingPrice;
+document.getElementById("targetPortions").value=data.targetPortions;
+
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  if(!confirm("Kembalikan semua harga dan takaran ke data awal?")) return;
+  data=JSON.parse(JSON.stringify(defaults));
+  localStorage.setItem("lalapanLegendaHPP",JSON.stringify(data));
+  location.reload();
+});
+
+document.getElementById("printBtn").addEventListener("click",()=>window.print());
+
+calculate();
+
+// Service worker akan aktif setelah file service-worker.js ditambahkan.
+if("serviceWorker" in navigator) {
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
