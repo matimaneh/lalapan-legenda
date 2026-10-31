@@ -1,4 +1,4 @@
-const CACHE_NAME = "lalapan-legenda-v5-7-sales-ui";
+const CACHE_NAME = "lalapan-legenda-v5-9-reports";
 const APP_FILES = ["./", "./index.html", "./manifest.json", "./icons/icon.jpeg"];
 self.addEventListener("install", event => {event.waitUntil((async()=>{const cache=await caches.open(CACHE_NAME);for(const file of APP_FILES){try{await cache.add(file)}catch(e){console.warn("Cache gagal:",file,e)}}await self.skipWaiting()})())});
 self.addEventListener("activate", event => {event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith("lalapan-legenda-")&&k!==CACHE_NAME).map(k=>caches.delete(k)));await self.clients.claim()})())});
