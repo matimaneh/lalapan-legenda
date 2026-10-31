@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "lalapan-legenda-v1";
+const CACHE_NAME = "lalapan-legenda-v2";
 
 const APP_FILES = [
   "./",
