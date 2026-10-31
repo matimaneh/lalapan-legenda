@@ -188,8 +188,8 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
 <section id="sales" class="page"><div class="card"><h2>Catat penjualan harian</h2><div class="field"><label>Tanggal penjualan</label><input id="saleDate" type="date"></div><p class="muted">Transaksi per tanggal disimpan sebagai snapshot. Menyimpan ulang tanggal yang sudah ada akan mengganti transaksi tanggal tersebut setelah konfirmasi.</p><div id="salesInputs"></div></div><div class="card"><h2>Biaya operasional hari ini</h2><div id="dailyOps"></div><div class="field"><label>Biaya tambahan hari ini</label><input id="dailyExtra" type="number" min="0" value="0"></div></div><div class="card"><h2>Pratinjau transaksi</h2><div id="salePreview"></div><div class="actions"><button class="primary" id="saveSale">Simpan penjualan</button><button class="secondary" id="clearSale">Kosongkan form</button></div><p class="muted" id="saleStatus">Belum disimpan.</p></div></section>
 <section id="hpp" class="page"><div class="card"><div class="row"><h2>Menu dan HPP</h2><button class="primary" id="addMenu">+ Tambah menu</button></div><div id="menuList"></div></div><div class="card"><div class="row"><h2>Bahan baku</h2><button class="primary" id="addIngredient">+ Tambah bahan</button></div><div id="ingredientList"></div></div><div class="card"><h2>Biaya operasional default harian</h2><div id="defaultOps"></div></div></section>
 <section id="inventory" class="page"><div class="card"><div class="row"><h2>Persediaan bahan</h2><button class="primary" id="stockAdjust">+ Koreksi stok</button></div><div class="notice">Stok awal belum tersedia dalam backup lama. Masukkan stok awal melalui koreksi stok. Penjualan baru akan mengurangi stok berdasarkan resep yang tercatat.</div><div id="stockList"></div></div><div class="card"><h2>Riwayat mutasi stok</h2><div id="stockHistory"></div></div></section>
-<section id="purchases" class="page"><div class="card"><h2>Catat pembelian bahan</h2><div class="field"><label>Tanggal pembelian</label><input id="purchaseDate" type="date"></div><div class="field"><label>Bahan</label><select id="purchaseIngredient"></select></div><div class="field"><label>Jumlah dibeli <small>Mengikuti satuan bahan</small></label><input id="purchaseQty" type="number" min="0" step="any"></div><div class="field"><label>Harga total pembelian (Rp)</label><input id="purchaseTotal" type="number" min="0"></div><div class="field"><label>Pemasok / toko</label><input id="purchaseSupplier" placeholder="Opsional"></div><div class="field"><label>Catatan</label><input id="purchaseNote" placeholder="Opsional"></div><div class="actions"><button class="primary" id="savePurchase">Simpan pembelian</button></div></div><div class="card"><h2>Riwayat pembelian</h2><div id="purchaseList"></div></div></section>
-<section id="expenses" class="page"><div class="card"><h2>Catat pengeluaran</h2><div class="field"><label>Tanggal</label><input id="expenseDate" type="date"></div><div class="field"><label>Kategori</label><select id="expenseCategory"><option>Bahan baku</option><option>Gas</option><option>Listrik</option><option>Air</option><option>Tenaga kerja</option><option>Sewa tempat</option><option>Transportasi</option><option>Peralatan</option><option>Lainnya</option></select></div><div class="field"><label>Nominal (Rp)</label><input id="expenseAmount" type="number" min="0"></div><div class="field"><label>Keterangan</label><input id="expenseNote" placeholder="Contoh: beli plastik tambahan"></div><div class="actions"><button class="primary" id="saveExpense">Simpan pengeluaran</button></div></div><div class="card"><h2>Riwayat pengeluaran</h2><div id="expenseList"></div></div></section>
+<section id="purchases" class="page"><div class="card"><div class="row" style="align-items:center;justify-content:space-between"><div><h2>Pembelian bahan</h2><p class="muted">Catat pembelian untuk menambah stok dan memperbarui harga bahan.</p></div><button class="primary" id="openPurchaseModal">+ Catat pembelian</button></div></div><div class="card"><h2>Riwayat pembelian</h2><div id="purchaseList"></div></div></section>
+<section id="expenses" class="page"><div class="card"><div class="row" style="align-items:center;justify-content:space-between"><div><h2>Pengeluaran tambahan</h2><p class="muted">Catat biaya di luar biaya operasional penjualan.</p></div><button class="primary" id="openExpenseModal">+ Catat pengeluaran</button></div></div><div class="card"><h2>Riwayat pengeluaran</h2><div id="expenseList"></div></div></section>
 <section id="reports" class="page"><div class="card"><h2>Laporan laba rugi</h2><div class="field"><label>Bulan laporan</label><input type="month" id="reportMonth"></div><div id="reportSummary"></div><div class="actions"><button class="secondary" id="printReport">Cetak / Simpan PDF</button><button class="secondary" id="csvReport">Ekspor CSV</button></div></div><div class="card"><h2>Analisis menu</h2><div id="menuAnalysis"></div></div><div class="card"><h2>Riwayat harga bahan</h2><div id="priceHistory"></div></div></section>
 <section id="calendar" class="page"><div class="card"><h2>Kalender penjualan</h2><div class="field"><label>Pilih bulan</label><input type="month" id="calendarMonth"></div><div id="calendarGrid" class="monthgrid"></div><hr><h3 id="selectedDateTitle">Detail penjualan</h3><div id="calendarDetail" class="empty">Pilih tanggal.</div></div><div class="card"><h2>Rekap bulanan</h2><div id="monthlySummary"></div></div></section>
 <section id="settings" class="page"><div class="card"><h2>Pengaturan & backup</h2><div class="notice">Data tersimpan lokal dan disinkronkan ke cloud setelah login. Gunakan satu perangkat untuk mengedit pada satu waktu. Backup JSON tetap disarankan.</div><div class="actions"><button class="primary" id="exportJSON">Ekspor backup JSON</button><button class="secondary" id="refreshCloud">Muat ulang dari cloud</button><button class="secondary" id="importButton">Impor backup JSON</button><input id="importFile" type="file" accept=".json,application/json" hidden></div><div class="line"><span>Jumlah bahan</span><b id="sIngredients">0</b></div><div class="line"><span>Jumlah menu</span><b id="sMenus">0</b></div><div class="line"><span>Hari penjualan tersimpan</span><b id="sRecords">0</b></div><div class="line"><span>Pembelian tercatat</span><b id="sPurchases">0</b></div><div class="line"><span>Pengeluaran tercatat</span><b id="sExpenses">0</b></div><div class="actions"><button class="danger" id="resetApp">Reset aplikasi</button></div></div></section>
@@ -263,6 +263,34 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
    </div>
   </div>
   <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelIngredient">Batal</button><button type="submit" class="modal-save" id="saveIngredientButton">Simpan Bahan</button></div>
+ </form>
+</div>
+
+
+<div id="purchaseModal" class="app-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="purchaseModalTitle">
+ <form id="purchaseForm" class="app-modal">
+  <div class="app-modal-head"><small>PERSEDIAAN BAHAN</small><h3 id="purchaseModalTitle">Catat Pembelian</h3><p>Pembelian akan menambah stok dan memperbarui harga satuan bahan.</p></div>
+  <div class="app-modal-body">
+   <div class="field"><label for="purchaseDate">Tanggal pembelian</label><input id="purchaseDate" type="date" required></div>
+   <div class="field"><label for="purchaseIngredient">Bahan</label><select id="purchaseIngredient" required></select></div>
+   <div class="field"><label for="purchaseQty">Jumlah dibeli <small>Mengikuti satuan bahan</small></label><input id="purchaseQty" type="number" min="0.000001" step="any" required></div>
+   <div class="field"><label for="purchaseTotal">Harga total pembelian (Rp)</label><input id="purchaseTotal" type="number" min="0.01" step="any" required></div>
+   <div class="field"><label for="purchaseSupplier">Pemasok / toko</label><input id="purchaseSupplier" maxlength="100" placeholder="Opsional"></div>
+   <div class="field"><label for="purchaseNote">Catatan</label><input id="purchaseNote" maxlength="200" placeholder="Opsional"></div>
+  </div>
+  <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelPurchase">Batal</button><button type="submit" class="modal-save">Simpan Pembelian</button></div>
+ </form>
+</div>
+<div id="expenseModal" class="app-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="expenseModalTitle">
+ <form id="expenseForm" class="app-modal">
+  <div class="app-modal-head"><small>KEUANGAN USAHA</small><h3 id="expenseModalTitle">Catat Pengeluaran</h3><p>Catat pengeluaran tambahan yang tidak dihitung dalam biaya operasional penjualan.</p></div>
+  <div class="app-modal-body">
+   <div class="field"><label for="expenseDate">Tanggal</label><input id="expenseDate" type="date" required></div>
+   <div class="field"><label for="expenseCategory">Kategori</label><select id="expenseCategory"><option>Bahan baku</option><option>Gas</option><option>Listrik</option><option>Air</option><option>Tenaga kerja</option><option>Sewa tempat</option><option>Transportasi</option><option>Peralatan</option><option>Lainnya</option></select></div>
+   <div class="field"><label for="expenseAmount">Nominal (Rp)</label><input id="expenseAmount" type="number" min="0.01" step="any" required></div>
+   <div class="field"><label for="expenseNote">Keterangan</label><input id="expenseNote" maxlength="200" placeholder="Contoh: beli plastik tambahan"></div>
+  </div>
+  <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelExpense">Batal</button><button type="submit" class="modal-save">Simpan Pengeluaran</button></div>
  </form>
 </div>
 
@@ -563,9 +591,51 @@ $('stockList').addEventListener('click',e=>{
 });
 $('stockAdjust').onclick=()=>openStockCorrectionModal(db.ingredients[0]?.id);
 function renderPurchases(){ $('purchaseIngredient').innerHTML=db.ingredients.map(i=>`<option value="${i.id}">${esc(i.name)} (${esc(i.unit)})</option>`).join('');$('purchaseList').innerHTML=db.purchases.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(p=>`<div class="line"><span>${esc(p.date)} · ${esc(p.name)}<small class="muted">${p.qty} ${esc(p.unit)} · ${esc(p.supplier||'Tanpa pemasok')}</small></span><b>${fmt(p.total)}</b></div>`).join('')||'<div class="empty">Belum ada pembelian.</div>'}
-$('savePurchase').onclick=()=>{const i=ing($('purchaseIngredient').value),qty=n($('purchaseQty').value),total=n($('purchaseTotal').value),date=$('purchaseDate').value;if(!i||!qty||!date||!total)return alert('Lengkapi tanggal, bahan, jumlah, dan total harga.');const unitCost=total/qty;db.purchases.push({id:uid(),date,ingredientId:i.id,name:i.name,qty,unit:i.unit,total,unitCost,supplier:$('purchaseSupplier').value,note:$('purchaseNote').value});i.stock=n(i.stock)+qty;if(unitCost!==n(i.cost)){db.priceHistory.push({id:uid(),ingredientId:i.id,name:i.name,date,oldCost:n(i.cost),newCost:unitCost,source:'purchase'});i.cost=unitCost}db.stockMoves.push({id:uid(),date,ingredientId:i.id,name:i.name,qty,unit:i.unit,source:'purchase',note:`Pembelian ${$('purchaseSupplier').value||''}`});save();$('purchaseQty').value='';$('purchaseTotal').value='';$('purchaseNote').value='';renderPurchases();renderInventory();renderHPP();renderDashboard();alert('Pembelian tersimpan, stok bertambah, dan harga bahan diperbarui.')};
+
+function openPurchaseModal(){
+ $('purchaseDate').value=today();
+ $('purchaseIngredient').innerHTML=db.ingredients.map(i=>`<option value="${esc(i.id)}">${esc(i.name)} (${esc(i.unit)})</option>`).join('');
+ $('purchaseQty').value='';
+ $('purchaseTotal').value='';
+ $('purchaseSupplier').value='';
+ $('purchaseNote').value='';
+ $('purchaseModal').classList.add('open');
+}
+function closePurchaseModal(){$('purchaseModal').classList.remove('open')}
+$('openPurchaseModal').addEventListener('click',openPurchaseModal);
+$('cancelPurchase').addEventListener('click',closePurchaseModal);
+$('purchaseModal').addEventListener('click',e=>{if(e.target===$('purchaseModal'))closePurchaseModal()});
+$('purchaseForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const item=ing($('purchaseIngredient').value),qty=Number($('purchaseQty').value),total=Number($('purchaseTotal').value),date=$('purchaseDate').value;
+ if(!item||!date||!Number.isFinite(qty)||qty<=0||!Number.isFinite(total)||total<=0)return;
+ const unitCost=total/qty,supplier=$('purchaseSupplier').value.trim(),note=$('purchaseNote').value.trim();
+ db.purchases.push({id:uid(),date,ingredientId:item.id,name:item.name,qty,unit:item.unit,total,unitCost,supplier,note});
+ item.stock=n(item.stock)+qty;
+ if(unitCost!==n(item.cost)){db.priceHistory.push({id:uid(),ingredientId:item.id,name:item.name,date,oldCost:n(item.cost),newCost:unitCost,source:'purchase'});item.cost=unitCost}
+ db.stockMoves.push({id:uid(),date,ingredientId:item.id,name:item.name,qty,unit:item.unit,source:'purchase',note:`Pembelian ${supplier}`});
+ save();closePurchaseModal();renderPurchases();renderInventory();renderHPP();renderDashboard();
+ alert('Pembelian tersimpan, stok bertambah, dan harga bahan diperbarui.');
+});
 function renderExpenses(){$('expenseList').innerHTML=db.expenses.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<div class="line"><span>${esc(x.date)} · ${esc(x.category)}<small class="muted">${esc(x.note||'')}</small></span><b>${fmt(x.amount)}</b></div>`).join('')||'<div class="empty">Belum ada pengeluaran tambahan.</div>'}
-$('saveExpense').onclick=()=>{const date=$('expenseDate').value,amount=n($('expenseAmount').value);if(!date||!amount)return alert('Isi tanggal dan nominal.');db.expenses.push({id:uid(),date,category:$('expenseCategory').value,amount,note:$('expenseNote').value});save();$('expenseAmount').value='';$('expenseNote').value='';renderExpenses();renderReports();alert('Pengeluaran tersimpan.')};
+function openExpenseModal(){
+ $('expenseDate').value=today();
+ $('expenseAmount').value='';
+ $('expenseNote').value='';
+ $('expenseModal').classList.add('open');
+}
+function closeExpenseModal(){$('expenseModal').classList.remove('open')}
+$('openExpenseModal').addEventListener('click',openExpenseModal);
+$('cancelExpense').addEventListener('click',closeExpenseModal);
+$('expenseModal').addEventListener('click',e=>{if(e.target===$('expenseModal'))closeExpenseModal()});
+$('expenseForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const date=$('expenseDate').value,amount=Number($('expenseAmount').value);
+ if(!date||!Number.isFinite(amount)||amount<=0)return;
+ db.expenses.push({id:uid(),date,category:$('expenseCategory').value,amount,note:$('expenseNote').value.trim()});
+ save();closeExpenseModal();renderExpenses();renderReports();
+ alert('Pengeluaran tersimpan.');
+});
 function monthRecords(month){return Object.entries(db.records).filter(([d])=>d.startsWith(month)).map(x=>x[1])}function renderReports(){const month=$('reportMonth').value||today().slice(0,7),rs=monthRecords(month),rev=rs.reduce((s,r)=>s+n(r.revenue),0),hpp=rs.reduce((s,r)=>s+n(r.recipeCost),0),ops=rs.reduce((s,r)=>s+n(r.opsTotal)+n(r.dailyExtra),0),extra=db.expenses.filter(x=>x.date.startsWith(month)).reduce((s,x)=>s+n(x.amount),0),profit=rev-hpp-ops-extra,portions=rs.reduce((s,r)=>s+n(r.portions),0);$('reportSummary').innerHTML=`<div class="line"><span>Hari transaksi</span><b>${rs.length}</b></div><div class="line"><span>Total porsi</span><b>${portions}</b></div><div class="line"><span>Omzet</span><b>${fmt(rev)}</b></div><div class="line"><span>HPP resep</span><b>${fmt(hpp)}</b></div><div class="line"><span>Operasional dari penjualan</span><b>${fmt(ops)}</b></div><div class="line"><span>Pengeluaran tambahan tercatat</span><b>${fmt(extra)}</b></div><div class="line"><b>Laba setelah biaya tercatat</b><b>${fmt(profit)}</b></div><p class="muted">Pembelian bahan tidak dikurangkan langsung sebagai beban laba rugi karena persediaan dihitung melalui HPP pemakaian. Pengeluaran tambahan harus tidak menduplikasi biaya yang sudah dimasukkan ke operasional penjualan.</p>`;const map={};rs.forEach(r=>recItems(r).forEach(x=>{const k=x.id||x.name;map[k]??={name:x.name,qty:0,revenue:0,hpp:0};map[k].qty+=n(x.qty);map[k].revenue+=n(x.qty)*n(x.price);map[k].hpp+=n(x.qty)*n(x.hpp)}));$('menuAnalysis').innerHTML=Object.values(map).sort((a,b)=>b.qty-a.qty).map(x=>`<div class="line"><span>${esc(x.name)}<small class="muted">${x.qty} porsi · omzet ${fmt(x.revenue)}</small></span><b>${fmt(x.revenue-x.hpp)}</b></div>`).join('')||'<div class="empty">Belum ada data menu pada bulan ini.</div>';$('priceHistory').innerHTML=db.priceHistory.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,40).map(x=>`<div class="line"><span>${esc(x.date)} · ${esc(x.name)}</span><b>${fmt(x.oldCost)} → ${fmt(x.newCost)}</b></div>`).join('')||'<div class="empty">Belum ada perubahan harga.</div>'}
 $('reportMonth').addEventListener('change',renderReports);$('printReport').onclick=()=>window.print();$('csvReport').onclick=()=>{const month=$('reportMonth').value||today().slice(0,7),rows=[['Tanggal','Menu','Qty','Harga','HPP snapshot','Omzet menu','Laba sebelum operasional']];Object.entries(db.records).filter(([d])=>d.startsWith(month)).forEach(([d,r])=>recItems(r).forEach(x=>rows.push([d,x.name,x.qty,x.price,x.hpp,x.qty*x.price,x.qty*(x.price-x.hpp)])));const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');download(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),`laporan-lalapan-${month}.csv`)};
 function renderCalendar(){const month=$('calendarMonth').value||today().slice(0,7),[y,m]=month.split('-').map(Number),first=new Date(y,m-1,1).getDay(),days=new Date(y,m,0).getDate();let html=['Min','Sen','Sel','Rab','Kam','Jum','Sab'].map(x=>`<div class="dayname">${x}</div>`).join('');for(let i=0;i<first;i++)html+='<div></div>';for(let d=1;d<=days;d++){const date=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,r=db.records[date];html+=`<button class="${r?'primary':'secondary'}" data-date="${date}">${d}${r?`<small style="display:block">${r.portions} porsi</small>`:''}</button>`}$('calendarGrid').innerHTML=html;const rs=monthRecords(month);$('monthlySummary').innerHTML=`<div class="line"><span>Hari transaksi</span><b>${rs.length}</b></div><div class="line"><span>Total porsi</span><b>${rs.reduce((s,r)=>s+n(r.portions),0)}</b></div><div class="line"><span>Omzet</span><b>${fmt(rs.reduce((s,r)=>s+n(r.revenue),0))}</b></div><div class="line"><b>Laba transaksi</b><b>${fmt(rs.reduce((s,r)=>s+n(r.profit),0))}</b></div>`}
