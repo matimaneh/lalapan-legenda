@@ -4,7 +4,8 @@ const CACHE_NAME = "lalapan-legenda-v1";
 const APP_FILES = [
   "./",
   "./index.html",
-  "./manifest.json"
+  "./manifest.json",
+  "./icons/icon.jpeg"
 ];
 
 // Instalasi dan penyimpanan file aplikasi
