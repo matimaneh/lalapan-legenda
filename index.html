@@ -137,6 +137,34 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
 .recipe-edit-row input{padding:10px 9px!important;text-align:right}
 .recipe-remove{border:0;background:#f8e9e5;color:#a34f3e;border-radius:9px;height:34px;font-size:18px;cursor:pointer}
 .recipe-empty{font-size:11px;color:#89928a;padding:12px;background:#f7f6f0;border-radius:9px}
+
+/* Stage 2.1 — viewport-safe, internally scrollable modal */
+.app-modal-backdrop{
+ overflow-y:auto;
+ overscroll-behavior:contain;
+ align-items:flex-start;
+}
+.app-modal{
+ display:flex;
+ flex-direction:column;
+ max-height:calc(100dvh - 36px);
+ max-height:calc(100vh - 36px);
+ margin:auto;
+ min-height:0;
+}
+.app-modal-head,.app-modal-actions{flex:0 0 auto}
+.app-modal-body{
+ flex:1 1 auto;
+ min-height:0;
+ overflow-y:auto;
+ overscroll-behavior:contain;
+ -webkit-overflow-scrolling:touch;
+}
+@media(max-width:520px){
+ .app-modal-backdrop{align-items:flex-start;padding:10px}
+ .app-modal{max-height:calc(100dvh - 20px);max-height:calc(100vh - 20px);margin:auto 0}
+}
+
 </style></head><body>
 <header class="app-header"><div class="brand-mark">LL</div><div class="brand-copy"><h1>LALAPAN LEGENDA</h1><p>Ruang kendali usaha · HPP · Stok · Penjualan · Keuangan</p></div><div class="header-meta"><span class="live-dot"></span><span class="cloud-status" id="cloudStatus">Belum login</span><button id="logoutBtn" class="secondary smallbtn hidden" style="margin-left:5px">Keluar</button></div></header>
 <nav id="nav"><button class="tab active" data-page="dashboard"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-label">Dashboard</span></button><button class="tab" data-page="sales"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Penjualan</span></button><button class="tab" data-page="hpp"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">HPP & Menu</span></button><button class="tab" data-page="inventory"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-label">Persediaan</span></button><button class="tab more-tab" type="button" data-more><span class="nav-icon" aria-hidden="true">⋯</span><span class="nav-label">Lainnya</span></button><div class="more-menu" id="moreMenu" aria-label="Menu lainnya"><button class="tab" data-page="purchases"><span class="nav-icon">＋</span><span class="nav-label">Pembelian</span></button><button class="tab" data-page="expenses"><span class="nav-icon">−</span><span class="nav-label">Pengeluaran</span></button><button class="tab" data-page="reports"><span class="nav-icon">▥</span><span class="nav-label">Laporan</span></button><button class="tab" data-page="calendar"><span class="nav-icon">▣</span><span class="nav-label">Kalender</span></button><button class="tab" data-page="settings"><span class="nav-icon">⚙</span><span class="nav-label">Pengaturan</span></button></div></nav>
