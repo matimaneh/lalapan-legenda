@@ -233,9 +233,55 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
  nav#nav .more-menu.open{display:flex!important;visibility:visible!important;opacity:1!important}
 }
 
+
+/* V5.3 Stage 10 — calendar and transaction history */
+.calendar-legend{display:flex;gap:18px;flex-wrap:wrap;margin:0 0 12px;color:var(--muted);font-size:11px}
+.calendar-legend span{display:flex;align-items:center;gap:6px}
+.calendar-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.calendar-dot.has-sale{background:#245c4b}.calendar-dot.no-sale{background:#d8ddd7}
+.monthgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}
+.monthgrid .dayname{text-align:center;font-size:11px;font-weight:750;color:var(--muted);padding:7px 0}
+.monthgrid .calendar-day{min-width:0;min-height:58px;border:1px solid #e8e5da;border-radius:10px;background:#fffefa;color:var(--ink);padding:6px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.monthgrid .calendar-day small{font-size:9px;color:var(--muted);font-weight:600}
+.monthgrid .calendar-day.has-sale{background:#eaf2ec;border-color:#cbded0;color:#174a39;font-weight:800}
+.monthgrid .calendar-day.no-sale{background:#fffefa}
+.monthgrid .calendar-day:active{transform:scale(.97)}
+.calendar-blank{min-height:1px}
+.calendar-month-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0}
+.calendar-stat{border:1px solid #e9e5d8;border-radius:10px;padding:11px;background:#fffefa;min-width:0}
+.calendar-stat span{display:block;font-size:10px;color:var(--muted);margin-bottom:4px}
+.calendar-stat b{font-size:14px;overflow-wrap:anywhere}
+@media(max-width:600px){.monthgrid{gap:4px}.monthgrid .calendar-day{min-height:48px;border-radius:8px;padding:4px 1px}.monthgrid .calendar-day small{font-size:8px}.calendar-month-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}}
+
+
+/* V5.3 Stage 11 — backup and restore safeguards */
+.backup-panel{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;padding:15px;border:1px solid #e5e8dd;background:#fbfcf8;border-radius:13px;margin:12px 0 18px}
+.backup-panel p{margin:5px 0}.backup-last-status{display:block;color:var(--muted);font-size:11px;line-height:1.5}
+.backup-panel .actions{margin:0;justify-content:flex-end}
+@media(max-width:650px){.backup-panel{grid-template-columns:1fr}.backup-panel .actions{justify-content:flex-start}.backup-panel .actions button{flex:1 1 100%}}
+
+
+/* V1.0 final: cash-flow, profitability and mobile audit refinements */
+.cashflow-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.cashflow-row small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.cash-in{color:#236b4b}.cash-out{color:#a34335}
+.profitability-note{font-size:11px;color:var(--muted);margin-top:5px}
+.audit-list{display:grid;gap:8px;margin-top:10px}
+.audit-item{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fffefa;font-size:12px}
+.audit-item strong{display:block;margin-bottom:3px}
+@media(max-width:650px){
+ .cashflow-row{grid-template-columns:minmax(0,1fr) auto;gap:7px}
+ .cashflow-row .cashflow-type{grid-column:1/-1;grid-row:2}
+ .report-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .report-metric{min-width:0;overflow-wrap:anywhere}
+ .menu-report-row{gap:8px}
+ .menu-report-row>div{min-width:0}
+ input,select,textarea{font-size:16px}
+ .actions button{min-height:42px}
+}
 </style></head><body>
 <header class="app-header"><div class="brand-mark">LL</div><div class="brand-copy"><h1>LALAPAN LEGENDA</h1><p>Ruang kendali usaha · HPP · Stok · Penjualan · Keuangan</p></div><div class="header-meta"><span class="live-dot"></span><span class="cloud-status" id="cloudStatus">Belum login</span><button id="logoutBtn" class="secondary smallbtn hidden" style="margin-left:5px">Keluar</button></div></header>
-<nav id="nav"><button class="tab active" data-page="dashboard"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-label">Dashboard</span></button><button class="tab" data-page="sales"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Penjualan</span></button><button class="tab" data-page="hpp"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">HPP & Menu</span></button><button class="tab" data-page="inventory"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-label">Persediaan</span></button><button class="tab more-tab" type="button" data-more><span class="nav-icon" aria-hidden="true">⋯</span><span class="nav-label">Lainnya</span></button><div class="more-menu" id="moreMenu" aria-label="Menu lainnya"><button class="tab" data-page="purchases"><span class="nav-icon">＋</span><span class="nav-label">Pembelian</span></button><button class="tab" data-page="expenses"><span class="nav-icon">−</span><span class="nav-label">Pengeluaran</span></button><button class="tab" data-page="reports"><span class="nav-icon">▥</span><span class="nav-label">Laporan</span></button><button class="tab" data-page="calendar"><span class="nav-icon">▣</span><span class="nav-label">Kalender</span></button><button class="tab" data-page="settings"><span class="nav-icon">⚙</span><span class="nav-label">Pengaturan</span></button></div></nav>
+<nav id="nav"><button class="tab active" data-page="dashboard"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-label">Dashboard</span></button><button class="tab" data-page="sales"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Penjualan</span></button><button class="tab" data-page="hpp"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">HPP & Menu</span></button><button class="tab" data-page="inventory"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-label">Persediaan</span></button><button class="tab more-tab" type="button" data-more><span class="nav-icon" aria-hidden="true">⋯</span><span class="nav-label">Lainnya</span></button><div class="more-menu" id="moreMenu" aria-label="Menu lainnya"><button class="tab" data-page="purchases"><span class="nav-icon">＋</span><span class="nav-label">Pembelian</span></button><button class="tab" data-page="expenses"><span class="nav-icon">−</span><span class="nav-label">Pengeluaran</span></button><button class="tab" data-page="cashflow"><span class="nav-icon">＄</span><span class="nav-label">Arus kas</span></button><button class="tab" data-page="reports"><span class="nav-icon">▥</span><span class="nav-label">Laporan</span></button><button class="tab" data-page="calendar"><span class="nav-icon">▣</span><span class="nav-label">Kalender</span></button><button class="tab" data-page="settings"><span class="nav-icon">⚙</span><span class="nav-label">Pengaturan</span></button></div></nav>
 <main class="wrap">
 <section id="dashboard" class="page active">
 <div class="dash-heading"><div><span class="eyebrow">LALAPAN LEGENDA / BUSINESS INTELLIGENCE</span><h2>Ringkasan usaha</h2><p class="muted">Pantau omzet, profitabilitas, dan performa menu dalam satu tampilan.</p></div><div class="period-control"><label for="dashPeriod">Periode analisis</label><select id="dashPeriod"><option value="month">Bulan ini</option><option value="today">Hari ini</option><option value="7">7 hari terakhir</option><option value="30">30 hari terakhir</option><option value="all">Semua data</option></select></div></div>
@@ -258,9 +304,14 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
 <section id="inventory" class="page"><div class="card"><div class="row"><h2>Persediaan bahan</h2><button class="primary" id="stockAdjust">+ Koreksi stok</button></div><div class="notice inventory-intro"><b>Rekonsiliasi stok fisik</b><br>Masukkan jumlah hasil hitung fisik melalui tombol Atur. Untuk pengisian pertama, tulis alasan “Stok awal hasil hitung fisik”. Setiap koreksi akan masuk ke riwayat mutasi. Penjualan dan pembelian berikutnya memperbarui stok secara otomatis.</div><div id="inventorySummary" class="inventory-summary"></div><div id="stockList"></div></div><div class="card"><h2>Riwayat mutasi stok</h2><div id="stockHistory"></div></div></section>
 <section id="purchases" class="page"><div class="card"><div class="row" style="align-items:center;justify-content:space-between"><div><h2>Pembelian bahan</h2><p class="muted">Catat pembelian untuk menambah stok dan memperbarui harga bahan.</p></div><button class="primary" id="openPurchaseModal">+ Catat pembelian</button></div></div><div class="card"><h2>Riwayat pembelian</h2><div id="purchaseList"></div></div></section>
 <section id="expenses" class="page"><div class="card"><div class="row" style="align-items:center;justify-content:space-between"><div><h2>Pengeluaran tambahan</h2><p class="muted">Catat biaya di luar biaya operasional penjualan.</p></div><button class="primary" id="openExpenseModal">+ Catat pengeluaran</button></div></div><div class="card"><h2>Riwayat pengeluaran</h2><div id="expenseList"></div></div></section>
+<section id="cashflow" class="page">
+<div class="card"><h2>Arus kas usaha</h2><p class="muted">Ringkasan uang masuk dan keluar berdasarkan transaksi yang sudah dicatat. Pembelian dihitung sebagai arus kas keluar, tetapi tidak otomatis menjadi beban laba rugi.</p><div class="field"><label>Bulan arus kas</label><input type="month" id="cashMonth"></div><div id="cashSummary" class="report-metrics"></div></div>
+<div class="card"><h2>Rincian arus kas</h2><div id="cashDetails"></div><div class="actions"><button class="secondary" id="cashCsv">Ekspor arus kas CSV</button></div></div>
+<div class="card"><h2>Catatan pembacaan</h2><p class="muted">Perhitungan menganggap penjualan diterima tunai dan pembelian/pengeluaran dibayar pada tanggal pencatatan. Jika ada piutang, utang, pembayaran tertunda, atau saldo awal kas, angka ini belum merepresentasikannya.</p></div>
+</section>
 <section id="reports" class="page"><div class="card"><h2>Laporan laba rugi</h2><div class="field"><label>Bulan laporan</label><input type="month" id="reportMonth"></div><div id="reportSummary"></div><div class="actions"><button class="secondary" id="printReport">Cetak / Simpan PDF</button><button class="secondary" id="csvReport">Ekspor CSV</button></div></div><div class="card"><h2>Rincian penjualan harian</h2><div id="dailyReport"></div></div><div class="card"><h2>Analisis menu</h2><div id="menuAnalysis"></div></div><div class="card"><h2>Riwayat harga bahan</h2><div id="priceHistory"></div></div></section>
-<section id="calendar" class="page"><div class="card"><h2>Kalender penjualan</h2><div class="field"><label>Pilih bulan</label><input type="month" id="calendarMonth"></div><div id="calendarGrid" class="monthgrid"></div><hr><h3 id="selectedDateTitle">Detail penjualan</h3><div id="calendarDetail" class="empty">Pilih tanggal.</div></div><div class="card"><h2>Rekap bulanan</h2><div id="monthlySummary"></div></div></section>
-<section id="settings" class="page"><div class="card"><h2>Pengaturan & backup</h2><div class="notice">Data tersimpan lokal dan disinkronkan ke cloud setelah login. Gunakan satu perangkat untuk mengedit pada satu waktu. Backup JSON tetap disarankan.</div><div class="actions"><button class="primary" id="exportJSON">Ekspor backup JSON</button><button class="secondary" id="refreshCloud">Muat ulang dari cloud</button><button class="secondary" id="importButton">Impor backup JSON</button><input id="importFile" type="file" accept=".json,application/json" hidden></div><div class="line"><span>Jumlah bahan</span><b id="sIngredients">0</b></div><div class="line"><span>Jumlah menu</span><b id="sMenus">0</b></div><div class="line"><span>Hari penjualan tersimpan</span><b id="sRecords">0</b></div><div class="line"><span>Pembelian tercatat</span><b id="sPurchases">0</b></div><div class="line"><span>Pengeluaran tercatat</span><b id="sExpenses">0</b></div><div class="actions"><button class="danger" id="resetApp">Reset aplikasi</button></div></div></section>
+<section id="calendar" class="page"><div class="card"><h2>Kalender penjualan</h2><div class="field"><label>Pilih bulan</label><input type="month" id="calendarMonth"></div><div class="calendar-legend"><span><i class="calendar-dot has-sale"></i> Ada transaksi</span><span><i class="calendar-dot no-sale"></i> Belum ada transaksi</span></div><div id="calendarGrid" class="monthgrid"></div><hr><div id="calendarMonthStats" class="calendar-month-stats"></div><h3 id="selectedDateTitle">Detail penjualan</h3><div id="calendarDetail" class="empty">Pilih tanggal.</div></div><div class="card"><h2>Rekap bulanan</h2><div id="monthlySummary"></div></div></section>
+<section id="settings" class="page"><div class="card"><h2>Pengaturan & backup</h2><div class="notice">Data tersimpan lokal dan disinkronkan ke cloud setelah login. Gunakan satu perangkat untuk mengedit pada satu waktu. Backup JSON tetap disarankan.</div><div class="backup-panel"><div><b>Perlindungan data usaha</b><p class="muted">Buat salinan data secara berkala sebelum memperbarui aplikasi atau memindahkan perangkat.</p><small id="backupLastStatus" class="backup-last-status">Belum ada informasi backup di perangkat ini.</small></div><div class="actions"><button class="primary" id="exportJSON">Ekspor backup JSON</button><button class="secondary" id="refreshCloud">Muat ulang dari cloud</button><button class="secondary" id="importButton">Impor backup JSON</button><input id="importFile" type="file" accept=".json,application/json" hidden></div></div><div class="line"><span>Jumlah bahan</span><b id="sIngredients">0</b></div><div class="line"><span>Jumlah menu</span><b id="sMenus">0</b></div><div class="line"><span>Hari penjualan tersimpan</span><b id="sRecords">0</b></div><div class="line"><span>Pembelian tercatat</span><b id="sPurchases">0</b></div><div class="line"><span>Pengeluaran tercatat</span><b id="sExpenses">0</b></div><div class="actions"><button class="danger" id="resetApp">Reset aplikasi</button></div><div class="card"><h2>Pemeriksaan kesehatan data</h2><p class="muted">Pemeriksaan ini hanya membaca data dan tidak mengubah transaksi, stok, maupun resep.</p><div id="dataAudit" class="audit-list"></div></div></div></section>
 </main>
 <div class="auth-gate" id="authGate">
  <div class="auth-panel">
@@ -376,7 +427,7 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
 
 <script>
 'use strict';
-const KEY='lalapanLegendaBusinessV3', OLD='lalapanLegendaHPP', VERSION=4, CLOUD_META_KEY='lalapanLegendaCloudMetaV1';
+const KEY='lalapanLegendaBusinessV3', OLD='lalapanLegendaHPP', VERSION=5, CLOUD_META_KEY='lalapanLegendaCloudMetaV1';
 const $=id=>document.getElementById(id), n=v=>Math.max(0,Number(v)||0), fmt=v=>'Rp'+Math.round(Number(v)||0).toLocaleString('id-ID'), today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}, uid=()=>`ll-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
 const seed={ingredients:[['ayam','Ayam goreng','potong',7500],['paru','Paru','gram',58],['nasi','Nasi matang','gram',200000/10/1000/2.4],['cabai','Cabai','gram',70],['tomat','Tomat','gram',25],['bmerah','Bawang merah','gram',45],['bputih','Bawang putih','gram',45],['timun','Timun','gram',20],['minyak','Minyak goreng','ml',23.5],['bumbu','Bumbu dasar','porsi',500],['gas','Gas','porsi',500],['plastik','Plastik box','pcs',530],['balado','Bumbu tambahan balado','porsi',0],['kemangi','Kemangi','porsi',0],['tahu','Tahu','potong',400],['terong','Terong','gram',25]].map(x=>({id:x[0],name:x[1],unit:x[2],cost:x[3],stock:0,minStock:0})),menus:[{id:'ayam-menu',name:'Nasi Ayam Goreng',price:25000,active:true,recipe:[['ayam',1],['nasi',180],['cabai',15],['tomat',10],['bmerah',5],['bputih',5],['timun',50],['minyak',50],['bumbu',1],['gas',1],['plastik',1]],extra:0},{id:'paru-menu',name:'Nasi Paru Goreng',price:25000,active:true,recipe:[['paru',107],['nasi',180],['cabai',15],['tomat',10],['bmerah',5],['bputih',5],['timun',50],['minyak',50],['bumbu',1],['gas',1],['plastik',1]],extra:0},{id:'balado-menu',name:'Nasi Paru Balado',price:25000,active:true,recipe:[['paru',107],['nasi',180],['cabai',15],['tomat',10],['bmerah',5],['bputih',5],['timun',50],['minyak',50],['bumbu',1],['balado',1],['gas',1],['plastik',1]],extra:0}],ops:[['electricity','Listrik'],['water','Air'],['labor','Tenaga kerja'],['rent','Sewa tempat'],['transport','Transportasi'],['other','Operasional lainnya']].map(x=>({id:x[0],name:x[1],value:0})),records:{},purchases:[],expenses:[],stockMoves:[],priceHistory:[],settings:{target:0,version:VERSION}};
 function normalize(d){d.ingredients=Array.isArray(d.ingredients)?d.ingredients:[];d.menus=Array.isArray(d.menus)?d.menus:[];d.ops=Array.isArray(d.ops)?d.ops:seed.ops.map(x=>({...x}));d.records=d.records&&typeof d.records==='object'?d.records:{};d.purchases=Array.isArray(d.purchases)?d.purchases:[];d.expenses=Array.isArray(d.expenses)?d.expenses:[];d.stockMoves=Array.isArray(d.stockMoves)?d.stockMoves:[];d.priceHistory=Array.isArray(d.priceHistory)?d.priceHistory:[];d.settings={target:0,...(d.settings||{}),version:VERSION};d.ingredients.forEach(i=>{if(!Number.isFinite(Number(i.stock)))i.stock=0;if(!Number.isFinite(Number(i.minStock)))i.minStock=0});return d}
@@ -426,7 +477,7 @@ async function checkCloudForUpdates(){
   await applyCloudPayload(remote.payload,remote.updated_at);cloudLabel('Data terbaru diterima · '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}),'ok');
  }catch(e){console.error('Cloud polling:',e);cloudLabel('Gagal memeriksa cloud','error')}
 }
-function renderAll(){renderDashboard();renderHPP();renderSales();renderInventory();renderPurchases();renderExpenses();renderReports();renderCalendar();renderSettings()}
+function renderAll(){renderDashboard();renderHPP();renderSales();renderInventory();renderPurchases();renderExpenses();renderReports();renderCashFlow();renderCalendar();renderSettings()}
 async function initializeCloudSession(){if(!window.supabase?.createClient){$('authError').textContent='Library koneksi cloud belum termuat. Periksa internet lalu muat ulang halaman.';cloudLabel('Library cloud tidak tersedia','error');return}supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});const {data:{session},error}=await supabaseClient.auth.getSession();if(error)console.warn(error);if(session?.user){await onAuthenticated(session.user)}else{$('authGate').classList.remove('hidden');cloudLabel('Menunggu login')}}
 async function onAuthenticated(user){
  currentUser=user;$('authGate').classList.add('hidden');$('logoutBtn').classList.remove('hidden');cloudLabel('Memeriksa cloud…');
@@ -742,14 +793,104 @@ function renderReports(){
  $('reportSummary').innerHTML=`<div class="report-metrics"><div class="report-metric"><span>Omzet</span><b>${fmt(rev)}</b></div><div class="report-metric"><span>HPP resep</span><b>${fmt(hpp)}</b></div><div class="report-metric"><span>Biaya operasional</span><b>${fmt(ops)}</b></div><div class="report-metric"><span>Pengeluaran tambahan</span><b>${fmt(extra)}</b></div><div class="report-metric report-profit"><span>Laba setelah biaya tercatat</span><b>${fmt(profit)}</b></div><div class="report-metric"><span>Margin laba</span><b>${margin.toFixed(1)}%</b></div><div class="report-metric"><span>Hari transaksi</span><b>${rs.length} hari</b></div><div class="report-metric"><span>Total porsi</span><b>${portions.toLocaleString('id-ID')}</b></div></div><p class="muted">Pembelian bahan tidak dikurangkan langsung sebagai beban laba rugi karena HPP dihitung dari bahan yang terpakai. Pastikan pengeluaran tambahan tidak menduplikasi biaya yang sudah dicatat pada operasional penjualan.</p>`;
  $('dailyReport').innerHTML=entries.map(([date,r])=>`<div class="daily-report-row"><div><b>${esc(date)}</b><small>${n(r.portions)||recItems(r).reduce((a,x)=>a+n(x.qty),0)} porsi · ${recItems(r).length} jenis menu</small></div><div><small>Omzet</small><b>${fmt(r.revenue)}</b></div><div><small>Laba estimasi</small><b class="${n(r.profit)<0?'bad':'good'}">${fmt(r.profit)}</b></div></div>`).join('')||'<div class="empty">Belum ada transaksi pada bulan ini.</div>';
  const map={};rs.forEach(r=>recItems(r).forEach(x=>{const k=x.id||x.name;map[k]??={name:x.name,qty:0,revenue:0,hpp:0};map[k].qty+=n(x.qty);map[k].revenue+=n(x.qty)*n(x.price);map[k].hpp+=n(x.qty)*n(x.hpp)}));
- $('menuAnalysis').innerHTML=Object.values(map).sort((a,b)=>b.qty-a.qty).map(x=>`<div class="menu-report-row"><div><b>${esc(x.name)}</b><small>${x.qty} porsi · harga rata-rata ${fmt(x.qty?x.revenue/x.qty:0)}</small></div><div><small>Omzet</small><b>${fmt(x.revenue)}</b></div><div><small>Kontribusi setelah HPP</small><b>${fmt(x.revenue-x.hpp)}</b></div></div>`).join('')||'<div class="empty">Belum ada data menu pada bulan ini.</div>';
+ $('menuAnalysis').innerHTML=Object.values(map).sort((a,b)=>(b.revenue-b.hpp)-(a.revenue-a.hpp)).map(x=>{const contribution=x.revenue-x.hpp,rate=x.revenue?contribution/x.revenue*100:0;return `<div class="menu-report-row"><div><b>${esc(x.name)}</b><small>${x.qty} porsi · harga rata-rata ${fmt(x.qty?x.revenue/x.qty:0)} · HPP/porsi ${fmt(x.qty?x.hpp/x.qty:0)}</small></div><div><small>Omzet</small><b>${fmt(x.revenue)}</b></div><div><small>Kontribusi setelah HPP</small><b>${fmt(contribution)}</b><small class="profitability-note">Margin kontribusi ${rate.toFixed(1)}%</small></div></div>`}).join('')||'<div class="empty">Belum ada data menu pada bulan ini.</div>';
  $('priceHistory').innerHTML=(db.priceHistory||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,40).map(x=>`<div class="line"><span>${esc(x.date)} · ${esc(x.name)}</span><b>${fmt(x.oldCost)} → ${fmt(x.newCost)}</b></div>`).join('')||'<div class="empty">Belum ada perubahan harga.</div>';
 }
+
+function renderCashFlow(){
+ const month=$('cashMonth')?.value||today().slice(0,7);
+ const rows=[];
+ Object.entries(db.records||{}).filter(([d])=>d.startsWith(month)).forEach(([date,r])=>{
+  rows.push({date,type:'Penjualan',label:`Penerimaan penjualan · ${n(r.portions)||recItems(r).reduce((a,x)=>a+n(x.qty),0)} porsi`,amount:n(r.revenue),direction:'in'});
+  const op=n(r.opsTotal)+n(r.dailyExtra);
+  if(op>0)rows.push({date,type:'Operasional',label:'Biaya operasional harian',amount:op,direction:'out'});
+ });
+ (db.purchases||[]).filter(x=>(x.date||'').startsWith(month)).forEach(x=>rows.push({date:x.date,type:'Pembelian bahan',label:`${x.name||'Pembelian bahan'} · ${n(x.qty)} ${x.unit||''}`,amount:n(x.total),direction:'out'}));
+ (db.expenses||[]).filter(x=>(x.date||'').startsWith(month)).forEach(x=>rows.push({date:x.date,type:'Pengeluaran',label:x.category||x.note||'Pengeluaran tambahan',amount:n(x.amount),direction:'out'}));
+ rows.sort((a,b)=>a.date.localeCompare(b.date)||a.type.localeCompare(b.type));
+ const masuk=rows.filter(x=>x.direction==='in').reduce((a,x)=>a+x.amount,0);
+ const keluar=rows.filter(x=>x.direction==='out').reduce((a,x)=>a+x.amount,0);
+ const net=masuk-keluar;
+ $('cashSummary').innerHTML=`<div class="report-metric"><span>Uang masuk</span><b class="cash-in">${fmt(masuk)}</b></div><div class="report-metric"><span>Uang keluar</span><b class="cash-out">${fmt(keluar)}</b></div><div class="report-metric report-profit"><span>Arus kas bersih</span><b>${fmt(net)}</b></div><div class="report-metric"><span>Jumlah catatan</span><b>${rows.length}</b></div>`;
+ $('cashDetails').innerHTML=rows.slice().reverse().map(x=>`<div class="cashflow-row"><div><b>${esc(x.label)}</b><small>${esc(x.date)} · ${esc(x.type)}</small></div><span class="cashflow-type">${x.direction==='in'?'Masuk':'Keluar'}</span><b class="${x.direction==='in'?'cash-in':'cash-out'}">${x.direction==='in'?'+':'−'}${fmt(x.amount)}</b></div>`).join('')||'<div class="empty">Belum ada arus kas pada bulan ini.</div>';
+}
+$('cashMonth').value=today().slice(0,7);
+$('cashMonth').addEventListener('change',renderCashFlow);
+$('cashCsv').onclick=()=>{
+ const month=$('cashMonth').value||today().slice(0,7),rows=[['Tanggal','Jenis','Keterangan','Arah','Jumlah']];
+ Object.entries(db.records||{}).filter(([d])=>d.startsWith(month)).forEach(([date,r])=>{
+  rows.push([date,'Penjualan','Penerimaan penjualan','Masuk',n(r.revenue)]);
+  const op=n(r.opsTotal)+n(r.dailyExtra);if(op>0)rows.push([date,'Operasional','Biaya operasional harian','Keluar',op]);
+ });
+ (db.purchases||[]).filter(x=>(x.date||'').startsWith(month)).forEach(x=>rows.push([x.date,'Pembelian bahan',x.name||'Pembelian bahan','Keluar',n(x.total)]));
+ (db.expenses||[]).filter(x=>(x.date||'').startsWith(month)).forEach(x=>rows.push([x.date,'Pengeluaran',x.category||x.note||'Pengeluaran tambahan','Keluar',n(x.amount)]));
+ const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\\r\\n');
+ download(new Blob(['\\ufeff'+csv],{type:'text/csv;charset=utf-8'}),`arus-kas-lalapan-${month}.csv`);
+};
+
 $('reportMonth').addEventListener('change',renderReports);$('printReport').onclick=()=>window.print();$('csvReport').onclick=()=>{const month=$('reportMonth').value||today().slice(0,7),rows=[['Tanggal','Menu','Qty','Harga','HPP snapshot','Omzet menu','Laba sebelum operasional']];Object.entries(db.records).filter(([d])=>d.startsWith(month)).forEach(([d,r])=>recItems(r).forEach(x=>rows.push([d,x.name,x.qty,x.price,x.hpp,x.qty*x.price,x.qty*(x.price-x.hpp)])));const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');download(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),`laporan-lalapan-${month}.csv`)};
-function renderCalendar(){const month=$('calendarMonth').value||today().slice(0,7),[y,m]=month.split('-').map(Number),first=new Date(y,m-1,1).getDay(),days=new Date(y,m,0).getDate();let html=['Min','Sen','Sel','Rab','Kam','Jum','Sab'].map(x=>`<div class="dayname">${x}</div>`).join('');for(let i=0;i<first;i++)html+='<div></div>';for(let d=1;d<=days;d++){const date=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,r=db.records[date];html+=`<button class="${r?'primary':'secondary'}" data-date="${date}">${d}${r?`<small style="display:block">${r.portions} porsi</small>`:''}</button>`}$('calendarGrid').innerHTML=html;const rs=monthRecords(month);$('monthlySummary').innerHTML=`<div class="line"><span>Hari transaksi</span><b>${rs.length}</b></div><div class="line"><span>Total porsi</span><b>${rs.reduce((s,r)=>s+n(r.portions),0)}</b></div><div class="line"><span>Omzet</span><b>${fmt(rs.reduce((s,r)=>s+n(r.revenue),0))}</b></div><div class="line"><b>Laba transaksi</b><b>${fmt(rs.reduce((s,r)=>s+n(r.profit),0))}</b></div>`}
-$('calendarGrid').addEventListener('click',e=>{const b=e.target.closest('[data-date]');if(b)showDate(b.dataset.date)});$('calendarMonth').addEventListener('change',renderCalendar);function showDate(date){const r=db.records[date];$('selectedDateTitle').textContent='Penjualan '+date;if(!r){$('calendarDetail').innerHTML='<div class="empty">Tidak ada transaksi.</div>';return}$('calendarDetail').innerHTML=recItems(r).map(x=>`<div class="line"><span>${esc(x.name)}<small class="muted">${x.qty} porsi × ${fmt(x.price)} · HPP snapshot ${fmt(x.hpp)}</small></span><b>${fmt(x.qty*x.price)}</b></div>`).join('')+`<hr><div class="line"><span>Omzet</span><b>${fmt(r.revenue)}</b></div><div class="line"><span>HPP</span><b>${fmt(r.recipeCost)}</b></div><div class="line"><span>Operasional + biaya tambahan</span><b>${fmt(n(r.opsTotal)+n(r.dailyExtra))}</b></div><div class="line"><b>Laba transaksi</b><b>${fmt(r.profit)}</b></div><div class="actions"><button class="danger smallbtn" id="deleteRecord">Hapus transaksi</button></div>`;$('deleteRecord').onclick=()=>{if(!confirm('Hapus transaksi? Stok yang dikurangi oleh transaksi ini akan dikembalikan.'))return;recItems(r).forEach(item=>(item.recipeSnapshot||[]).forEach(line=>{const i=ing(line.ingredientId);if(i)i.stock=n(i.stock)+n(line.qty)*n(item.qty)}));db.stockMoves=db.stockMoves.filter(x=>!(x.source==='sale'&&x.date===date));delete db.records[date];save();renderCalendar();renderInventory();renderDashboard();showDate(date)}}
-function renderSettings(){$('sIngredients').textContent=db.ingredients.length;$('sMenus').textContent=db.menus.length;$('sRecords').textContent=Object.keys(db.records).length;$('sPurchases').textContent=db.purchases.length;$('sExpenses').textContent=db.expenses.length}
-function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}$('exportJSON').onclick=()=>{save();download(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),`backup-lalapan-legenda-${today()}.json`)};$('importButton').onclick=()=>$('importFile').click();$('importFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!Array.isArray(x.ingredients)||!Array.isArray(x.menus)||!x.records||typeof x.records!=='object')throw Error('Struktur backup tidak dikenali');if(!confirm('Sebelum impor, backup kondisi saat ini akan diunduh. Lanjutkan?'))return;$('exportJSON').click();db=normalize(x);save();alert('Backup berhasil dipulihkan.');location.reload()}catch(err){alert('Impor gagal: '+err.message)}finally{e.target.value=''}});$('resetApp').onclick=()=>{if(!confirm('Reset menghapus database aplikasi pada perangkat ini. Ekspor backup terlebih dahulu. Lanjutkan?'))return;if(!confirm('Konfirmasi kedua: seluruh transaksi lokal akan dihapus.'))return;localStorage.removeItem(KEY);location.reload()};
-function init(){const t=today();['saleDate','purchaseDate','expenseDate'].forEach(id=>$(id).value=t);$('calendarMonth').value=t.slice(0,7);$('reportMonth').value=t.slice(0,7);save();renderDashboard();renderHPP();renderSales();renderInventory();renderPurchases();renderExpenses();renderReports();renderCalendar();renderSettings()}
+function renderCalendar(){
+ const month=$('calendarMonth').value||today().slice(0,7),[y,m]=month.split('-').map(Number),first=(new Date(y,m-1,1).getDay()+6)%7,days=new Date(y,m,0).getDate();
+ let out=['Sen','Sel','Rab','Kam','Jum','Sab','Min'].map(x=>`<div class="dayname">${x}</div>`).join('');
+ for(let i=0;i<first;i++)out+='<div class="calendar-blank"></div>';
+ for(let d=1;d<=days;d++){
+  const date=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,r=db.records[date];
+  out+=`<button type="button" class="calendar-day ${r?'has-sale':'no-sale'}" data-date="${date}" aria-label="${date}${r?`, ${n(r.portions)} porsi, omzet ${fmt(r.revenue)}`:', belum ada transaksi'}"><span>${d}</span>${r?`<small>${n(r.portions)||recItems(r).reduce((a,x)=>a+n(x.qty),0)} porsi</small>`:''}</button>`;
+ }
+ $('calendarGrid').innerHTML=out;
+ const entries=Object.entries(db.records||{}).filter(([d])=>d.startsWith(month)),rs=entries.map(x=>x[1]),rev=rs.reduce((a,r)=>a+n(r.revenue),0),profit=rs.reduce((a,r)=>a+n(r.profit),0),portions=rs.reduce((a,r)=>a+(n(r.portions)||recItems(r).reduce((v,x)=>v+n(x.qty),0)),0);
+ $('calendarMonthStats').innerHTML=`<div class="calendar-stat"><span>Hari transaksi</span><b>${rs.length}</b></div><div class="calendar-stat"><span>Total porsi</span><b>${portions}</b></div><div class="calendar-stat"><span>Omzet</span><b>${fmt(rev)}</b></div><div class="calendar-stat"><span>Estimasi laba</span><b>${fmt(profit)}</b></div>`;
+ $('monthlySummary').innerHTML=`<div class="line"><span>Hari dalam bulan</span><b>${days}</b></div><div class="line"><span>Hari transaksi</span><b>${rs.length}</b></div><div class="line"><span>Total porsi</span><b>${portions}</b></div><div class="line"><span>Omzet</span><b>${fmt(rev)}</b></div><div class="line"><b>Laba transaksi</b><b>${fmt(profit)}</b></div>`;
+}
+$('calendarGrid').addEventListener('click',e=>{const b=e.target.closest('[data-date]');if(b)showDate(b.dataset.date)});
+$('calendarMonth').addEventListener('change',()=>{renderCalendar();$('selectedDateTitle').textContent='Detail penjualan';$('calendarDetail').innerHTML='<div class="empty">Pilih tanggal untuk melihat rincian transaksi.</div>'});
+function showDate(date){
+ const r=db.records[date];$('selectedDateTitle').textContent='Penjualan '+date;
+ if(!r){$('calendarDetail').innerHTML='<div class="empty">Tidak ada transaksi pada tanggal ini.</div>';return}
+ const items=recItems(r);
+ $('calendarDetail').innerHTML=items.map(x=>`<div class="line"><span>${esc(x.name)}<small class="muted">${x.qty} porsi × ${fmt(x.price)} · HPP snapshot ${fmt(x.hpp)}</small></span><b>${fmt(x.qty*x.price)}</b></div>`).join('')+`<hr><div class="line"><span>Total porsi</span><b>${n(r.portions)||items.reduce((a,x)=>a+n(x.qty),0)}</b></div><div class="line"><span>Omzet</span><b>${fmt(r.revenue)}</b></div><div class="line"><span>HPP</span><b>${fmt(r.recipeCost)}</b></div><div class="line"><span>Operasional + biaya tambahan</span><b>${fmt(n(r.opsTotal)+n(r.dailyExtra))}</b></div><div class="line"><b>Laba transaksi</b><b>${fmt(r.profit)}</b></div><div class="actions"><button class="danger smallbtn" id="deleteRecord">Hapus transaksi</button></div>`;
+ $('deleteRecord').onclick=()=>{
+  if(!confirm('Hapus transaksi? Stok yang dikurangi oleh transaksi ini akan dikembalikan.'))return;
+  items.forEach(item=>(item.recipeSnapshot||[]).forEach(line=>{const i=ing(line.ingredientId);if(i)i.stock=n(i.stock)+n(line.qty)*n(item.qty)}));
+  db.stockMoves=db.stockMoves.filter(x=>!(x.source==='sale'&&x.date===date));delete db.records[date];save();renderCalendar();renderInventory();renderDashboard();showDate(date);
+ };
+}
+function renderSettings(){
+ $('sIngredients').textContent=db.ingredients.length;$('sMenus').textContent=db.menus.length;$('sRecords').textContent=Object.keys(db.records).length;$('sPurchases').textContent=db.purchases.length;$('sExpenses').textContent=db.expenses.length;
+ const last=localStorage.getItem('lalapanLegendaLastBackupAt');
+ $('backupLastStatus').textContent=last?'Backup terakhir dibuat dari perangkat ini: '+new Date(last).toLocaleString('id-ID'):'Belum ada informasi backup di perangkat ini. Buat backup JSON untuk menyimpan salinan data.';
+ const checks=[];
+ const badMenus=db.menus.filter(m=>!Array.isArray(m.recipe)||!m.recipe.length);
+ const missingIngredients=db.menus.flatMap(m=>(m.recipe||[]).filter(line=>!ing(line[0])).map(line=>`${m.name}: bahan ${line[0]} tidak ditemukan`));
+ const negativeStock=db.ingredients.filter(i=>Number(i.stock)<0);
+ const malformedSales=Object.entries(db.records||{}).filter(([date,r])=>!r||!Array.isArray(r.items)&&!Array.isArray(r.menuItems));
+ checks.push({ok:badMenus.length===0,title:'Resep menu',detail:badMenus.length?`${badMenus.length} menu tidak memiliki rincian resep.`:'Semua menu memiliki struktur resep.'});
+ checks.push({ok:missingIngredients.length===0,title:'Referensi bahan',detail:missingIngredients.length?missingIngredients.slice(0,4).join(' · '):'Semua bahan pada resep ditemukan.'});
+ checks.push({ok:negativeStock.length===0,title:'Stok negatif',detail:negativeStock.length?negativeStock.map(i=>i.name).join(', '):'Tidak ditemukan stok negatif.'});
+ checks.push({ok:malformedSales.length===0,title:'Struktur transaksi',detail:malformedSales.length?`${malformedSales.length} transaksi perlu diperiksa.`:'Struktur transaksi tersimpan terbaca.'});
+ $('dataAudit').innerHTML=checks.map(c=>`<div class="audit-item"><strong>${c.ok?'✓':'Perlu diperiksa'} · ${esc(c.title)}</strong>${esc(c.detail)}</div>`).join('');
+
+}
+function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}$('exportJSON').onclick=()=>{
+ save();
+ const backup={...db,_backupInfo:{app:'Lalapan Legenda',formatVersion:1,exportedAt:new Date().toISOString(),counts:{ingredients:db.ingredients.length,menus:db.menus.length,salesDays:Object.keys(db.records||{}).length,purchases:db.purchases.length,expenses:db.expenses.length}}};
+ download(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}),`backup-lalapan-legenda-${today()}.json`);
+ localStorage.setItem('lalapanLegendaLastBackupAt',new Date().toISOString());renderSettings();
+};
+$('importButton').onclick=()=>$('importFile').click();
+$('importFile').addEventListener('change',async e=>{
+ const f=e.target.files[0];if(!f)return;
+ try{
+  const x=JSON.parse(await f.text());
+  const validArray=k=>Array.isArray(x[k]);
+  if(!x||typeof x!=='object'||!validArray('ingredients')||!validArray('menus')||!x.records||typeof x.records!=='object'||Array.isArray(x.records)||(x.ops!==undefined&&!validArray('ops'))||(x.expenses!==undefined&&!validArray('expenses'))||(x.purchases!==undefined&&!validArray('purchases')))throw Error('Struktur backup tidak lengkap atau tidak dikenali. Gunakan file backup JSON Lalapan Legenda.');
+  const salesDays=Object.keys(x.records).length,counts=`Bahan: ${x.ingredients.length}\nMenu: ${x.menus.length}\nHari penjualan: ${salesDays}\nPembelian: ${(x.purchases||[]).length}\nPengeluaran: ${(x.expenses||[]).length}`;
+  if(!confirm(`Isi backup yang dipilih:\n${counts}\n\nSebelum impor, aplikasi akan mengunduh backup kondisi saat ini. Lanjutkan?`))return;
+  $('exportJSON').click();
+  db=normalize(x);save();alert('Backup berhasil dipulihkan. Aplikasi akan dimuat ulang.');location.reload();
+ }catch(err){alert('Impor gagal: '+err.message)}finally{e.target.value=''}
+});
+$('resetApp').onclick=()=>{if(!confirm('Reset menghapus database aplikasi pada perangkat ini. Ekspor backup terlebih dahulu. Lanjutkan?'))return;if(!confirm('Konfirmasi kedua: seluruh transaksi lokal akan dihapus.'))return;localStorage.removeItem(KEY);location.reload()};
+function init(){const t=today();['saleDate','purchaseDate','expenseDate'].forEach(id=>$(id).value=t);$('calendarMonth').value=t.slice(0,7);$('reportMonth').value=t.slice(0,7);save();renderDashboard();renderHPP();renderSales();renderInventory();renderPurchases();renderExpenses();renderReports();renderCashFlow();renderCalendar();renderSettings()}
 init();initializeCloudSession();if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(console.error));
 </script></body></html>
