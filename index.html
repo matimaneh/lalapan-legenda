@@ -294,6 +294,18 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
  </form>
 </div>
 
+
+<div id="addMenuModal" class="app-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="addMenuModalTitle">
+ <form id="addMenuForm" class="app-modal">
+  <div class="app-modal-head"><small>MENU & HARGA JUAL</small><h3 id="addMenuModalTitle">Tambah Menu</h3><p>Masukkan nama menu dan harga jual standar.</p></div>
+  <div class="app-modal-body">
+   <div class="field"><label for="newMenuName">Nama menu</label><input id="newMenuName" type="text" maxlength="80" required placeholder="Contoh: Lalapan Ayam"></div>
+   <div class="field"><label for="newMenuPrice">Harga jual standar (Rp)</label><input id="newMenuPrice" type="number" min="0" step="500" required inputmode="numeric" placeholder="25000"></div>
+  </div>
+  <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelAddMenu">Batal</button><button type="submit" class="modal-save">Simpan Menu</button></div>
+ </form>
+</div>
+
 <script>
 'use strict';
 const KEY='lalapanLegendaBusinessV3', OLD='lalapanLegendaHPP', VERSION=4, CLOUD_META_KEY='lalapanLegendaCloudMetaV1';
@@ -475,8 +487,24 @@ $('ingredientForm').addEventListener('submit',e=>{
  renderHPP();
  renderInventory();
 });
-$('addMenu').onclick=()=>{const name=prompt('Nama menu');if(!name?.trim())return;const price=n(prompt('Harga jual standar (Rp)','25000'));db.menus.push({id:uid(),name:name.trim(),price,active:true,recipe:[],extra:0});save();renderHPP()};
+$('addMenu').onclick=()=>openAddMenuModal();
 
+
+function openAddMenuModal(){
+ $('newMenuName').value='';
+ $('newMenuPrice').value='25000';
+ $('addMenuModal').classList.add('open');
+}
+function closeAddMenuModal(){$('addMenuModal').classList.remove('open')}
+$('cancelAddMenu').addEventListener('click',closeAddMenuModal);
+$('addMenuModal').addEventListener('click',e=>{if(e.target===$('addMenuModal'))closeAddMenuModal()});
+$('addMenuForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const name=$('newMenuName').value.trim(),price=Number($('newMenuPrice').value);
+ if(!name||!Number.isFinite(price)||price<0)return;
+ db.menus.push({id:uid(),name,price,active:true,recipe:[],extra:0});
+ save();closeAddMenuModal();renderHPP();
+});
 let editingRecipeMenuId=null,recipeDraft=[],recipeExtraDraft=0;
 function renderRecipeRows(){
  const rows=recipeDraft.map((line,index)=>{
