@@ -306,6 +306,39 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
  #subRecipeRows .recipe-edit-row{grid-template-columns:minmax(0,1fr) 82px 36px;gap:7px}
 }
 
+
+/* Fix layout khusus modal Edit Resep Menu */
+#editRecipeModal .app-modal{width:min(100%,560px)}
+#editRecipeModal .app-modal-body{display:flex;flex-direction:column;gap:10px}
+#editRecipeModal .app-modal-body>.field{
+ display:flex;flex-direction:column;align-items:stretch;gap:8px;
+ width:100%;padding:10px 0;border-bottom:1px solid #ece9df;
+}
+#editRecipeModal .app-modal-body>.field>label{display:block;width:100%;margin:0;line-height:1.4}
+#editRecipeModal .app-modal-body>.field>.row{
+ display:grid;grid-template-columns:minmax(0,1fr) 94px auto;
+ gap:9px;width:100%;align-items:center;
+}
+#editRecipeModal #recipeIngredientSelect{width:100%;min-width:0;box-sizing:border-box;padding:12px;border:1px solid #dcded3;border-radius:10px;background:#fff;color:#203d30}
+#editRecipeModal #recipeNewQty{width:100%!important;min-width:0;box-sizing:border-box;text-align:center;padding:12px}
+#editRecipeModal #addRecipeIngredient{white-space:nowrap;min-height:44px;padding:11px 16px}
+#editRecipeModal #recipeRows{display:grid;gap:0;width:100%;min-height:42px}
+#editRecipeModal #recipeRows .recipe-edit-row{
+ display:grid;grid-template-columns:minmax(0,1fr) 100px 38px;
+ gap:9px;align-items:center;width:100%;box-sizing:border-box;padding:10px 0;
+ border-bottom:1px solid #ece9df;
+}
+#editRecipeModal #recipeRows .recipe-edit-name{min-width:0;overflow-wrap:anywhere;line-height:1.4}
+#editRecipeModal #recipeRows input{width:100%;min-width:0;box-sizing:border-box;min-height:42px;text-align:right}
+#editRecipeModal #recipeRows .recipe-remove{height:40px}
+#editRecipeModal #recipeRows .recipe-empty{display:block;min-height:42px}
+#editRecipeModal #recipeExtraCost{width:100%;box-sizing:border-box}
+@media(max-width:520px){
+ #editRecipeModal .app-modal-body>.field>.row{grid-template-columns:minmax(0,1fr) 78px;gap:8px}
+ #editRecipeModal #addRecipeIngredient{grid-column:1/-1;width:100%}
+ #editRecipeModal #recipeRows .recipe-edit-row{grid-template-columns:minmax(0,1fr) 82px 36px;gap:7px}
+}
+
 /* Thermal receipt page */
 .receipt-preview{width:100%;max-width:340px;margin:0 auto;padding:14px 12px;background:#fff;color:#111;border:1px dashed #c9c9c9;font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
 .receipt-preview .receipt-center{text-align:center}
@@ -404,7 +437,7 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
   <div class="app-modal-head"><small>BIAYA PRODUKSI</small><h3 id="editRecipeTitle">Edit Resep Menu</h3><p>Atur bahan dan takaran untuk satu porsi.</p></div>
   <div class="app-modal-body">
    <div id="recipeRows"></div>
-   <div class="field" style="margin-top:18px"><label for="recipeIngredientSelect">Tambah bahan</label><div class="row" style="gap:8px;align-items:center"><select id="recipeIngredientSelect" style="flex:1;min-width:0;padding:12px;border:1px solid #dcded3;border-radius:10px;background:#fff;color:#203d30"></select><input id="recipeNewQty" type="number" min="0" step="any" value="1" aria-label="Takaran bahan baru" style="width:90px"><button type="button" id="addRecipeIngredient" class="modal-save" style="border:0;border-radius:10px;padding:11px 13px;font-weight:750">Tambah</button></div></div>
+   <div class="field" style="margin-top:18px"><label for="recipeIngredientSelect">Tambah bahan</label><div class="recipe-add-row row" style="gap:8px;align-items:center"><select id="recipeIngredientSelect" style="flex:1;min-width:0;padding:12px;border:1px solid #dcded3;border-radius:10px;background:#fff;color:#203d30"></select><input id="recipeNewQty" type="number" min="0" step="any" value="1" aria-label="Takaran bahan baru" style="width:90px"><button type="button" id="addRecipeIngredient" class="modal-save" style="border:0;border-radius:10px;padding:11px 13px;font-weight:750">Tambah</button></div></div>
    <div class="field"><label for="recipeExtraCost">Biaya tambahan per porsi (Rp)</label><input id="recipeExtraCost" type="number" min="0" step="500" value="0"></div>
   </div>
   <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelEditRecipe">Batal</button><button type="submit" class="modal-save">Simpan Resep</button></div>
