@@ -280,6 +280,32 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
  .actions button{min-height:42px}
 }
 
+
+/* Fix: dedicated responsive layout for sub-recipe modal */
+#subRecipeModal .app-modal{width:min(100%,560px)}
+#subRecipeModal .app-modal-body{display:flex;flex-direction:column;gap:10px}
+#subRecipeModal .app-modal-body>.field{display:flex;flex-direction:column;align-items:stretch;gap:7px;width:100%;padding:9px 0;border-bottom:1px solid #ece9df}
+#subRecipeModal .app-modal-body>.field label{width:100%;margin:0}
+#subRecipeModal .app-modal-body>.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;width:100%}
+#subRecipeModal .app-modal-body>.grid .field{display:flex;flex-direction:column;align-items:stretch;gap:7px;min-width:0;padding:9px 0;border-bottom:1px solid #ece9df}
+#subRecipeModal .app-modal-body>.grid .field label{width:100%;margin:0;line-height:1.4;min-height:30px}
+#subRecipeModal .app-modal-body input,#subRecipeModal .app-modal-body select{width:100%;min-width:0;box-sizing:border-box}
+#subRecipeModal .subrecipe-add-row{display:grid;grid-template-columns:minmax(0,1fr) 100px auto;gap:9px;width:100%;align-items:center}
+#subRecipeModal .subrecipe-add-row select{min-width:0}
+#subRecipeRows{display:grid;gap:0;width:100%;min-height:44px;margin:2px 0 8px}
+#subRecipeRows .recipe-edit-row{display:grid;grid-template-columns:minmax(0,1fr) 110px 38px;gap:9px;align-items:center;padding:10px 0;border-bottom:1px solid #ece9df}
+#subRecipeRows .recipe-edit-name{overflow-wrap:anywhere;line-height:1.4}
+#subRecipeRows input{min-height:42px}
+#subRecipeRows .recipe-remove{height:40px}
+#subRecipeRows .recipe-empty{display:block;min-height:44px}
+#subRecipeCostPreview{display:block;width:100%;padding:11px 12px;background:#f6f5ef;border-radius:10px;line-height:1.5;box-sizing:border-box}
+@media(max-width:520px){
+ #subRecipeModal .app-modal-body>.grid{grid-template-columns:1fr 1fr;gap:10px}
+ #subRecipeModal .subrecipe-add-row{grid-template-columns:minmax(0,1fr) 76px;gap:8px}
+ #subRecipeModal .subrecipe-add-row button{grid-column:1/-1;width:100%;min-height:42px}
+ #subRecipeRows .recipe-edit-row{grid-template-columns:minmax(0,1fr) 82px 36px;gap:7px}
+}
+
 /* Thermal receipt page */
 .receipt-preview{width:100%;max-width:340px;margin:0 auto;padding:14px 12px;background:#fff;color:#111;border:1px dashed #c9c9c9;font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
 .receipt-preview .receipt-center{text-align:center}
@@ -393,7 +419,7 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
    <div class="field"><label for="subRecipeName">Nama racikan</label><input id="subRecipeName" required maxlength="60" placeholder="Contoh: Sambal Terasi"></div>
    <div class="grid"><div class="field"><label for="subRecipeOutputQty">Hasil jadi</label><input id="subRecipeOutputQty" type="number" min="0.001" step="any" value="500" required></div><div class="field"><label for="subRecipeOutputUnit">Satuan hasil</label><select id="subRecipeOutputUnit"><option value="gram">gram</option><option value="ml">ml</option><option value="pcs">pcs</option><option value="porsi">porsi</option></select></div></div>
    <div id="subRecipeRows"></div>
-   <div class="field"><label for="subRecipeIngredient">Tambah bahan baku</label><div class="row" style="gap:8px"><select id="subRecipeIngredient" style="flex:1;min-width:0"></select><input id="subRecipeQty" type="number" min="0.001" step="any" value="10" style="width:95px"><button type="button" class="modal-save" id="addSubRecipeIngredient">Tambah</button></div></div>
+   <div class="field"><label for="subRecipeIngredient">Tambah bahan baku</label><div class="subrecipe-add-row"><select id="subRecipeIngredient" style="flex:1;min-width:0"></select><input id="subRecipeQty" type="number" min="0.001" step="any" value="10" style="width:95px"><button type="button" class="modal-save" id="addSubRecipeIngredient">Tambah</button></div></div>
    <div id="subRecipeCostPreview" class="muted"></div>
   </div>
   <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelSubRecipe">Batal</button><button type="submit" class="modal-save">Simpan Racikan</button></div>
@@ -620,22 +646,28 @@ $('editMenuForm').addEventListener('submit',e=>{
 let subRecipeDraft=[],editingSubRecipeId=null;
 function subRecipeRawCost(r){return expandRecipeLines(r.recipe||[]).reduce((sum,line)=>sum+n(ing(line.ingredientId)?.cost)*line.qty,0)}
 function renderSubRecipeRows(){
- $('subRecipeRows').innerHTML=subRecipeDraft.map((line,index)=>{const i=ing(line[0]);return `<div class="recipe-edit-row"><div class="recipe-edit-name">${esc(i?.name||'Bahan tidak ditemukan')} <span class="recipe-edit-unit">${esc(i?.unit||'')}</span></div><input type="number" min="0" step="any" data-subrecipe-index="${index}" value="${n(line[1])}"><button type="button" class="recipe-remove" data-subrecipe-remove="${index}">×</button></div>`}).join('')||'<div class="recipe-empty">Belum ada bahan. Tambahkan bahan baku di bawah.</div>';
- const temp={recipe:subRecipeDraft};const costValue=expandRecipeLines(temp.recipe).reduce((sum,line)=>sum+n(ing(line.ingredientId)?.cost)*line.qty,0);
- $('subRecipeCostPreview').textContent=`Total biaya produksi: ${fmt(costValue)} · HPP per ${$('subRecipeOutputUnit').value}: ${fmt(n($('subRecipeOutputQty').value)?costValue/n($('subRecipeOutputQty').value):0)}`;
+ const host=$('subRecipeRows');
+ host.innerHTML=subRecipeDraft.map((line,index)=>{
+  const item=ing(line[0]);
+  return `<div class="recipe-edit-row"><div class="recipe-edit-name">${esc(item?.name||'Bahan tidak ditemukan')} <span class="recipe-edit-unit">${esc(item?.unit||'')}</span></div><input type="number" min="0" step="any" data-subrecipe-index="${index}" value="${n(line[1])}" aria-label="Takaran ${esc(item?.name||'bahan')}"><button type="button" class="recipe-remove" data-subrecipe-remove="${index}" aria-label="Hapus bahan">×</button></div>`;
+ }).join('');
+ if(!subRecipeDraft.length)host.innerHTML='<div class="recipe-empty">Belum ada bahan. Pilih bahan baku, isi takaran, lalu tekan Tambah.</div>';
+ const costValue=subRecipeDraft.reduce((sum,line)=>sum+n(ing(line[0])?.cost)*n(line[1]),0);
+ const output=n($('subRecipeOutputQty').value);
+ $('subRecipeCostPreview').textContent=`Total biaya produksi: ${fmt(costValue)} · HPP per ${$('subRecipeOutputUnit').value}: ${fmt(output>0?costValue/output:0)}`;
 }
 function openSubRecipeModal(id=null){
  editingSubRecipeId=id;const r=id?subRecipe(id):null;
  $('subRecipeTitle').textContent=r?'Edit Resep Racikan':'Tambah Resep Racikan';
  $('subRecipeName').value=r?.name||'';$('subRecipeOutputQty').value=r?.outputQty??500;$('subRecipeOutputUnit').value=r?.outputUnit||'gram';
- $('subRecipeIngredient').innerHTML=db.ingredients.map(i=>`<option value="${esc(i.id)}">${esc(i.name)} (${esc(i.unit)})</option>`).join('');
+ $('subRecipeIngredient').innerHTML=db.ingredients.length?db.ingredients.map(i=>`<option value="${esc(i.id)}">${esc(i.name)} (${esc(i.unit)})</option>`).join(''):'<option value="">Belum ada bahan baku — tambahkan di halaman HPP & Menu</option>';
  subRecipeDraft=(r?.recipe||[]).map(x=>[x[0],n(x[1])]);$('subRecipeQty').value=10;renderSubRecipeRows();$('subRecipeModal').classList.add('open');
 }
 function closeSubRecipeModal(){$('subRecipeModal').classList.remove('open');editingSubRecipeId=null}
 $('addSubRecipe').addEventListener('click',()=>openSubRecipeModal());
 $('cancelSubRecipe').addEventListener('click',closeSubRecipeModal);
 $('subRecipeModal').addEventListener('click',e=>{if(e.target===$('subRecipeModal'))closeSubRecipeModal()});
-$('addSubRecipeIngredient').addEventListener('click',()=>{const id=$('subRecipeIngredient').value,qty=Number($('subRecipeQty').value);if(!id||!Number.isFinite(qty)||qty<=0)return;const old=subRecipeDraft.find(x=>x[0]===id);if(old)old[1]=n(old[1])+qty;else subRecipeDraft.push([id,qty]);$('subRecipeQty').value=10;renderSubRecipeRows()});
+$('addSubRecipeIngredient').addEventListener('click',()=>{const id=$('subRecipeIngredient').value,qty=Number($('subRecipeQty').value);if(!id){alert('Pilih bahan baku terlebih dahulu.');return}if(!Number.isFinite(qty)||qty<=0){$('subRecipeQty').focus();return}const old=subRecipeDraft.find(x=>x[0]===id);if(old)old[1]=n(old[1])+qty;else subRecipeDraft.push([id,qty]);$('subRecipeQty').value=10;renderSubRecipeRows()});
 $('subRecipeRows').addEventListener('click',e=>{const b=e.target.closest('[data-subrecipe-remove]');if(!b)return;subRecipeDraft.splice(Number(b.dataset.subrecipeRemove),1);renderSubRecipeRows()});
 $('subRecipeRows').addEventListener('change',e=>{const f=e.target.closest('[data-subrecipe-index]');if(!f)return;const i=Number(f.dataset.subrecipeIndex),v=Number(f.value);if(Number.isFinite(v)&&v>=0&&subRecipeDraft[i])subRecipeDraft[i][1]=v;renderSubRecipeRows()});
 ['subRecipeOutputQty','subRecipeOutputUnit'].forEach(id=>$(id).addEventListener('input',renderSubRecipeRows));
