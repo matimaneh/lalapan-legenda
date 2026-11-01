@@ -350,6 +350,136 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
  #printPreview{position:absolute;left:0;top:0;width:58mm;max-width:58mm;border:0;padding:0;margin:0;font-size:10pt}
  @page{size:58mm auto;margin:2mm}
 }
+
+/* FINAL FIX — prevent recipe rows and add-material form from overlapping */
+#editRecipeModal .app-modal-body{
+ display:block!important;
+ overflow-y:auto!important;
+ min-height:0!important;
+}
+#editRecipeModal #recipeRows{
+ display:block!important;
+ position:relative!important;
+ width:100%!important;
+ height:auto!important;
+ min-height:42px!important;
+ margin:0 0 22px!important;
+ padding:0!important;
+ clear:both!important;
+}
+#editRecipeModal #recipeRows .recipe-edit-row{
+ display:grid!important;
+ position:relative!important;
+ float:none!important;
+ clear:both!important;
+ grid-template-columns:minmax(0,1fr) 92px 38px!important;
+ gap:9px!important;
+ align-items:center!important;
+ width:100%!important;
+ min-height:62px!important;
+ height:auto!important;
+ box-sizing:border-box!important;
+ padding:10px 0!important;
+ margin:0!important;
+ border-bottom:1px solid #ece9df!important;
+}
+#editRecipeModal #recipeRows .recipe-edit-name{
+ display:block!important;
+ position:static!important;
+ min-width:0!important;
+ line-height:1.45!important;
+ overflow-wrap:anywhere!important;
+}
+#editRecipeModal #recipeRows input{
+ display:block!important;
+ position:static!important;
+ width:100%!important;
+ min-width:0!important;
+ height:44px!important;
+ box-sizing:border-box!important;
+}
+#editRecipeModal #recipeRows .recipe-remove{
+ display:block!important;
+ position:static!important;
+ width:38px!important;
+ height:42px!important;
+}
+#editRecipeModal #recipeRows .recipe-empty{
+ display:block!important;
+ position:static!important;
+ min-height:44px!important;
+ padding:13px!important;
+}
+#editRecipeModal .app-modal-body>.field{
+ display:block!important;
+ position:relative!important;
+ clear:both!important;
+ float:none!important;
+ width:100%!important;
+ height:auto!important;
+ min-height:0!important;
+ box-sizing:border-box!important;
+ margin:0!important;
+ padding:13px 0!important;
+ border-top:1px solid #ece9df!important;
+ border-bottom:0!important;
+}
+#editRecipeModal .app-modal-body>.field>label{
+ display:block!important;
+ position:static!important;
+ width:100%!important;
+ margin:0 0 9px!important;
+ line-height:1.45!important;
+}
+#editRecipeModal .app-modal-body>.field>.row{
+ display:grid!important;
+ position:static!important;
+ grid-template-columns:minmax(0,1fr) 82px auto!important;
+ gap:8px!important;
+ align-items:center!important;
+ width:100%!important;
+ height:auto!important;
+ min-height:46px!important;
+}
+#editRecipeModal #recipeIngredientSelect,
+#editRecipeModal #recipeNewQty{
+ display:block!important;
+ position:static!important;
+ width:100%!important;
+ min-width:0!important;
+ height:46px!important;
+ box-sizing:border-box!important;
+}
+#editRecipeModal #addRecipeIngredient{
+ display:block!important;
+ position:static!important;
+ width:auto!important;
+ min-width:76px!important;
+ height:44px!important;
+ white-space:nowrap!important;
+}
+#editRecipeModal #recipeExtraCost{
+ display:block!important;
+ position:static!important;
+ width:100%!important;
+ height:46px!important;
+ box-sizing:border-box!important;
+}
+@media(max-width:520px){
+ #editRecipeModal #recipeRows .recipe-edit-row{
+  grid-template-columns:minmax(0,1fr) 78px 36px!important;
+  gap:7px!important;
+  min-height:60px!important;
+ }
+ #editRecipeModal .app-modal-body>.field>.row{
+  grid-template-columns:minmax(0,1fr) 72px!important;
+ }
+ #editRecipeModal #addRecipeIngredient{
+  grid-column:1/-1!important;
+  width:100%!important;
+ }
+}
+
 </style></head><body>
 <header class="app-header"><div class="brand-mark">LL</div><div class="brand-copy"><h1>LALAPAN LEGENDA</h1><p>Ruang kendali usaha · HPP · Stok · Penjualan · Keuangan</p></div><div class="header-meta"><span class="live-dot"></span><span class="cloud-status" id="cloudStatus">Belum login</span><button id="logoutBtn" class="secondary smallbtn hidden" style="margin-left:5px">Keluar</button></div></header>
 <nav id="nav"><button class="tab active" data-page="dashboard"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-label">Dashboard</span></button><button class="tab" data-page="sales"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Penjualan</span></button><button class="tab" data-page="hpp"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">HPP & Menu</span></button><button class="tab" data-page="inventory"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-label">Persediaan</span></button><button class="tab more-tab" type="button" data-more><span class="nav-icon" aria-hidden="true">⋯</span><span class="nav-label">Lainnya</span></button><div class="more-menu" id="moreMenu" aria-label="Menu lainnya"><button class="tab" data-page="purchases"><span class="nav-icon">＋</span><span class="nav-label">Pembelian</span></button><button class="tab" data-page="expenses"><span class="nav-icon">−</span><span class="nav-label">Pengeluaran</span></button><button class="tab" data-page="cashflow"><span class="nav-icon">＄</span><span class="nav-label">Arus kas</span></button><button class="tab" data-page="printing"><span class="nav-icon">▤</span><span class="nav-label">Cetak Struk</span></button><button class="tab" data-page="reports"><span class="nav-icon">▥</span><span class="nav-label">Laporan</span></button><button class="tab" data-page="calendar"><span class="nav-icon">▣</span><span class="nav-label">Kalender</span></button><button class="tab" data-page="settings"><span class="nav-icon">⚙</span><span class="nav-label">Pengaturan</span></button></div></nav>
