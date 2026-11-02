@@ -1192,7 +1192,7 @@ function renderSales(){
   const recipeOptions=db.subrecipes.map(r=>`<option value="${esc(r.id)}">${esc(r.name)} (${esc(r.outputUnit)})</option>`).join('');
   const groupRows=groups.map(g=>saleVariantRow(m.id,g.subrecipeId,g.qty)).join('');
   return `<div class="item sale-menu-card"><div class="row sale-menu-heading"><b>${esc(m.name)}</b><span class="badge">HPP dasar / porsi ${fmt(cost(m))}</span></div><div class="grid sale-input-grid"><div><label>Jumlah terjual <small>Total semua varian</small></label><input class="sale-qty" data-id="${m.id}" type="number" min="0" step="1" inputmode="numeric" placeholder="0" value="${saved?.qty||0}"></div><div><label>Harga jual per porsi <small>Rupiah</small></label><input class="sale-price" data-id="${m.id}" type="number" min="0" step="500" inputmode="numeric" placeholder="0" value="${saved?.price??m.price}"></div></div>
-  <div class="sale-variant-panel" data-menu-id="${m.id}"><div class="sale-variant-head"><b>Varian sambal / racikan</b><small>Opsional · setiap menu memakai 1 porsi racikan</small></div><div class="sale-variant-rows">${groupRows}</div>${db.subrecipes.length?`<button type="button" class="secondary sale-add-variant" data-menu-id="${m.id}">+ Tambah kelompok sambal</button>`:'<small class="muted">Buat resep racikan terlebih dahulu di halaman HPP & Menu.</small>'}</div></div>`;
+  <div class="sale-variant-panel" data-menu-id="${m.id}"><div class="sale-variant-head"><b>Varian sambal / racikan</b><small>Opsional · hanya untuk statistik pilihan sambal, tidak menambah HPP atau stok</small></div><div class="sale-variant-rows">${groupRows}</div>${db.subrecipes.length?`<button type="button" class="secondary sale-add-variant" data-menu-id="${m.id}">+ Tambah kelompok sambal</button>`:'<small class="muted">Buat resep racikan terlebih dahulu di halaman HPP & Menu.</small>'}</div></div>`;
  }).join('')||'<div class="empty">Belum ada menu aktif. Tambahkan menu terlebih dahulu di halaman HPP & Menu.</div>';
  const status=$('saleStatus');if(status){status.className='sale-status'+(old?' is-saved':'');status.textContent=old?'Transaksi tersimpan untuk tanggal ini. Form memuat snapshot terakhir; simpan ulang akan menggantinya setelah konfirmasi.':'Belum ada transaksi tersimpan untuk tanggal ini.';}
  document.querySelectorAll('#sales input').forEach(x=>x.addEventListener('input',previewSale));
@@ -1206,22 +1206,19 @@ $('saleDate').addEventListener('change',renderSales);function saleItems(){
  return activeMenus().map(m=>{
   const qty=n(document.querySelector(`.sale-qty[data-id="${m.id}"]`)?.value),price=n(document.querySelector(`.sale-price[data-id="${m.id}"]`)?.value??m.price);
   const baseExpanded=expandRecipeLines(m.recipe||[]);
+  // Sambal variant is analytics-only. Recipe/HPP and stock are exclusively from the menu recipe.
   const variants=[...document.querySelectorAll(`.sale-variant-row[data-menu-id="${m.id}"]`)].map(row=>{
-   const subId=row.querySelector('.sale-variant-id')?.value||'',groupQty=n(row.querySelector('.sale-variant-qty')?.value),r=subRecipe(subId),usageQty=1;
+   const subId=row.querySelector('.sale-variant-id')?.value||'',groupQty=n(row.querySelector('.sale-variant-qty')?.value),r=subRecipe(subId);
    if(!subId||!r||groupQty<=0)return null;
-   const raw=expandRecipeLines([['@sub:'+subId,usageQty]]);
-   const variantCost=raw.reduce((sum,line)=>sum+n(ing(line.ingredientId)?.cost)*line.qty,0);
-   return {subrecipeId:subId,name:r.name,qty:groupQty,usageQty,outputQty:n(r.outputQty),outputUnit:r.outputUnit,hppPerPortion:variantCost,recipeSnapshot:raw.map(line=>{const i=ing(line.ingredientId);return {ingredientId:i.id,name:i.name,unit:i.unit,qty:line.qty,unitCost:n(i.cost),lineCost:n(i.cost)*line.qty}})};
+   return {subrecipeId:subId,name:r.name,qty:groupQty,usageQty:1,outputQty:n(r.outputQty),outputUnit:r.outputUnit,hppPerPortion:0,recipeSnapshot:[]};
   }).filter(Boolean);
   const usedVariantQty=variants.reduce((sum,v)=>sum+v.qty,0);
   const baseTotal=baseExpanded.reduce((sum,line)=>sum+n(ing(line.ingredientId)?.cost)*line.qty,0)+n(m.extra);
-  const variantTotal=variants.reduce((sum,v)=>sum+v.hppPerPortion*v.qty,0);
-  const totalHpp=baseTotal*qty+variantTotal;
+  const totalHpp=baseTotal*qty;
   const stockTotals={};
   baseExpanded.forEach(line=>stockTotals[line.ingredientId]=(stockTotals[line.ingredientId]||0)+line.qty*qty);
-  variants.forEach(v=>v.recipeSnapshot.forEach(line=>stockTotals[line.ingredientId]=(stockTotals[line.ingredientId]||0)+line.qty*v.qty));
   const recipeSnapshot=Object.entries(stockTotals).map(([id,totalQty])=>{const i=ing(id);return i?{ingredientId:i.id,name:i.name,unit:i.unit,qty:qty?totalQty/qty:0,unitCost:n(i.cost),lineCost:qty?totalQty/qty*n(i.cost):0}:null}).filter(Boolean);
-  return {id:m.id,name:m.name,qty,price,hpp:qty?totalHpp/qty:cost(m),baseHpp:cost(m),variantHpp:qty?variantTotal/qty:0,variants,recipeSnapshot,variantQty:usedVariantQty};
+  return {id:m.id,name:m.name,qty,price,hpp:qty?totalHpp/qty:cost(m),baseHpp:cost(m),variantHpp:0,variants,recipeSnapshot,variantQty:usedVariantQty};
  });
 }
 $('salesInputs').addEventListener('click',e=>{
