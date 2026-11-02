@@ -704,6 +704,17 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
 @media(max-width:1050px){#menuList{grid-template-columns:1fr}}
 @media(max-width:850px){#menuList{grid-template-columns:1fr}#menuList>.item{padding:14px}}
 
+
+/* Kategori menu di halaman HPP */
+.menu-category-group{margin:0 0 22px}
+.menu-category-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 4px 12px;border-bottom:2px solid var(--line,#e8e3d8);margin-bottom:12px}
+.menu-category-heading h3{margin:0;font-size:17px;color:var(--green,#205c49)}
+.menu-category-heading span{font-size:12px;color:var(--muted,#7b817b)}
+.menu-category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.menu-category-grid>.item{margin:0;min-width:0;padding:16px;display:flex;flex-direction:column;gap:10px}
+.menu-category-grid>.item .actions{margin-top:auto;display:flex;flex-wrap:wrap;gap:6px}
+@media(max-width:1050px){.menu-category-grid{grid-template-columns:1fr}}
+
 </style></head><body>
 <header class="app-header"><img class="brand-mark" src="./icons/icon.jpeg" alt="Logo Lalapan Legenda"><div class="brand-copy"><h1>LALAPAN LEGENDA</h1><p>Ruang kendali usaha · HPP · Stok · Penjualan · Keuangan</p></div><div class="header-meta"><span class="live-dot"></span><span class="cloud-status" id="cloudStatus">Belum login</span><button id="logoutBtn" class="secondary smallbtn hidden" style="margin-left:5px">Keluar</button></div></header>
 <nav id="nav"><button class="tab active" data-page="dashboard"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-label">Dashboard</span></button><button class="tab" data-page="sales"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Penjualan</span></button><button class="tab" data-page="hpp"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">HPP & Menu</span></button><button class="tab" data-page="inventory"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-label">Persediaan</span></button><button class="tab more-tab" type="button" data-more><span class="nav-icon" aria-hidden="true">⋯</span><span class="nav-label">Lainnya</span></button><div class="more-menu" id="moreMenu" aria-label="Menu lainnya"><button class="tab" data-page="purchases"><span class="nav-icon">＋</span><span class="nav-label">Pembelian</span></button><button class="tab" data-page="expenses"><span class="nav-icon">−</span><span class="nav-label">Pengeluaran</span></button><button class="tab" data-page="cashflow"><span class="nav-icon">＄</span><span class="nav-label">Arus kas</span></button><button class="tab" data-page="printing"><span class="nav-icon">▤</span><span class="nav-label">Cetak Struk</span></button><button class="tab" data-page="reports"><span class="nav-icon">▥</span><span class="nav-label">Laporan</span></button><button class="tab" data-page="calendar"><span class="nav-icon">▣</span><span class="nav-label">Kalender</span></button><button class="tab" data-page="settings"><span class="nav-icon">⚙</span><span class="nav-label">Pengaturan</span></button></div></nav>
@@ -779,7 +790,7 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
     <div class="app-modal-head"><small>KELOLA PRODUK</small><h3 id="editMenuTitle">Edit Menu</h3><p>Perbarui informasi menu dan harga jual standar.</p></div>
     <div class="app-modal-body">
       <div class="field"><label for="editMenuName">Nama menu</label><input id="editMenuName" type="text" maxlength="80" required placeholder="Contoh: Nasi Ayam Goreng"></div>
-      <div class="field"><label for="editMenuPrice">Harga jual standar (Rp)</label><input id="editMenuPrice" type="number" min="0" step="500" required inputmode="numeric" placeholder="25000"></div>
+      <div class="field"><label for="editMenuCategory">Kategori menu</label><select id="editMenuCategory"><option value="Dengan Nasi">Dengan Nasi</option><option value="Tanpa Nasi">Tanpa Nasi</option><option value="Minuman">Minuman</option><option value="Tambahan">Tambahan</option><option value="Lainnya">Lainnya</option></select></div><div class="field"><label for="editMenuPrice">Harga jual standar (Rp)</label><input id="editMenuPrice" type="number" min="0" step="500" required inputmode="numeric" placeholder="25000"></div>
     </div>
     <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelEditMenu">Batal</button><button type="submit" class="modal-save">Simpan Perubahan</button></div>
   </form>
@@ -877,7 +888,7 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
   <div class="app-modal-head"><small>MENU & HARGA JUAL</small><h3 id="addMenuModalTitle">Tambah Menu</h3><p>Masukkan nama menu dan harga jual standar.</p></div>
   <div class="app-modal-body">
    <div class="field"><label for="newMenuName">Nama menu</label><input id="newMenuName" type="text" maxlength="80" required placeholder="Contoh: Lalapan Ayam"></div>
-   <div class="field"><label for="newMenuPrice">Harga jual standar (Rp)</label><input id="newMenuPrice" type="number" min="0" step="500" required inputmode="numeric" placeholder="25000"></div>
+   <div class="field"><label for="newMenuCategory">Kategori menu</label><select id="newMenuCategory"><option value="Dengan Nasi">Dengan Nasi</option><option value="Tanpa Nasi">Tanpa Nasi</option><option value="Minuman">Minuman</option><option value="Tambahan">Tambahan</option><option value="Lainnya">Lainnya</option></select></div><div class="field"><label for="newMenuPrice">Harga jual standar (Rp)</label><input id="newMenuPrice" type="number" min="0" step="500" required inputmode="numeric" placeholder="25000"></div>
   </div>
   <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelAddMenu">Batal</button><button type="submit" class="modal-save">Simpan Menu</button></div>
  </form>
@@ -1006,6 +1017,7 @@ let editingMenuId=null;
 function openMenuEditModal(menu){
  editingMenuId=menu.id;
  $('editMenuName').value=menu.name||'';
+ $('editMenuCategory').value=menu.category||'Lainnya';
  $('editMenuPrice').value=n(menu.price);
  $('editMenuModal').classList.add('open');
  setTimeout(()=>$('editMenuName').focus(),30);
@@ -1024,6 +1036,7 @@ $('editMenuForm').addEventListener('submit',e=>{
  if(!name){$('editMenuName').focus();return}
  if(!Number.isFinite(price)||price<0){$('editMenuPrice').focus();return}
  menu.name=name;
+ menu.category=$('editMenuCategory').value||'Lainnya';
  menu.price=price;
  save();
  closeMenuEditModal();
@@ -1077,7 +1090,12 @@ $('subRecipeList').addEventListener('click',e=>{
  }
 });
 
-function renderHPP(){$('subRecipeList').innerHTML=db.subrecipes.map(r=>`<div class="item"><div class="row"><b>${esc(r.name)}</b><b>${fmt(subRecipeRawCost(r))}</b></div><div class="muted">Hasil ${n(r.outputQty)} ${esc(r.outputUnit)} · HPP/${esc(r.outputUnit)} ${fmt(n(r.outputQty)?subRecipeRawCost(r)/n(r.outputQty):0)}</div><div class="muted">${(r.recipe||[]).map(x=>`${esc(ing(x[0])?.name||x[0])} ${n(x[1])} ${esc(ing(x[0])?.unit||'')}`).join(' · ')}</div><div class="actions"><button class="secondary smallbtn" data-subrecipe-action="edit" data-id="${r.id}">Edit</button><button class="warn smallbtn" data-subrecipe-action="delete" data-id="${r.id}">Hapus</button></div></div>`).join('')||'<div class="empty">Belum ada resep racikan.</div>';$('menuList').innerHTML=db.menus.map(m=>`<div class="item"><div class="row"><div><h3>${esc(m.name)}</h3><span class="badge ${m.active===false?'gold':''}">${m.active===false?'Diarsipkan':'Aktif'}</span></div><b>${fmt(cost(m))}</b></div><div class="line"><span>Harga jual</span><b>${fmt(m.price)}</b></div><div class="line"><span>Margin sebelum operasional</span><b>${fmt(m.price-cost(m))}</b></div><p class="muted">${(m.recipe||[]).map(l=>`${esc(recipeLineName(l[0]))} ${l[1]} ${esc(isSubRecipeLine(l[0])?subRecipe(l[0])?.outputUnit||'':ing(l[0])?.unit||'')}`).join(' · ')||'Resep kosong'}</p><div class="actions"><button class="secondary smallbtn" data-action="recipe" data-id="${m.id}">Edit resep</button><button class="secondary smallbtn" data-action="menu" data-id="${m.id}">Edit menu</button><button class="secondary smallbtn" data-action="duplicate" data-id="${m.id}">Duplikat</button><button class="warn smallbtn" data-action="archive" data-id="${m.id}">${m.active===false?'Aktifkan':'Arsipkan'}</button></div></div>`).join('');$('ingredientList').innerHTML=db.ingredients.map(i=>`<div class="line"><span><b>${esc(i.name)}</b><small class="muted">${esc(i.unit)} · stok ${n(i.stock)}</small></span><span><b>${fmt(i.cost)}/${esc(i.unit)}</b> <button class="secondary smallbtn" data-action="ingredient" data-id="${i.id}">Edit</button></span></div>`).join('');$('defaultOps').innerHTML=db.ops.map(o=>`<div class="field"><label>${esc(o.name)}</label><input type="number" min="0" data-op="${o.id}" value="${n(o.value)}"></div>`).join('')}
+function renderHPP(){$('subRecipeList').innerHTML=db.subrecipes.map(r=>`<div class="item"><div class="row"><b>${esc(r.name)}</b><b>${fmt(subRecipeRawCost(r))}</b></div><div class="muted">Hasil ${n(r.outputQty)} ${esc(r.outputUnit)} · HPP/${esc(r.outputUnit)} ${fmt(n(r.outputQty)?subRecipeRawCost(r)/n(r.outputQty):0)}</div><div class="muted">${(r.recipe||[]).map(x=>`${esc(ing(x[0])?.name||x[0])} ${n(x[1])} ${esc(ing(x[0])?.unit||'')}`).join(' · ')}</div><div class="actions"><button class="secondary smallbtn" data-subrecipe-action="edit" data-id="${r.id}">Edit</button><button class="warn smallbtn" data-subrecipe-action="delete" data-id="${r.id}">Hapus</button></div></div>`).join('')||'<div class="empty">Belum ada resep racikan.</div>';const menuCategories=['Dengan Nasi','Tanpa Nasi','Minuman','Tambahan','Lainnya'];
+$('menuList').innerHTML=menuCategories.map(category=>{
+ const items=db.menus.filter(m=>(m.category||'Lainnya')===category);
+ if(!items.length)return '';
+ return `<section class="menu-category-group"><div class="menu-category-heading"><h3>${esc(category)}</h3><span>${items.length} menu</span></div><div class="menu-category-grid">${items.map(m=>`<div class="item"><div class="row"><div><h3>${esc(m.name)}</h3><span class="badge ${m.active===false?'gold':''}">${m.active===false?'Diarsipkan':'Aktif'}</span></div><b>${fmt(cost(m))}</b></div><div class="line"><span>Harga jual</span><b>${fmt(m.price)}</b></div><div class="line"><span>Margin sebelum operasional</span><b>${fmt(m.price-cost(m))}</b></div><p class="muted">${(m.recipe||[]).map(l=>`${esc(recipeLineName(l[0]))} ${l[1]} ${esc(isSubRecipeLine(l[0])?subRecipe(l[0])?.outputUnit||'':ing(l[0])?.unit||'')}`).join(' · ')||'Resep kosong'}</p><div class="actions"><button class="secondary smallbtn" data-action="recipe" data-id="${m.id}">Edit resep</button><button class="secondary smallbtn" data-action="menu" data-id="${m.id}">Edit menu</button><button class="secondary smallbtn" data-action="duplicate" data-id="${m.id}">Duplikat</button><button class="warn smallbtn" data-action="archive" data-id="${m.id}">${m.active===false?'Aktifkan':'Arsipkan'}</button></div></div>`).join('')}</div></section>`;
+}).join('')||'<div class="empty">Belum ada menu.</div>'; $('ingredientList').innerHTML=db.ingredients.map(i=>`<div class="line"><span><b>${esc(i.name)}</b><small class="muted">${esc(i.unit)} · stok ${n(i.stock)}</small></span><span><b>${fmt(i.cost)}/${esc(i.unit)}</b> <button class="secondary smallbtn" data-action="ingredient" data-id="${i.id}">Edit</button></span></div>`).join('');$('defaultOps').innerHTML=db.ops.map(o=>`<div class="field"><label>${esc(o.name)}</label><input type="number" min="0" data-op="${o.id}" value="${n(o.value)}"></div>`).join('')}
 $('menuList').addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const m=db.menus.find(x=>x.id===b.dataset.id);if(!m)return;if(b.dataset.action==='archive'){m.active=m.active===false;save();renderHPP()}if(b.dataset.action==='menu'){openMenuEditModal(m)}if(b.dataset.action==='recipe')editRecipe(m);if(b.dataset.action==='duplicate'){const baseName=`${m.name} (Salinan)`;let copyName=baseName,n=2;while(db.menus.some(x=>x.name.toLowerCase()===copyName.toLowerCase())){copyName=`${baseName} ${n++}`}const copy={...m,id:uid(),name:copyName,active:true,recipe:(m.recipe||[]).map(line=>[...line])};db.menus.push(copy);save();renderHPP();alert(`Menu berhasil diduplikat: ${copyName}. Silakan edit nama, harga, atau resepnya.`)}});
 $('ingredientList').addEventListener('click',e=>{const b=e.target.closest('[data-action=ingredient]');if(!b)return;openIngredientModal('edit',b.dataset.id)});$('defaultOps').addEventListener('change',e=>{const id=e.target.dataset.op;if(id){const o=db.ops.find(x=>x.id===id);o.value=n(e.target.value);save()}});
 $('addIngredient').onclick=()=>openIngredientModal('add');
@@ -1136,6 +1154,7 @@ $('addMenu').onclick=()=>openAddMenuModal();
 
 function openAddMenuModal(){
  $('newMenuName').value='';
+ $('newMenuCategory').value='Dengan Nasi';
  $('newMenuPrice').value='25000';
  $('addMenuModal').classList.add('open');
 }
@@ -1144,9 +1163,9 @@ $('cancelAddMenu').addEventListener('click',closeAddMenuModal);
 $('addMenuModal').addEventListener('click',e=>{if(e.target===$('addMenuModal'))closeAddMenuModal()});
 $('addMenuForm').addEventListener('submit',e=>{
  e.preventDefault();
- const name=$('newMenuName').value.trim(),price=Number($('newMenuPrice').value);
+ const name=$('newMenuName').value.trim(),price=Number($('newMenuPrice').value),category=$('newMenuCategory').value||'Lainnya';
  if(!name||!Number.isFinite(price)||price<0)return;
- db.menus.push({id:uid(),name,price,active:true,recipe:[],extra:0});
+ db.menus.push({id:uid(),name,category,price,active:true,recipe:[],extra:0});
  save();closeAddMenuModal();renderHPP();
 });
 let editingRecipeMenuId=null,recipeDraft=[],recipeExtraDraft=0;
