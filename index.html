@@ -741,6 +741,17 @@ button.secondary{background:#edf1eb;color:#345244}button.warn{background:#fff4df
 #downloadHppReport{white-space:nowrap}
 @media(max-width:600px){#downloadHppReport{font-size:12px;padding:9px}}
 
+
+/* PDF report in same tab, avoids browser popup blocking */
+body.hpp-report-open>*:not(#hppPdfReport){display:none!important}
+#hppPdfReport{display:block!important;background:#fff;color:#203c32;padding:24px;max-width:900px;margin:20px auto;font-family:Arial,sans-serif}
+.hpp-print-header{background:#17483b;color:#fff8e9;padding:18px 20px;border-bottom:4px solid #c99a43}
+.hpp-print-header h1{font-size:22px;margin:0 0 5px}.hpp-print-header p{margin:0;font-size:12px}
+.hpp-print-meta{font-size:12px;color:#64736a;margin:18px 0}
+.hpp-print-actions{display:flex;gap:10px;margin:14px 0}.hpp-print-actions button{padding:10px 14px;border:0;border-radius:6px;background:#205b49;color:white;font-weight:bold;cursor:pointer}
+.hpp-print-table{width:100%;border-collapse:collapse;font-size:12px}.hpp-print-table th{background:#e8efe9;color:#17483b;text-align:left;padding:10px;border-bottom:2px solid #c99a43}.hpp-print-table td{padding:9px 10px;border-bottom:1px solid #dfe5dd}.hpp-print-table tr:nth-child(even){background:#faf9f4}.hpp-print-footer{margin-top:18px;font-size:10px;color:#778078;text-align:right}
+@media print{body.hpp-report-open>*:not(#hppPdfReport){display:none!important}#hppPdfReport{display:block!important;margin:0;padding:0;max-width:none}.hpp-print-actions{display:none!important}@page{size:A4 portrait;margin:15mm}}
+
 </style></head><body>
 <header class="app-header"><img class="brand-mark" src="./icons/icon.jpeg" alt="Logo Lalapan Legenda"><div class="brand-copy"><h1>LALAPAN LEGENDA</h1><p>Ruang kendali usaha · HPP · Stok · Penjualan · Keuangan</p></div><div class="header-meta"><span class="live-dot"></span><span class="cloud-status" id="cloudStatus">Belum login</span><button id="logoutBtn" class="secondary smallbtn hidden" style="margin-left:5px">Keluar</button></div></header>
 <nav id="nav"><button class="tab active" data-page="dashboard"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-label">Dashboard</span></button><button class="tab" data-page="sales"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Penjualan</span></button><button class="tab" data-page="hpp"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">HPP & Menu</span></button><button class="tab" data-page="inventory"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-label">Persediaan</span></button><button class="tab more-tab" type="button" data-more><span class="nav-icon" aria-hidden="true">⋯</span><span class="nav-label">Lainnya</span></button><div class="more-menu" id="moreMenu" aria-label="Menu lainnya"><button class="tab" data-page="purchases"><span class="nav-icon">＋</span><span class="nav-label">Pembelian</span></button><button class="tab" data-page="expenses"><span class="nav-icon">−</span><span class="nav-label">Pengeluaran</span></button><button class="tab" data-page="cashflow"><span class="nav-icon">＄</span><span class="nav-label">Arus kas</span></button><button class="tab" data-page="printing"><span class="nav-icon">▤</span><span class="nav-label">Cetak Struk</span></button><button class="tab" data-page="reports"><span class="nav-icon">▥</span><span class="nav-label">Laporan</span></button><button class="tab" data-page="calendar"><span class="nav-icon">▣</span><span class="nav-label">Kalender</span></button><button class="tab" data-page="settings"><span class="nav-icon">⚙</span><span class="nav-label">Pengaturan</span></button></div></nav>
@@ -1256,34 +1267,13 @@ $('editRecipeForm').addEventListener('submit',e=>{
 function downloadHppReport(){
  const items=(db.menus||[]).filter(m=>m.active!==false);
  const rows=items.map(m=>({name:m.name,hpp:Math.round(cost(m)),price:Math.round(n(m.price))}));
- const w=window.open('','_blank');
- if(!w){alert('Popup diblokir browser. Izinkan popup untuk aplikasi Lalapan Legenda lalu coba lagi.');return;}
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Laporan HPP Lalapan Legenda</title>
- <style>
- @page{size:A4 portrait;margin:15mm}
- body{font-family:Arial,sans-serif;color:#203c32;margin:0}
- header{background:#17483b;color:#fff8e9;padding:18px 20px;border-bottom:4px solid #c99a43}
- h1{font-size:21px;margin:0 0 5px} header p{margin:0;font-size:11px}
- .meta{margin:18px 0 12px;font-size:11px;color:#64736a}
- table{width:100%;border-collapse:collapse;font-size:12px}
- th{background:#e8efe9;color:#17483b;text-align:left;padding:10px;border-bottom:2px solid #c99a43}
- td{padding:9px 10px;border-bottom:1px solid #dfe5dd}
- td.num,th.num{text-align:right;white-space:nowrap}
- tbody tr:nth-child(even){background:#faf9f4}
- footer{margin-top:18px;font-size:10px;color:#778078;text-align:right}
- .print{margin:15px 0;padding:9px 14px;border:0;border-radius:6px;background:#205b49;color:white;font-weight:bold}
- @media print{.print{display:none}}
- </style></head><body>
- <header><h1>LALAPAN LEGENDA</h1><p>Laporan HPP & Harga Jual Menu</p></header>
- <div class="meta">Tanggal cetak: ${esc(new Date().toLocaleDateString('id-ID'))} · ${rows.length} menu aktif</div>
- <button class="print" onclick="window.print()">Cetak / Simpan PDF</button>
- <table><thead><tr><th>No.</th><th>Nama Menu</th><th class="num">HPP (Rp)</th><th class="num">Harga Jual (Rp)</th></tr></thead>
- <tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.name)}</td><td class="num">${r.hpp.toLocaleString('id-ID')}</td><td class="num">${r.price.toLocaleString('id-ID')}</td></tr>`).join('')}</tbody></table>
- <footer>Lalapan Legenda · Dokumen internal</footer>
- <script>window.onload=()=>setTimeout(()=>window.print(),350)<\/script>
- </body></html>`);
- w.document.close();
+ const report=document.createElement('section'); report.id='hppPdfReport';
+ report.innerHTML=`<header class="hpp-print-header"><h1>LALAPAN LEGENDA</h1><p>Laporan HPP & Harga Jual Menu</p></header>
+ <p class="hpp-print-meta">Tanggal cetak: ${esc(new Date().toLocaleDateString('id-ID'))} · ${rows.length} menu aktif</p>
+ <div class="hpp-print-actions"><button onclick="window.print()">Cetak / Simpan PDF</button><button onclick="document.getElementById('hppPdfReport').remove();document.body.classList.remove('hpp-report-open')">Kembali ke aplikasi</button></div>
+ <table class="hpp-print-table"><thead><tr><th>No.</th><th>Nama Menu</th><th>HPP (Rp)</th><th>Harga Jual (Rp)</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.name)}</td><td>${r.hpp.toLocaleString('id-ID')}</td><td>${r.price.toLocaleString('id-ID')}</td></tr>`).join('')}</tbody></table><p class="hpp-print-footer">Lalapan Legenda · Dokumen internal</p>`;
+ document.body.classList.add('hpp-report-open');document.body.appendChild(report);report.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function renderSales(){
