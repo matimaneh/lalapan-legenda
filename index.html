@@ -1309,13 +1309,14 @@ function renderSales(){
  const date=$('saleDate').value||today(),old=db.records[date];
  $('dailyOps').innerHTML=db.ops.map(o=>`<div class="field sale-op-field"><label>${esc(o.name)}<small>Biaya operasional harian</small></label><input class="daily-op" data-id="${o.id}" type="number" min="0" inputmode="numeric" aria-label="Biaya ${esc(o.name)}" value="${old?.ops?.[o.id]??o.value}"></div>`).join('');
  $('dailyExtra').value=old?.dailyExtra||0;
- $('salesInputs').innerHTML=activeMenus().map(m=>{
+ const menuCategories=['Dengan Nasi','Tanpa Nasi','Minuman','Tambahan','Lainnya'];
+ $('salesInputs').innerHTML=menuCategories.map(category=>{const categoryMenus=activeMenus().filter(m=>(m.category||'Lainnya')===category);if(!categoryMenus.length)return '';const cards=categoryMenus.map(m=>{
   const saved=recItems(old||{}).find(x=>x.id===m.id),groups=saved?.variants||[];
   const recipeOptions=db.subrecipes.map(r=>`<option value="${esc(r.id)}">${esc(r.name)} (${esc(r.outputUnit)})</option>`).join('');
   const groupRows=groups.map(g=>saleVariantRow(m.id,g.subrecipeId,g.qty)).join('');
   return `<div class="item sale-menu-card"><div class="row sale-menu-heading"><b>${esc(m.name)}</b><span class="badge sale-hpp-badge">HPP ${fmt(cost(m))}/porsi</span></div><div class="grid sale-input-grid"><div><label>Jumlah terjual <small>Total semua varian</small></label><input class="sale-qty" data-id="${m.id}" type="number" min="0" step="1" inputmode="numeric" placeholder="0" value="${saved?.qty||0}"></div><div><label>Harga jual per porsi <small>Rupiah</small></label><input class="sale-price" data-id="${m.id}" type="number" min="0" step="500" inputmode="numeric" placeholder="0" value="${saved?.price??m.price}"></div></div>
   <div class="sale-variant-panel" data-menu-id="${m.id}"><div class="sale-variant-head"><b>Varian sambal / racikan</b><small>Opsional · hanya untuk statistik pilihan sambal, tidak menambah HPP atau stok</small></div><div class="sale-variant-rows">${groupRows}</div>${db.subrecipes.length?`<button type="button" class="secondary sale-add-variant" data-menu-id="${m.id}">+ Tambah kelompok sambal</button>`:'<small class="muted">Buat resep racikan terlebih dahulu di halaman HPP & Menu.</small>'}</div></div>`;
- }).join('')||'<div class="empty">Belum ada menu aktif. Tambahkan menu terlebih dahulu di halaman HPP & Menu.</div>';
+ }).join('');return cards?`<section class="menu-category-group sale-category-group"><div class="menu-category-heading"><h3>${esc(category)}</h3><span>${categoryMenus.length} menu</span></div><div class="menu-category-grid">${cards}</div></section>`:''}).join('')||'<div class="empty">Belum ada menu aktif. Tambahkan menu terlebih dahulu di halaman HPP & Menu.</div>';
  const status=$('saleStatus');if(status){status.className='sale-status'+(old?' is-saved':'');status.textContent=old?'Transaksi tersimpan untuk tanggal ini. Form memuat snapshot terakhir; simpan ulang akan menggantinya setelah konfirmasi.':'Belum ada transaksi tersimpan untuk tanggal ini.';}
  document.querySelectorAll('#sales input').forEach(x=>x.addEventListener('input',previewSale));
  previewSale();
