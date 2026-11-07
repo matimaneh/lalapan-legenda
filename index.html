@@ -1384,9 +1384,7 @@ function renderPurchases(){ $('purchaseIngredient').innerHTML=db.ingredients.map
 function openPurchaseModal(){
  $('purchaseDate').value=today();
  $('purchaseIngredient').innerHTML=db.ingredients.map(i=>`<option value="${esc(i.id)}">${esc(i.name)}</option>`).join('');
- $('purchaseQty').value='';
  $('purchaseTotal').value='';
- $('purchaseSupplier').value='';
  $('purchaseNote').value='';
  $('purchaseModal').classList.add('open');
 }
