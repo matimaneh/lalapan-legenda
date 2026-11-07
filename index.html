@@ -852,6 +852,9 @@ nav#nav .tab[data-page="inventory"],nav#nav .more-menu .tab[data-page="inventory
  </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+window.loadSupabaseLibrary=window.loadSupabaseLibrary||(()=>{if(window.supabase?.createClient)return Promise.resolve(true);if(window.supabaseLibraryPromise)return window.supabaseLibraryPromise;window.supabaseLibraryPromise=(async()=>{for(const src of ["https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"]){const loaded=await new Promise(resolve=>{const script=document.createElement("script");let done=false;const finish=value=>{if(done)return;done=true;clearTimeout(timer);script.onload=script.onerror=null;resolve(value)};const timer=setTimeout(()=>finish(false),12000);script.src=src;script.onload=()=>finish(true);script.onerror=()=>finish(false);document.head.appendChild(script)});if(loaded&&window.supabase?.createClient)return true}return false})();return window.supabaseLibraryPromise});
+</script>
 
 <div id="editMenuModal" class="app-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="editMenuTitle">
   <form id="editMenuForm" class="app-modal">
@@ -1038,7 +1041,7 @@ async function checkCloudForUpdates(){
  }catch(e){console.error('Cloud polling:',e);cloudLabel('Gagal memeriksa cloud','error')}
 }
 function renderAll(){renderDashboard();renderHPP();renderSales();renderInventory();renderPurchases();renderExpenses();renderReports();renderCashFlow();renderPrintPage();renderCalendar();renderSettings()}
-async function initializeCloudSession(){if(!window.supabase?.createClient){$('authError').textContent='Library koneksi cloud belum termuat. Periksa internet lalu muat ulang halaman.';cloudLabel('Library cloud tidak tersedia','error');return}supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});const {data:{session},error}=await supabaseClient.auth.getSession();if(error)console.warn(error);if(session?.user){await onAuthenticated(session.user)}else{$('authGate').classList.remove('hidden');cloudLabel('Menunggu login')}}
+async function initializeCloudSession(){if(!window.supabase?.createClient&&!await window.loadSupabaseLibrary()){ $('authError').textContent='Pustaka koneksi cloud gagal dimuat. Periksa koneksi internet lalu coba lagi.';cloudLabel('Library cloud tidak tersedia','error');return}if(!window.supabase?.createClient){$('authError').textContent='Pustaka koneksi cloud belum tersedia.';return}supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});const {data:{session},error}=await supabaseClient.auth.getSession();if(error)console.warn(error);if(session?.user){await onAuthenticated(session.user)}else{$('authGate').classList.remove('hidden');cloudLabel('Menunggu login')}}
 async function onAuthenticated(user){
  currentUser=user;$('authGate').classList.add('hidden');$('logoutBtn').classList.remove('hidden');cloudLabel('Memeriksa cloud…');
  try{
@@ -1055,7 +1058,7 @@ async function onAuthenticated(user){
   if(cloudPollTimer)clearInterval(cloudPollTimer);cloudPollTimer=setInterval(checkCloudForUpdates,8000);
  }catch(e){console.error(e);cloudReady=false;$('authGate').classList.remove('hidden');$('logoutBtn').classList.add('hidden');cloudLabel('Gagal memuat cloud','error');alert('Tidak dapat memuat/sinkronisasi cloud: '+(e.message||e)+'\nData lokal di perangkat ini tetap dipertahankan. Periksa SQL dan koneksi Supabase.')}
 }
-$('authForm').addEventListener('submit',async e=>{e.preventDefault();$('authError').textContent='';$('loginBtn').disabled=true;$('loginBtn').textContent='Memproses…';try{if(!supabaseClient)throw new Error('Koneksi Supabase belum siap. Muat ulang halaman.');const {data,error}=await supabaseClient.auth.signInWithPassword({email:$('authEmail').value.trim(),password:$('authPassword').value});if(error)throw error;await onAuthenticated(data.user)}catch(err){$('authError').textContent=err.message||'Login gagal.'}finally{$('loginBtn').disabled=false;$('loginBtn').textContent='Login dan sinkronkan'}});
+$('authForm').addEventListener('submit',async e=>{e.preventDefault();$('authError').textContent='';$('loginBtn').disabled=true;$('loginBtn').textContent='Memproses…';try{if(!supabaseClient)await window.supabaseReady;if(!supabaseClient)throw new Error($('authError').textContent||'Koneksi cloud belum siap. Periksa internet lalu coba lagi.');const {data,error}=await supabaseClient.auth.signInWithPassword({email:$('authEmail').value.trim(),password:$('authPassword').value});if(error)throw error;await onAuthenticated(data.user)}catch(err){$('authError').textContent=err.message||'Login gagal.'}finally{$('loginBtn').disabled=false;$('loginBtn').textContent='Login dan sinkronkan'}});
 $('logoutBtn').addEventListener('click',async()=>{if(!confirm('Keluar dari akun? Data lokal tetap tersimpan di perangkat ini.'))return;cloudReady=false;currentUser=null;await supabaseClient.auth.signOut();$('authGate').classList.remove('hidden');$('logoutBtn').classList.add('hidden');cloudLabel('Belum login')});
 $('refreshCloud').addEventListener('click',async()=>{if(!currentUser)return alert('Login terlebih dahulu.');if(!confirm('Muat ulang data cloud? Data lokal perangkat ini akan diganti setelah backup otomatis.'))return;try{backupDownloadSnapshot(db,'sebelum-refresh-cloud');const remote=await fetchCloudState();if(!remote)throw new Error('Belum ada data di cloud.');await applyCloudPayload(remote.payload,remote.updated_at);cloudLabel('Data cloud dimuat','ok');alert('Data cloud berhasil dimuat.')}catch(e){alert('Gagal memuat cloud: '+e.message)}});
 function save(){localStorage.setItem(KEY,JSON.stringify(db));scheduleCloudSync()}function ing(id){return db.ingredients.find(x=>x.id===id)}
@@ -1542,6 +1545,6 @@ $('importFile').addEventListener('change',async e=>{
 });
 $('resetApp').onclick=()=>{if(!confirm('Reset menghapus database aplikasi pada perangkat ini. Ekspor backup terlebih dahulu. Lanjutkan?'))return;if(!confirm('Konfirmasi kedua: seluruh transaksi lokal akan dihapus.'))return;localStorage.removeItem(KEY);location.reload()};
 function init(){const t=today();['saleDate','purchaseDate','expenseDate'].forEach(id=>$(id).value=t);$('calendarMonth').value=t.slice(0,7);$('reportMonth').value=t.slice(0,7);save();renderDashboard();renderHPP();renderSales();renderInventory();renderPurchases();renderExpenses();renderReports();renderCashFlow();renderCalendar();renderSettings()}
-init();initializeCloudSession();if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(console.error));
+init();window.supabaseReady=initializeCloudSession();if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(console.error));
 </script><div id="appToast" class="app-toast" role="status" aria-live="polite"></div>
 </body></html>
