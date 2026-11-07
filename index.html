@@ -1417,8 +1417,8 @@ $('purchaseForm').addEventListener('submit',e=>{
  const item=ing($('purchaseIngredient').value),total=Number($('purchaseTotal').value),date=$('purchaseDate').value,note=$('purchaseNote').value.trim();
  if(!item||!date||!Number.isFinite(total)||total<=0)return;
  const record={...(editingPurchaseId?db.purchases.find(p=>p.id===editingPurchaseId):null),id:editingPurchaseId||uid(),date,ingredientId:item.id,name:item.name,total,note};if(editingPurchaseId){const index=db.purchases.findIndex(p=>p.id===editingPurchaseId);if(index<0)return;db.purchases[index]=record}else db.purchases.push({...record,qty:0,unit:item.unit,unitCost:0,quantityRecorded:false});
- save();closePurchaseModal();renderPurchases();renderCashFlow();
- showAppToast(editingPurchaseId?'Perubahan catatan belanja disimpan.':'Belanja bahan tersimpan di arus kas.');
+ const wasEditing=!!editingPurchaseId;save();closePurchaseModal();renderPurchases();renderCashFlow();
+ showAppToast(wasEditing?'Perubahan catatan belanja disimpan.':'Belanja bahan tersimpan di arus kas.');
 });
 function renderExpenses(){$('expenseList').innerHTML=db.expenses.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<div class="line"><span>${esc(x.date)} · ${esc(x.category)}<small class="muted">${esc(x.note||'')}</small></span><b>${fmt(x.amount)}</b></div>`).join('')||'<div class="empty">Belum ada pengeluaran tambahan.</div>'}
 function openExpenseModal(){
