@@ -967,7 +967,30 @@ nav#nav .tab[data-page="inventory"],nav#nav .more-menu .tab[data-page="inventory
 const KEY='lalapanLegendaBusinessV3', OLD='lalapanLegendaHPP', VERSION=6, CLOUD_META_KEY='lalapanLegendaCloudMetaV1';
 const $=id=>document.getElementById(id), n=v=>Math.max(0,Number(v)||0), fmt=v=>'Rp'+Math.round(Number(v)||0).toLocaleString('id-ID'), today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}, uid=()=>`ll-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
 const seed={ingredients:[['ayam','Ayam goreng','potong',7500],['paru','Paru','gram',58],['nasi','Nasi matang','gram',200000/10/1000/2.4],['cabai','Cabai','gram',70],['tomat','Tomat','gram',25],['bmerah','Bawang merah','gram',45],['bputih','Bawang putih','gram',45],['timun','Timun','gram',20],['minyak','Minyak goreng','ml',23.5],['bumbu','Bumbu dasar','porsi',500],['gas','Gas','porsi',500],['plastik','Plastik box','pcs',530],['balado','Bumbu tambahan balado','porsi',0],['kemangi','Kemangi','porsi',0],['tahu','Tahu','potong',400],['terong','Terong','gram',25]].map(x=>({id:x[0],name:x[1],unit:x[2],cost:x[3],stock:0,minStock:0})),menus:[{id:'ayam-menu',name:'Nasi Ayam Goreng',price:25000,active:true,recipe:[['ayam',1],['nasi',180],['cabai',15],['tomat',10],['bmerah',5],['bputih',5],['timun',50],['minyak',50],['bumbu',1],['gas',1],['plastik',1]],extra:0},{id:'paru-menu',name:'Nasi Paru Goreng',price:25000,active:true,recipe:[['paru',107],['nasi',180],['cabai',15],['tomat',10],['bmerah',5],['bputih',5],['timun',50],['minyak',50],['bumbu',1],['gas',1],['plastik',1]],extra:0},{id:'balado-menu',name:'Nasi Paru Balado',price:25000,active:true,recipe:[['paru',107],['nasi',180],['cabai',15],['tomat',10],['bmerah',5],['bputih',5],['timun',50],['minyak',50],['bumbu',1],['balado',1],['gas',1],['plastik',1]],extra:0}],ops:[['electricity','Listrik'],['water','Air'],['labor','Tenaga kerja'],['rent','Sewa tempat'],['transport','Transportasi'],['other','Operasional lainnya']].map(x=>({id:x[0],name:x[1],value:0})),records:{},purchases:[],expenses:[],stockMoves:[],priceHistory:[],settings:{target:0,version:VERSION}};
-function normalize(d){d.ingredients=Array.isArray(d.ingredients)?d.ingredients:[];d.menus=Array.isArray(d.menus)?d.menus:[];d.subrecipes=Array.isArray(d.subrecipes)?d.subrecipes:[];d.menuCategories=[...new Set(['Dengan Nasi','Tanpa Nasi','Minuman','Tambahan','Lainnya',...(Array.isArray(d.menuCategories)?d.menuCategories:[]),...d.menus.map(m=>m.category).filter(Boolean)])];d.ops=Array.isArray(d.ops)?d.ops:seed.ops.map(x=>({...x}));d.records=d.records&&typeof d.records==='object'?d.records:{};d.purchases=Array.isArray(d.purchases)?d.purchases:[];d.expenses=Array.isArray(d.expenses)?d.expenses:[];d.expenses=d.expenses.filter(x=>x.date!=='2026-11-07');d.stockMoves=Array.isArray(d.stockMoves)?d.stockMoves:[];d.priceHistory=Array.isArray(d.priceHistory)?d.priceHistory:[];d.settings={target:0,...(d.settings||{}),version:VERSION};d.ingredients.forEach(i=>{if(!Number.isFinite(Number(i.stock)))i.stock=0;if(!Number.isFinite(Number(i.minStock)))i.minStock=0});return d}
+function normalize(d){d.ingredients=Array.isArray(d.ingredients)?d.ingredients:[];d.menus=Array.isArray(d.menus)?d.menus:[];d.subrecipes=Array.isArray(d.subrecipes)?d.subrecipes:[];d.menuCategories=[...new Set(['Dengan Nasi','Tanpa Nasi','Minuman','Tambahan','Lainnya',...(Array.isArray(d.menuCategories)?d.menuCategories:[]),...d.menus.map(m=>m.category).filter(Boolean)])];d.ops=Array.isArray(d.ops)?d.ops:seed.ops.map(x=>({...x}));d.records=d.records&&typeof d.records==='object'?d.records:{};d.purchases=Array.isArray(d.purchases)?d.purchases:[];d.expenses=Array.isArray(d.expenses)?d.expenses:[];d.expenses=d.expenses.filter(x=>x.date!=='2026-11-07');
+if(d.grabRevenueFormulaVersion!==2){
+ Object.values(d.records).forEach(r=>{
+  if(!r||typeof r!=='object')return;
+  const items=Array.isArray(r.items)?r.items:Array.isArray(r.menuItems)?r.menuItems:Object.values(r.items||{});
+  let migrated=false;
+  items.forEach(it=>{
+   const grabQty=Number(it.grabQty)||0,grabGross=Number(it.grabGrossPrice);
+   if(grabQty<=0||!Number.isFinite(grabGross))return;
+   const offlineQty=Number(it.offlineQty??Math.max(0,(Number(it.qty)||0)-grabQty))||0;
+   const offlinePrice=Number(it.offlinePrice??it.price)||0,grabNetPrice=grabGross*.9,qty=offlineQty+grabQty;
+   it.offlineQty=offlineQty;it.offlinePrice=offlinePrice;it.grabNetPrice=grabNetPrice;it.qty=qty;
+   it.revenue=offlineQty*offlinePrice+grabQty*grabNetPrice;it.price=qty?it.revenue/qty:0;
+   it.profitBeforeOps=it.revenue-qty*(Number(it.hpp)||0);migrated=true;
+  });
+  if(migrated){
+   r.portions=items.reduce((a,it)=>a+(Number(it.qty)||0),0);
+   r.revenue=items.reduce((a,it)=>a+(Number.isFinite(Number(it.revenue))?Number(it.revenue):(Number(it.qty)||0)*(Number(it.price)||0)),0);
+   r.recipeCost=items.reduce((a,it)=>a+(Number(it.qty)||0)*(Number(it.hpp)||0),0);
+   r.profit=r.revenue-r.recipeCost-(Number(r.opsTotal)||0)-(Number(r.dailyExtra)||0);
+  }
+ });
+ d.grabRevenueFormulaVersion=2;
+}d.stockMoves=Array.isArray(d.stockMoves)?d.stockMoves:[];d.priceHistory=Array.isArray(d.priceHistory)?d.priceHistory:[];d.settings={target:0,...(d.settings||{}),version:VERSION};d.ingredients.forEach(i=>{if(!Number.isFinite(Number(i.stock)))i.stock=0;if(!Number.isFinite(Number(i.minStock)))i.minStock=0});return d}
 function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x?.ingredients&&x?.menus&&x?.records)return normalize(x)}catch(e){}let d=JSON.parse(JSON.stringify(seed));try{const old=JSON.parse(localStorage.getItem(OLD));if(old){if(old.prices?.chicken)d.ingredients.find(x=>x.id==='ayam').cost=old.prices.chicken/Math.max(1,old.prices.chickenPieces||8);if(old.prices?.paru)d.ingredients.find(x=>x.id==='paru').cost=old.prices.paru/1000;if(old.prices?.rice10kg)d.ingredients.find(x=>x.id==='nasi').cost=old.prices.rice10kg/10/1000/(old.prices.riceYield||2.4);if(old.sellingPrice)d.menus.forEach(m=>m.price=old.sellingPrice)}}catch(e){}return d}
 let db=load();
 const SUPABASE_URL='https://lqudgluvathzbjlwauqh.supabase.co';
@@ -1019,7 +1042,7 @@ async function initializeCloudSession(){if(!window.supabase?.createClient){$('au
 async function onAuthenticated(user){
  currentUser=user;$('authGate').classList.add('hidden');$('logoutBtn').classList.remove('hidden');cloudLabel('Memeriksa cloud…');
  try{
-  const remote=await fetchCloudState();cloudReady=true;const cloudHadNoSpendDayExpense=!!(remote&&(remote.payload.expenses||[]).some(x=>x.date==='2026-11-07'));
+  const remote=await fetchCloudState();cloudReady=true;const cloudHadNoSpendDayExpense=!!(remote&&(remote.payload.expenses||[]).some(x=>x.date==='2026-11-07')),cloudNeedsGrabFormulaMigration=!!(remote&&remote.payload.grabRevenueFormulaVersion!==2);
   if(!remote){localDirty=true;await pushCloudState();}
   else{
    const remotePayload=normalize(JSON.parse(JSON.stringify(remote.payload)));
@@ -1027,7 +1050,7 @@ async function onAuthenticated(user){
    if(localText!==remoteText){backupDownloadSnapshot(db,'lokal-sebelum-muat-cloud');await applyCloudPayload(remote.payload,remote.updated_at);cloudLabel('Data cloud dimuat otomatis','ok')}
    else{lastCloudUpdatedAt=remote.updated_at;localDirty=false;saveCloudMeta();cloudLabel('Data sudah sinkron','ok')}
   }
-  if(cloudHadNoSpendDayExpense){localDirty=true;save();await pushCloudState()}
+  if(cloudHadNoSpendDayExpense||cloudNeedsGrabFormulaMigration){localDirty=true;save();await pushCloudState()}
   renderAll();cloudLabel('Terhubung · '+(user.email||'pemilik'),'ok');
   if(cloudPollTimer)clearInterval(cloudPollTimer);cloudPollTimer=setInterval(checkCloudForUpdates,8000);
  }catch(e){console.error(e);cloudReady=false;$('authGate').classList.remove('hidden');$('logoutBtn').classList.add('hidden');cloudLabel('Gagal memuat cloud','error');alert('Tidak dapat memuat/sinkronisasi cloud: '+(e.message||e)+'\nData lokal di perangkat ini tetap dipertahankan. Periksa SQL dan koneksi Supabase.')}
