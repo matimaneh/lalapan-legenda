@@ -861,6 +861,14 @@ nav#nav .tab[data-page="inventory"],nav#nav .more-menu .tab[data-page="inventory
   </form>
 </div>
 
+<div id="addMenuCategoryModal" class="app-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="addMenuCategoryTitle">
+ <form id="addMenuCategoryForm" class="app-modal">
+  <div class="app-modal-head"><small>KELOLA MENU</small><h3 id="addMenuCategoryTitle">Tambah Kategori</h3><p>Buat kategori untuk mengelompokkan menu di HPP dan Penjualan.</p></div>
+  <div class="app-modal-body"><div class="field"><label for="newMenuCategoryName">Nama kategori</label><input id="newMenuCategoryName" type="text" maxlength="40" required placeholder="Contoh: Paket Keluarga"></div></div>
+  <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelAddMenuCategory">Batal</button><button type="submit" class="modal-save">Simpan Kategori</button></div>
+ </form>
+</div>
+
 
 <div id="editRecipeModal" class="app-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="editRecipeTitle">
  <form id="editRecipeForm" class="app-modal">
@@ -1165,7 +1173,11 @@ $('menuList').innerHTML=menuCategories.map(category=>{
 }).join('')||'<div class="empty">Belum ada menu.</div>'; $('ingredientList').innerHTML=db.ingredients.map(i=>`<div class="line"><span><b>${esc(i.name)}</b><small class="muted">${esc(i.unit)} · stok ${n(i.stock)}</small></span><span><b>${fmt(i.cost)}/${esc(i.unit)}</b> <button class="secondary smallbtn" data-action="ingredient" data-id="${i.id}">Edit</button></span></div>`).join('');$('defaultOps').innerHTML=db.ops.map(o=>`<div class="field"><label>${esc(o.name)}</label><input type="number" min="0" data-op="${o.id}" value="${n(o.value)}"></div>`).join('')}
 $('menuList').addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const m=db.menus.find(x=>x.id===b.dataset.id);if(!m)return;if(b.dataset.action==='archive'){m.active=m.active===false;save();renderHPP()}if(b.dataset.action==='delete'){const used=Object.values(db.records||{}).some(r=>recItems(r).some(it=>it.id===m.id));const message=`Hapus menu ${m.name}?${used?'\n\nRiwayat penjualan lama tetap tersimpan sebagai snapshot.':''}`;if(confirm(message)){db.menus=db.menus.filter(x=>x.id!==m.id);save();renderHPP();renderSales()}}if(b.dataset.action==='menu'){openMenuEditModal(m)}if(b.dataset.action==='recipe')editRecipe(m);if(b.dataset.action==='duplicate'){const baseName=`${m.name} (Salinan)`;let copyName=baseName,n=2;while(db.menus.some(x=>x.name.toLowerCase()===copyName.toLowerCase())){copyName=`${baseName} ${n++}`}const copy={...m,id:uid(),name:copyName,active:true,recipe:(m.recipe||[]).map(line=>[...line])};db.menus.push(copy);save();renderHPP();alert(`Menu berhasil diduplikat: ${copyName}. Silakan edit nama, harga, atau resepnya.`)}});
 $('ingredientList').addEventListener('click',e=>{const b=e.target.closest('[data-action=ingredient]');if(!b)return;openIngredientModal('edit',b.dataset.id)});$('defaultOps').addEventListener('change',e=>{const id=e.target.dataset.op;if(id){const o=db.ops.find(x=>x.id===id);o.value=n(e.target.value);save()}});
-$('addMenuCategory').onclick=()=>{const name=prompt('Nama kategori baru:');if(name===null)return;const category=name.trim();if(!category)return alert('Nama kategori tidak boleh kosong.');if(db.menuCategories.some(x=>x.toLowerCase()===category.toLowerCase()))return alert('Kategori tersebut sudah ada.');db.menuCategories.push(category);save();renderHPP();renderSales()};
+function closeAddMenuCategory(){ $('addMenuCategoryModal').classList.remove('open') }
+$('addMenuCategory').onclick=()=>{ $('newMenuCategoryName').value='';$('addMenuCategoryModal').classList.add('open');setTimeout(()=>$('newMenuCategoryName').focus(),30) };
+$('cancelAddMenuCategory').onclick=closeAddMenuCategory;
+$('addMenuCategoryModal').addEventListener('click',e=>{if(e.target===$('addMenuCategoryModal'))closeAddMenuCategory()});
+$('addMenuCategoryForm').addEventListener('submit',e=>{e.preventDefault();const category=$('newMenuCategoryName').value.trim();if(!category)return;if(db.menuCategories.some(x=>x.toLowerCase()===category.toLowerCase())){$('newMenuCategoryName').setCustomValidity('Kategori sudah ada.');$('newMenuCategoryName').reportValidity();$('newMenuCategoryName').setCustomValidity('');return}db.menuCategories.push(category);save();closeAddMenuCategory();renderHPP();renderSales()});
 $('addIngredient').onclick=()=>openIngredientModal('add');
 let ingredientModalMode='add',editingIngredientId=null;
 function openIngredientModal(mode,id){
