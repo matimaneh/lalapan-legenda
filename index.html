@@ -1024,11 +1024,10 @@ async function initializeCloudSession(){if(!window.supabase?.createClient){$('au
 async function onAuthenticated(user){
  currentUser=user;$('authGate').classList.add('hidden');$('logoutBtn').classList.remove('hidden');cloudLabel('Memeriksa cloud…');
  try{
-  const remote=await fetchCloudState();cloudReady=true;
+  const remote=await fetchCloudState();cloudReady=true;const cloudHadNoSpendDayExpense=!!(remote&&(remote.payload.expenses||[]).some(x=>x.date==='2026-11-07'));
   if(!remote){localDirty=true;await pushCloudState();}
   else{
-   const cloudHadNoSpendDayExpense=(remote.payload.expenses||[]).some(x=>x.date==='2026-11-07');
-  const remotePayload=normalize(JSON.parse(JSON.stringify(remote.payload)));
+   const remotePayload=normalize(JSON.parse(JSON.stringify(remote.payload)));
    const localText=JSON.stringify(db),remoteText=JSON.stringify(remotePayload);
    if(localText!==remoteText){backupDownloadSnapshot(db,'lokal-sebelum-muat-cloud');await applyCloudPayload(remote.payload,remote.updated_at);cloudLabel('Data cloud dimuat otomatis','ok')}
    else{lastCloudUpdatedAt=remote.updated_at;localDirty=false;saveCloudMeta();cloudLabel('Data sudah sinkron','ok')}
