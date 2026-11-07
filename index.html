@@ -804,7 +804,6 @@ nav#nav .tab[data-page="inventory"],nav#nav .more-menu .tab[data-page="inventory
 <section id="hpp" class="page"><div class="card"><div class="row"><h2>Menu dan HPP</h2><div class="actions"><button class="secondary" id="downloadHppReport">↓ Download PDF laporan HPP</button><button class="secondary" id="addMenuCategory">+ Tambah kategori</button><button class="primary" id="addMenu">+ Tambah menu</button></div></div><div id="menuList"></div>
 <div class="card" style="margin-top:16px"><div class="row"><div><h2>Resep Racikan</h2><p class="muted">Buat sambal, bumbu, saus, atau olahan dasar untuk dipakai di beberapa menu.</p></div><button type="button" class="primary" id="addSubRecipe">+ Racikan</button></div><div id="subRecipeList"></div></div>
 </div><div class="card"><div class="row"><h2>Bahan baku</h2><button class="primary" id="addIngredient">+ Tambah bahan</button></div><div id="ingredientList"></div></div><div class="card"><h2>Biaya operasional default harian</h2><div id="defaultOps"></div></div></section>
-<section id="inventory" class="page"><div class="card"><div class="row"><h2>Persediaan bahan</h2><button class="primary" id="stockAdjust">+ Koreksi stok</button></div><div class="notice inventory-intro"><b>Rekonsiliasi stok fisik</b><br>Masukkan jumlah hasil hitung fisik melalui tombol Atur. Untuk pengisian pertama, tulis alasan “Stok awal hasil hitung fisik”. Setiap koreksi akan masuk ke riwayat mutasi. Penjualan dan pembelian berikutnya memperbarui stok secara otomatis.</div><div id="inventorySummary" class="inventory-summary"></div><div id="stockList"></div></div><div class="card"><h2>Riwayat mutasi stok</h2><div id="stockHistory"></div></div></section>
 <section id="purchases" class="page"><div class="card"><div class="row" style="align-items:center;justify-content:space-between"><div><h2>Pembelian bahan</h2><p class="muted">Catat pembelian untuk menambah stok dan memperbarui harga bahan.</p></div><button class="primary" id="openPurchaseModal">+ Catat pembelian</button></div></div><div class="card"><h2>Riwayat pembelian</h2><div id="purchaseList"></div></div></section>
 <section id="expenses" class="page"><div class="card"><div class="row" style="align-items:center;justify-content:space-between"><div><h2>Pengeluaran tambahan</h2><p class="muted">Catat biaya di luar biaya operasional penjualan.</p></div><button class="primary" id="openExpenseModal">+ Catat pengeluaran</button></div></div><div class="card"><h2>Riwayat pengeluaran</h2><div id="expenseList"></div></div></section>
 <section id="cashflow" class="page">
@@ -896,21 +895,6 @@ nav#nav .tab[data-page="inventory"],nav#nav .more-menu .tab[data-page="inventory
   <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelSubRecipe">Batal</button><button type="submit" class="modal-save">Simpan Racikan</button></div>
  </form>
 </div>
-<div id="stockCorrectionModal" class="app-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="stockCorrectionTitle">
- <form id="stockCorrectionForm" class="app-modal">
-  <div class="app-modal-head"><small>PERSEDIAAN BAHAN</small><h3 id="stockCorrectionTitle">Koreksi Stok</h3><p>Masukkan hasil hitung fisik agar catatan stok sesuai kondisi sebenarnya.</p></div>
-  <div class="app-modal-body">
-   <div class="field"><label for="stockIngredientSelect">Bahan baku</label><select id="stockIngredientSelect" required style="width:100%;padding:13px;border:1px solid #dcded3;border-radius:11px;background:#fff;color:#203d30"></select></div>
-   <div class="field"><label for="stockCurrentDisplay">Stok tercatat saat ini</label><input id="stockCurrentDisplay" type="text" readonly></div>
-   <div class="field"><label for="stockPhysicalInput">Stok fisik hasil perhitungan</label><input id="stockPhysicalInput" type="number" min="0" step="any" required></div>
-   <div class="field"><label for="stockMinimumInput">Batas minimum stok</label><input id="stockMinimumInput" type="number" min="0" step="any" required></div>
-   <div class="field"><label for="stockCorrectionNote">Catatan (opsional)</label><input id="stockCorrectionNote" type="text" maxlength="120" placeholder="Contoh: hitung stok akhir hari"></div>
-  </div>
-  <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelStockCorrection">Batal</button><button type="submit" class="modal-save">Simpan Koreksi</button></div>
- </form>
-</div>
-
-
 <div id="ingredientModal" class="app-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="ingredientModalTitle">
  <form id="ingredientForm" class="app-modal">
   <div class="app-modal-head"><small>KELOLA BAHAN BAKU</small><h3 id="ingredientModalTitle">Tambah Bahan Baku</h3><p id="ingredientModalSubtitle">Lengkapi identitas dan harga bahan baku.</p></div>
@@ -1394,60 +1378,7 @@ function saleOps(){const o={};document.querySelectorAll('.daily-op').forEach(x=>
 }
 document.addEventListener('input',e=>{if(e.target.closest('#sales'))previewSale()});$('saveSale').onclick=()=>{const date=$('saleDate').value;if(!date)return alert('Pilih tanggal.');const items=saleItems().filter(x=>x.qty>0);const zeroSales=items.length===0;const invalid=items.find(x=>x.variantQty>x.qty);if(invalid)return alert(`Jumlah kelompok sambal untuk ${invalid.name} (${invalid.variantQty}) melebihi jumlah terjual (${invalid.qty}).`);if(db.records[date]&&!confirm('Tanggal ini sudah memiliki transaksi. Ganti transaksi tersimpan dengan data form sekarang?'))return;const portions=items.reduce((s,x)=>s+x.qty,0),revenue=items.reduce((s,x)=>s+(x.revenue??x.qty*x.price),0),recipeCost=items.reduce((s,x)=>s+x.qty*x.hpp,0),ops=zeroSales?Object.fromEntries(db.ops.map(o=>[o.id,0])):saleOps(),opsTotal=totalOps(ops),dailyExtra=zeroSales?0:n($('dailyExtra').value),profit=revenue-recipeCost-opsTotal-dailyExtra;const previous=db.records[date];const record={date,items:items.map(x=>({...x,profitBeforeOps:(x.revenue??x.qty*x.price)-x.qty*x.hpp})),portions,revenue,recipeCost,ops,opsTotal,dailyExtra,profit,createdAt:previous?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString(),snapshotVersion:3};db.records[date]=record;const oldMoves=db.stockMoves.filter(x=>x.source==='sale'&&x.date===date);db.stockMoves=db.stockMoves.filter(x=>!(x.source==='sale'&&x.date===date));const oldDeductions={};oldMoves.forEach(x=>oldDeductions[x.ingredientId]=(oldDeductions[x.ingredientId]||0)-x.qty);Object.entries(oldDeductions).forEach(([id,v])=>{const i=ing(id);if(i)i.stock=n(i.stock)-v});items.forEach(item=>item.recipeSnapshot.forEach(line=>{const q=line.qty*item.qty,i=ing(line.ingredientId);if(i){i.stock=n(i.stock)-q;db.stockMoves.push({id:uid(),date,ingredientId:i.id,name:i.name,qty:-q,unit:i.unit,source:'sale',note:`Penjualan ${item.name} (${item.qty} porsi)`})}}));save();renderSales();$('saleStatus').className='sale-status is-saved';$('saleStatus').textContent='Tersimpan. Snapshot HPP dan mutasi stok untuk tanggal ini sudah diperbarui.';renderDashboard()};$('clearSale').onclick=()=>{document.querySelectorAll('.sale-qty').forEach(x=>x.value=0);$('dailyExtra').value=0;previewSale();$('saleStatus').className='sale-status';$('saleStatus').textContent='Form dikosongkan. Perubahan belum disimpan.'};
 
-let editingStockIngredientId=null;
-function populateStockIngredientSelect(selectedId){
- $('stockIngredientSelect').innerHTML=db.ingredients.map(i=>`<option value="${esc(i.id)}">${esc(i.name)} (${esc(i.unit)})</option>`).join('');
- if(selectedId&&db.ingredients.some(i=>i.id===selectedId))$('stockIngredientSelect').value=selectedId;
-}
-function updateStockCorrectionFields(){
- const item=ing($('stockIngredientSelect').value);
- if(!item)return;
- editingStockIngredientId=item.id;
- $('stockCurrentDisplay').value=`${n(item.stock)} ${item.unit}`;
- $('stockPhysicalInput').value=n(item.stock);
- $('stockMinimumInput').value=n(item.minStock);
-}
-function openStockCorrectionModal(selectedId){
- populateStockIngredientSelect(selectedId||db.ingredients[0]?.id);
- updateStockCorrectionFields();
- $('stockCorrectionNote').value='';
- $('stockCorrectionModal').classList.add('open');
-}
-function closeStockCorrectionModal(){
- $('stockCorrectionModal').classList.remove('open');
- editingStockIngredientId=null;
-}
-$('stockIngredientSelect').addEventListener('change',updateStockCorrectionFields);
-$('cancelStockCorrection').addEventListener('click',closeStockCorrectionModal);
-$('stockCorrectionModal').addEventListener('click',e=>{if(e.target===$('stockCorrectionModal'))closeStockCorrectionModal()});
-$('stockCorrectionForm').addEventListener('submit',e=>{
- e.preventDefault();
- const item=ing(editingStockIngredientId);
- if(!item)return closeStockCorrectionModal();
- const physical=Number($('stockPhysicalInput').value),minimum=Number($('stockMinimumInput').value);
- if(!Number.isFinite(physical)||physical<0||!Number.isFinite(minimum)||minimum<0)return;
- const note=$('stockCorrectionNote').value.trim();if(!note){$('stockCorrectionNote').setCustomValidity('Isi alasan koreksi stok.');$('stockCorrectionNote').reportValidity();return;}$('stockCorrectionNote').setCustomValidity('');const delta=physical-n(item.stock);
- item.stock=physical;
- item.minStock=minimum;
- if(delta)db.stockMoves.push({id:uid(),date:today(),ingredientId:item.id,name:item.name,qty:delta,unit:item.unit,source:'adjustment',note});
- save();
- closeStockCorrectionModal();
- renderInventory();
- renderDashboard();
-});
-function renderInventory(){
- const low=db.ingredients.filter(i=>n(i.minStock)>0&&n(i.stock)<=n(i.minStock));
- const zero=db.ingredients.filter(i=>n(i.stock)<=0);
- $('inventorySummary').innerHTML=`<div class="inventory-stat"><span>Total bahan</span><b>${db.ingredients.length}</b></div><div class="inventory-stat"><span>Stok menipis</span><b>${low.length}</b></div><div class="inventory-stat"><span>Stok kosong</span><b>${zero.length}</b></div>`;
- $('stockList').innerHTML=`<div class="tablewrap"><table><thead><tr><th>Bahan</th><th>Stok saat ini</th><th>Minimum</th><th>Status</th><th>Nilai stok*</th><th></th></tr></thead><tbody>${db.ingredients.map(i=>{const qty=n(i.stock),min=n(i.minStock),status=qty<=0?'<span class="stock-pill stock-empty">Kosong</span>':min>0&&qty<=min?'<span class="stock-pill stock-low">Menipis</span>':'<span class="stock-pill stock-ok">Aman</span>';return `<tr><td>${esc(i.name)}<small class="muted">${esc(i.unit)}</small></td><td><b>${qty}</b></td><td>${min}</td><td>${status}</td><td>${fmt(qty*n(i.cost))}</td><td><button class="secondary smallbtn" data-stock="${esc(i.id)}">Atur</button></td></tr>`}).join('')}</tbody></table></div><p class="muted">*Nilai estimasi berdasarkan harga bahan saat ini, bukan nilai historis.</p>`;
- $('stockHistory').innerHTML=db.stockMoves.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,60).map(x=>`<div class="line"><span>${esc(x.date)} · ${esc(x.name)}<small class="muted">${esc(x.note||x.source)} · ${x.source==='initial'?'Stok awal':x.source==='adjustment'?'Koreksi manual':x.source==='purchase'?'Pembelian':x.source==='sale'?'Penjualan':esc(x.source||'Mutasi')}</small></span><b class="${x.qty<0?'bad':'good'}">${x.qty>0?'+':''}${x.qty} ${esc(x.unit)}</b></div>`).join('')||'<div class="empty">Belum ada mutasi stok.</div>';
-}
-$('stockList').addEventListener('click',e=>{
- const button=e.target.closest('[data-stock]');
- if(!button)return;
- openStockCorrectionModal(button.dataset.stock);
-});
-$('stockAdjust').onclick=()=>openStockCorrectionModal(db.ingredients[0]?.id);
+function renderInventory(){}
 function renderPurchases(){ $('purchaseIngredient').innerHTML=db.ingredients.map(i=>`<option value="${i.id}">${esc(i.name)} (${esc(i.unit)})</option>`).join('');$('purchaseList').innerHTML=db.purchases.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(p=>`<div class="line"><span>${esc(p.date)} · ${esc(p.name)}<small class="muted">${p.quantityRecorded===false||n(p.qty)===0?(p.note?esc(p.note)+' · ':'')+'Jumlah tidak dicatat':`${p.qty} ${esc(p.unit)}`} · ${esc(p.supplier||'Tanpa pemasok')}</small></span><b>${fmt(p.total)}</b></div>`).join('')||'<div class="empty">Belum ada pembelian.</div>'}
 
 function openPurchaseModal(){
