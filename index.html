@@ -781,6 +781,7 @@ body.hpp-report-open>*:not(#hppPdfReport){display:none!important}
 #sales .sale-menu-heading{align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:7px}#sales .sale-hpp-badge,#sales .sale-grab-hpp-badge{display:inline-flex;align-items:center;min-height:29px;white-space:nowrap}
 nav#nav .tab[data-page="inventory"],nav#nav .more-menu .tab[data-page="inventory"],nav#nav .tab[data-page="expenses"],nav#nav .more-menu .tab[data-page="expenses"],#inventory.page,#expenses.page{display:none!important}
 .purchase-history-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)}.purchase-history-row:last-child{border-bottom:0}.purchase-history-row>div:first-child{min-width:0}.purchase-history-row>div:first-child>b{display:block}.purchase-history-actions{display:flex;gap:6px}@media(max-width:600px){.purchase-history-row{grid-template-columns:minmax(0,1fr) auto;gap:8px}.purchase-history-row>strong{grid-column:2;grid-row:1}.purchase-history-actions{grid-column:1/-1;justify-content:flex-end}}
+.app-toast{position:fixed;right:20px;bottom:20px;z-index:11000;max-width:min(420px,calc(100vw - 32px));padding:13px 17px;border:1px solid #c9ddce;border-radius:12px;background:#edf5ee;color:#245c4b;box-shadow:0 12px 32px rgba(20,45,34,.18);font-size:13px;font-weight:700;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}.app-toast.visible{opacity:1;transform:translateY(0)}#confirmPurchaseDelete{background:#b43b32;color:#fff}#confirmPurchaseDelete:hover{filter:brightness(.95)}
 </style></head><body>
 <header class="app-header"><img class="brand-mark" src="./icons/icon.jpeg" alt="Logo Lalapan Legenda"><div class="brand-copy"><h1>LALAPAN LEGENDA</h1><p>Ruang kendali usaha · HPP · Stok · Penjualan · Keuangan</p></div><div class="header-meta"><span class="live-dot"></span><span class="cloud-status" id="cloudStatus">Belum login</span><button id="logoutBtn" class="secondary smallbtn hidden" style="margin-left:5px">Keluar</button></div></header>
 <nav id="nav"><button class="tab active" data-page="dashboard"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-label">Dashboard</span></button><button class="tab" data-page="sales"><span class="nav-icon" aria-hidden="true">↗</span><span class="nav-label">Penjualan</span></button><button class="tab" data-page="hpp"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">HPP & Menu</span></button><button class="tab" data-page="inventory"><span class="nav-icon" aria-hidden="true">▦</span><span class="nav-label">Persediaan</span></button><button class="tab more-tab" type="button" data-more><span class="nav-icon" aria-hidden="true">⋯</span><span class="nav-label">Lainnya</span></button><div class="more-menu" id="moreMenu" aria-label="Menu lainnya"><button class="tab" data-page="purchases"><span class="nav-icon">＋</span><span class="nav-label">Belanja Bahan</span></button><button class="tab" data-page="expenses"><span class="nav-icon">−</span><span class="nav-label">Pengeluaran</span></button><button class="tab" data-page="cashflow"><span class="nav-icon">＄</span><span class="nav-label">Arus kas</span></button><button class="tab" data-page="printing"><span class="nav-icon">▤</span><span class="nav-label">Cetak Struk</span></button><button class="tab" data-page="reports"><span class="nav-icon">▥</span><span class="nav-label">Laporan</span></button><button class="tab" data-page="calendar"><span class="nav-icon">▣</span><span class="nav-label">Kalender</span></button><button class="tab" data-page="settings"><span class="nav-icon">⚙</span><span class="nav-label">Pengaturan</span></button></div></nav>
@@ -912,6 +913,13 @@ nav#nav .tab[data-page="inventory"],nav#nav .more-menu .tab[data-page="inventory
  </form>
 </div>
 
+
+<div id="purchaseDeleteModal" class="app-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="purchaseDeleteTitle">
+ <div class="app-modal">
+  <div class="app-modal-head"><small>KELOLA BELANJA</small><h3 id="purchaseDeleteTitle">Hapus catatan belanja?</h3><p id="purchaseDeleteMessage">Catatan ini akan dihapus dari riwayat dan arus kas.</p></div>
+  <div class="app-modal-actions"><button type="button" class="modal-cancel" id="cancelPurchaseDelete">Batal</button><button type="button" class="modal-save danger" id="confirmPurchaseDelete">Hapus Catatan</button></div>
+ </div>
+</div>
 
 <div id="purchaseModal" class="app-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="purchaseModalTitle">
  <form id="purchaseForm" class="app-modal">
@@ -1395,7 +1403,13 @@ function openPurchaseModal(purchase=null){
 }
 function closePurchaseModal(){$('purchaseModal').classList.remove('open');editingPurchaseId=null}
 $('openPurchaseModal').addEventListener('click',openPurchaseModal);
-$('purchaseList').addEventListener('click',e=>{const b=e.target.closest('[data-purchase-action]');if(!b)return;const p=db.purchases.find(x=>x.id===b.dataset.id);if(!p)return;if(b.dataset.purchaseAction==='edit'){openPurchaseModal(p);return}if(b.dataset.purchaseAction==='delete'&&confirm(`Hapus catatan belanja ${p.name} tanggal ${p.date}?`)){db.purchases=db.purchases.filter(x=>x.id!==p.id);save();renderPurchases();renderCashFlow()}});
+let pendingPurchaseDeleteId=null;
+function showAppToast(message,type='success'){const t=$('appToast');if(!t)return;t.textContent=message;t.className='app-toast '+type+' visible';clearTimeout(showAppToast.timer);showAppToast.timer=setTimeout(()=>t.classList.remove('visible'),3200)}
+function closePurchaseDelete(){ $('purchaseDeleteModal').classList.remove('open');pendingPurchaseDeleteId=null }
+$('purchaseList').addEventListener('click',e=>{const b=e.target.closest('[data-purchase-action]');if(!b)return;const p=db.purchases.find(x=>x.id===b.dataset.id);if(!p)return;if(b.dataset.purchaseAction==='edit'){openPurchaseModal(p);return}if(b.dataset.purchaseAction==='delete'){pendingPurchaseDeleteId=p.id;$('purchaseDeleteMessage').textContent='Hapus catatan '+p.name+' tanggal '+p.date+' dari riwayat dan arus kas?';$('purchaseDeleteModal').classList.add('open')}});
+$('cancelPurchaseDelete').addEventListener('click',closePurchaseDelete);
+$('purchaseDeleteModal').addEventListener('click',e=>{if(e.target===$('purchaseDeleteModal'))closePurchaseDelete()});
+$('confirmPurchaseDelete').addEventListener('click',()=>{const id=pendingPurchaseDeleteId;if(!id)return;const p=db.purchases.find(x=>x.id===id);db.purchases=db.purchases.filter(x=>x.id!==id);save();renderPurchases();renderCashFlow();closePurchaseDelete();showAppToast(p?'Catatan belanja '+p.name+' dihapus.':'Catatan belanja dihapus.')});
 $('cancelPurchase').addEventListener('click',closePurchaseModal);
 $('purchaseModal').addEventListener('click',e=>{if(e.target===$('purchaseModal'))closePurchaseModal()});
 $('purchaseForm').addEventListener('submit',e=>{
@@ -1404,7 +1418,7 @@ $('purchaseForm').addEventListener('submit',e=>{
  if(!item||!date||!Number.isFinite(total)||total<=0)return;
  const record={...(editingPurchaseId?db.purchases.find(p=>p.id===editingPurchaseId):null),id:editingPurchaseId||uid(),date,ingredientId:item.id,name:item.name,total,note};if(editingPurchaseId){const index=db.purchases.findIndex(p=>p.id===editingPurchaseId);if(index<0)return;db.purchases[index]=record}else db.purchases.push({...record,qty:0,unit:item.unit,unitCost:0,quantityRecorded:false});
  save();closePurchaseModal();renderPurchases();renderCashFlow();
- alert('Belanja bahan tersimpan di arus kas. Stok dan HPP tidak berubah.');
+ showAppToast(editingPurchaseId?'Perubahan catatan belanja disimpan.':'Belanja bahan tersimpan di arus kas.');
 });
 function renderExpenses(){$('expenseList').innerHTML=db.expenses.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<div class="line"><span>${esc(x.date)} · ${esc(x.category)}<small class="muted">${esc(x.note||'')}</small></span><b>${fmt(x.amount)}</b></div>`).join('')||'<div class="empty">Belum ada pengeluaran tambahan.</div>'}
 function openExpenseModal(){
@@ -1574,4 +1588,5 @@ $('importFile').addEventListener('change',async e=>{
 $('resetApp').onclick=()=>{if(!confirm('Reset menghapus database aplikasi pada perangkat ini. Ekspor backup terlebih dahulu. Lanjutkan?'))return;if(!confirm('Konfirmasi kedua: seluruh transaksi lokal akan dihapus.'))return;localStorage.removeItem(KEY);location.reload()};
 function init(){const t=today();['saleDate','purchaseDate','expenseDate'].forEach(id=>$(id).value=t);$('calendarMonth').value=t.slice(0,7);$('reportMonth').value=t.slice(0,7);save();renderDashboard();renderHPP();renderSales();renderInventory();renderPurchases();renderExpenses();renderReports();renderCashFlow();renderCalendar();renderSettings()}
 init();initializeCloudSession();if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(console.error));
-</script></body></html>
+</script><div id="appToast" class="app-toast" role="status" aria-live="polite"></div>
+</body></html>
