@@ -1482,6 +1482,92 @@ function downloadReportPdf(){
  download(new Blob([pdf],{type:'application/pdf'}),'Laporan-Lalapan-Legenda-'+month+'.pdf');
 }
 $('reportMonth').addEventListener('change',renderReports);$('printReport').onclick=downloadReportPdf;$('csvReport').onclick=()=>{const month=$('reportMonth').value||today().slice(0,7),rows=[['Tanggal','Menu','Qty','Harga','HPP snapshot','Omzet menu','Laba sebelum operasional']];Object.entries(db.records).filter(([d])=>d.startsWith(month)).forEach(([d,r])=>recItems(r).forEach(x=>rows.push([d,x.name,x.qty,x.price,x.hpp,x.qty*x.price,x.qty*(x.price-x.hpp)])));const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');download(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),`laporan-lalapan-${month}.csv`)};
+function renderReports(){
+ const month=$('reportMonth').value||today().slice(0,7),entries=Object.entries(db.records||{}).filter(([d])=>d.startsWith(month)).sort((a,b)=>a[0].localeCompare(b[0])),rs=entries.map(x=>x[1]);
+ const rev=rs.reduce((s,r)=>s+n(r.revenue),0),hpp=rs.reduce((s,r)=>s+n(r.recipeCost),0),ops=rs.reduce((s,r)=>s+n(r.opsTotal)+n(r.dailyExtra),0),extra=(db.expenses||[]).filter(x=>x.date.startsWith(month)).reduce((s,x)=>s+n(x.amount),0),profit=rev-hpp-ops-extra,portions=rs.reduce((s,r)=>s+(n(r.portions)||recItems(r).reduce((a,x)=>a+n(x.qty),0)),0),margin=rev?profit/rev*100:0;
+ $('reportSummary').innerHTML=`<div class="report-metrics"><div class="report-metric"><span>Omzet</span><b>${fmt(rev)}</b></div><div class="report-metric"><span>HPP resep</span><b>${fmt(hpp)}</b></div><div class="report-metric"><span>Biaya operasional</span><b>${fmt(ops)}</b></div><div class="report-metric"><span>Pengeluaran tambahan</span><b>${fmt(extra)}</b></div><div class="report-metric report-profit"><span>Laba setelah biaya tercatat</span><b>${fmt(profit)}</b></div><div class="report-metric"><span>Margin laba</span><b>${margin.toFixed(1)}%</b></div><div class="report-metric"><span>Hari transaksi</span><b>${rs.length} hari</b></div><div class="report-metric"><span>Total porsi</span><b>${portions.toLocaleString('id-ID')}</b></div></div><p class="muted">Pembelian bahan tidak dikurangkan langsung sebagai beban laba rugi karena HPP dihitung dari bahan yang terpakai. Pastikan pengeluaran tambahan tidak menduplikasi biaya yang sudah dicatat pada operasional penjualan.</p>`;
+ $('dailyReport').innerHTML=entries.map(([date,r])=>`<div class="daily-report-row"><div><b>${new Date(date+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'})}</b><small>${n(r.portions)||recItems(r).reduce((a,x)=>a+n(x.qty),0)} porsi · ${recItems(r).length} jenis menu</small></div><div><small>Omzet</small><b>${fmt(r.revenue)}</b></div><div><small>Laba estimasi</small><b class="${n(r.profit)<0?'bad':'good'}">${fmt(r.profit)}</b></div></div>`).join('')||'<div class="empty">Belum ada transaksi pada bulan ini.</div>';
+ const map={};rs.forEach(r=>recItems(r).forEach(x=>{const k=x.id||x.name;map[k]??={name:x.name,qty:0,revenue:0,hpp:0};map[k].qty+=n(x.qty);map[k].revenue+=n(x.qty)*n(x.price);map[k].hpp+=n(x.qty)*n(x.hpp)}));
+ $('menuAnalysis').innerHTML=Object.values(map).sort((a,b)=>(b.revenue-b.hpp)-(a.revenue-a.hpp)).map(x=>{const contribution=x.revenue-x.hpp,rate=x.revenue?contribution/x.revenue*100:0;return `<div class="menu-report-row"><div><b>${esc(x.name)}</b><small>${x.qty} porsi · harga rata-rata ${fmt(x.qty?x.revenue/x.qty:0)} · HPP/porsi ${fmt(x.qty?x.hpp/x.qty:0)}</small></div><div><small>Omzet</small><b>${fmt(x.revenue)}</b></div><div><small>Kontribusi setelah HPP</small><b>${fmt(contribution)}</b><small class="profitability-note">Margin kontribusi ${rate.toFixed(1)}%</small></div></div>`}).join('')||'<div class="empty">Belum ada data menu pada bulan ini.</div>';
+ $('priceHistory').innerHTML=(db.priceHistory||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,40).map(x=>`<div class="line"><span>${esc(x.date)} · ${esc(x.name)}</span><b>${fmt(x.oldCost)} → ${fmt(x.newCost)}</b></div>`).join('')||'<div class="empty">Belum ada perubahan harga.</div>';
+}
+
+
+
+function printMoney(v){return 'Rp'+Math.round(Number(v)||0).toLocaleString('id-ID')}
+function printSafeText(v){return String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\x20-\x7E]/g,' ').replace(/\s+/g,' ').trim()}
+function printWrap(text,width=32){const words=printSafeText(text).split(' '),lines=[];let line='';words.forEach(w=>{if(!w)return;if((line+' '+w).trim().length>width){if(line)lines.push(line);line=w}else line=(line+' '+w).trim()});if(line)lines.push(line);return lines}
+function printRecord(){const date=$('printTransaction')?.value;return date?db.records[date]:null}
+function buildReceiptText(){
+ const date=$('printTransaction').value,r=printRecord();if(!r)return '';
+ const width=32,format=$('printFormat').value,business=printSafeText($('printBusinessName').value||'LALAPAN LEGENDA'),contact=printSafeText($('printContact').value),address=printSafeText($('printAddress').value),footer=printSafeText($('printFooter').value);
+ const out=[],line='--------------------------------';
+ out.push('\x1b\x40','\x1b\x61\x01','\x1b\x45\x01',...printWrap(business,width),'\x1b\x45\x00');
+ if(address)out.push(...printWrap(address,width));if(contact)out.push(...printWrap('Kontak: '+contact,width));
+ out.push(line,'\x1b\x61\x00',format==='invoice'?'INVOICE PENJUALAN':'STRUK PENJUALAN',`Tanggal: ${date}`,line);
+ const items=recItems(r);items.forEach(it=>{const qty=Number(it.qty)||0,price=Number(it.price)||0,amount=qty*price;out.push(...printWrap(it.name||'Menu',width),`${qty} x ${printMoney(price)}`,`  ${printMoney(amount)}`)});
+ out.push(line,`TOTAL${' '.repeat(Math.max(1,width-5-printMoney(r.revenue).length))}${printMoney(r.revenue)}`,line);
+ if(format==='invoice'){out.push('Rincian:',`Jumlah porsi: ${Number(r.portions)||items.reduce((s,x)=>s+(Number(x.qty)||0),0)}`);out.push('Status: LUNAS / DITERIMA');}
+ out.push('', '\x1b\x61\x01',...printWrap(footer,width),'','\x1b\x61\x00','','','');
+ return out.join('\n');
+}
+function renderPrintPage(){
+ const select=$('printTransaction');if(!select)return;
+ const previous=select.value,dates=Object.keys(db.records||{}).filter(d=>db.records[d]).sort((a,b)=>b.localeCompare(a));
+ select.innerHTML=dates.map(d=>`<option value="${esc(d)}">${esc(d)} · ${fmt(db.records[d].revenue||0)}</option>`).join('')||'<option value="">Belum ada transaksi tersimpan</option>';
+ if(dates.includes(previous))select.value=previous;
+ updatePrintPreview();
+}
+function updatePrintPreview(){
+ const el=$('printPreview');if(!el)return;const text=buildReceiptText();
+ el.textContent=text?text.replace(/\x1b[\x40\x61\x45]/g,''):'Belum ada transaksi tersimpan untuk dicetak.';
+}
+function encodeBase64Utf8(text){
+ const bytes=new TextEncoder().encode(text);let binary='';for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(binary);
+}
+$('printTransaction').addEventListener('change',updatePrintPreview);
+['printFormat','printBusinessName','printContact','printAddress','printFooter'].forEach(id=>$(id).addEventListener('input',updatePrintPreview));
+$('printBluetooth').onclick=()=>{
+ const text=buildReceiptText();if(!text){alert('Belum ada transaksi yang bisa dicetak.');return}
+ const uri='rawbt:base64,'+encodeBase64Utf8(text);
+ $('printStatus').textContent='Mengirim struk ke aplikasi RawBT. Jika tidak terbuka, pastikan RawBT terpasang dan printer sudah Test Print.';
+ window.location.href=uri;
+};
+$('printSystem').onclick=()=>{if(!buildReceiptText()){alert('Belum ada transaksi yang bisa dicetak.');return}window.print()};
+
+
+function renderCashFlow(){
+ const month=$('cashMonth')?.value||today().slice(0,7);
+ const rows=[];
+ Object.entries(db.records||{}).filter(([d])=>d.startsWith(month)).forEach(([date,r])=>{
+  rows.push({date,type:'Penjualan',label:`Penerimaan penjualan · ${n(r.portions)||recItems(r).reduce((a,x)=>a+n(x.qty),0)} porsi`,amount:n(r.revenue),direction:'in'});
+  const op=n(r.opsTotal)+n(r.dailyExtra);
+  if(op>0)rows.push({date,type:'Operasional',label:'Biaya operasional harian',amount:op,direction:'out'});
+ });
+ (db.purchases||[]).filter(x=>(x.date||'').startsWith(month)).forEach(x=>rows.push({date:x.date,type:'Pembelian bahan',label:`${x.name||'Belanja bahan'}${x.note?' · '+x.note:''}`,amount:n(x.total),direction:'out'}));
+ (db.expenses||[]).filter(x=>(x.date||'').startsWith(month)).forEach(x=>rows.push({date:x.date,type:'Pengeluaran',label:x.category||x.note||'Pengeluaran tambahan',amount:n(x.amount),direction:'out'}));
+ rows.sort((a,b)=>a.date.localeCompare(b.date)||a.type.localeCompare(b.type));
+ const masuk=rows.filter(x=>x.direction==='in').reduce((a,x)=>a+x.amount,0);
+ const keluar=rows.filter(x=>x.direction==='out').reduce((a,x)=>a+x.amount,0);
+ const net=masuk-keluar;
+ $('cashSummary').innerHTML=`<div class="report-metric"><span>Uang masuk</span><b class="cash-in">${fmt(masuk)}</b></div><div class="report-metric"><span>Uang keluar</span><b class="cash-out">${fmt(keluar)}</b></div><div class="report-metric report-profit"><span>Arus kas bersih</span><b>${fmt(net)}</b></div><div class="report-metric"><span>Jumlah catatan</span><b>${rows.length}</b></div>`;
+ $('cashDetails').innerHTML=rows.slice().reverse().map(x=>`<div class="cashflow-row"><div><b>${esc(x.label)}</b><small>${esc(x.date)} · ${esc(x.type)}</small></div><span class="cashflow-type">${x.direction==='in'?'Masuk':'Keluar'}</span><b class="${x.direction==='in'?'cash-in':'cash-out'}">${x.direction==='in'?'+':'−'}${fmt(x.amount)}</b></div>`).join('')||'<div class="empty">Belum ada arus kas pada bulan ini.</div>';
+}
+$('cashMonth').value=today().slice(0,7);
+$('cashMonth').addEventListener('change',renderCashFlow);
+$('cashCsv').onclick=()=>{
+ const month=$('cashMonth').value||today().slice(0,7),rows=[['Tanggal','Jenis','Keterangan','Arah','Jumlah']];
+ Object.entries(db.records||{}).filter(([d])=>d.startsWith(month)).forEach(([date,r])=>{
+  rows.push([date,'Penjualan','Penerimaan penjualan','Masuk',n(r.revenue)]);
+  const op=n(r.opsTotal)+n(r.dailyExtra);if(op>0)rows.push([date,'Operasional','Biaya operasional harian','Keluar',op]);
+ });
+ (db.purchases||[]).filter(x=>(x.date||'').startsWith(month)).forEach(x=>rows.push([x.date,'Pembelian bahan',x.name||'Pembelian bahan','Keluar',n(x.total)]));
+ (db.expenses||[]).filter(x=>(x.date||'').startsWith(month)).forEach(x=>rows.push([x.date,'Pengeluaran',x.category||x.note||'Pengeluaran tambahan','Keluar',n(x.amount)]));
+ const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\\r\\n');
+ download(new Blob(['\\ufeff'+csv],{type:'text/csv;charset=utf-8'}),`arus-kas-lalapan-${month}.csv`);
+};
+
+
 function renderCalendar(){
  const month=$('calendarMonth').value||today().slice(0,7),[y,m]=month.split('-').map(Number),first=(new Date(y,m-1,1).getDay()+6)%7,days=new Date(y,m,0).getDate();
  let out=['Sen','Sel','Rab','Kam','Jum','Sab','Min'].map(x=>`<div class="dayname">${x}</div>`).join('');
