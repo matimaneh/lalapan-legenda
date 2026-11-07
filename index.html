@@ -934,7 +934,7 @@ nav#nav .tab[data-page="inventory"],nav#nav .more-menu .tab[data-page="inventory
   <div class="app-modal-body">
    <div class="field"><label for="purchaseDate">Tanggal pembelian</label><input id="purchaseDate" type="date" required></div>
    <div class="field"><label for="purchaseIngredient">Bahan</label><select id="purchaseIngredient" required></select></div>
-   <div class="field"><label for="purchaseQty">Jumlah dibeli <small>Mengikuti satuan bahan</small></label><input id="purchaseQty" type="number" min="0.000001" step="any" required></div>
+   <div class="field"><label for="purchaseQty">Jumlah (opsional) <small>Gunakan satuan dasar bahan; kosongkan untuk catat nominal saja</small></label><input id="purchaseQty" type="number" min="0" step="any" placeholder="Lewati jika tidak mencatat jumlah"></div>
    <div class="field"><label for="purchaseTotal">Harga total pembelian (Rp)</label><input id="purchaseTotal" type="number" min="0.01" step="any" required></div>
    <div class="field"><label for="purchaseSupplier">Pemasok / toko</label><input id="purchaseSupplier" maxlength="100" placeholder="Opsional"></div>
    <div class="field"><label for="purchaseNote">Catatan</label><input id="purchaseNote" maxlength="200" placeholder="Opsional"></div>
@@ -1448,7 +1448,7 @@ $('stockList').addEventListener('click',e=>{
  openStockCorrectionModal(button.dataset.stock);
 });
 $('stockAdjust').onclick=()=>openStockCorrectionModal(db.ingredients[0]?.id);
-function renderPurchases(){ $('purchaseIngredient').innerHTML=db.ingredients.map(i=>`<option value="${i.id}">${esc(i.name)} (${esc(i.unit)})</option>`).join('');$('purchaseList').innerHTML=db.purchases.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(p=>`<div class="line"><span>${esc(p.date)} · ${esc(p.name)}<small class="muted">${p.qty} ${esc(p.unit)} · ${esc(p.supplier||'Tanpa pemasok')}</small></span><b>${fmt(p.total)}</b></div>`).join('')||'<div class="empty">Belum ada pembelian.</div>'}
+function renderPurchases(){ $('purchaseIngredient').innerHTML=db.ingredients.map(i=>`<option value="${i.id}">${esc(i.name)} (${esc(i.unit)})</option>`).join('');$('purchaseList').innerHTML=db.purchases.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(p=>`<div class="line"><span>${esc(p.date)} · ${esc(p.name)}<small class="muted">${p.quantityRecorded===false||n(p.qty)===0?(p.note?esc(p.note)+' · ':'')+'Jumlah tidak dicatat':`${p.qty} ${esc(p.unit)}`} · ${esc(p.supplier||'Tanpa pemasok')}</small></span><b>${fmt(p.total)}</b></div>`).join('')||'<div class="empty">Belum ada pembelian.</div>'}
 
 function openPurchaseModal(){
  $('purchaseDate').value=today();
@@ -1465,15 +1465,17 @@ $('cancelPurchase').addEventListener('click',closePurchaseModal);
 $('purchaseModal').addEventListener('click',e=>{if(e.target===$('purchaseModal'))closePurchaseModal()});
 $('purchaseForm').addEventListener('submit',e=>{
  e.preventDefault();
- const item=ing($('purchaseIngredient').value),qty=Number($('purchaseQty').value),total=Number($('purchaseTotal').value),date=$('purchaseDate').value;
- if(!item||!date||!Number.isFinite(qty)||qty<=0||!Number.isFinite(total)||total<=0)return;
- const unitCost=total/qty,supplier=$('purchaseSupplier').value.trim(),note=$('purchaseNote').value.trim();
- db.purchases.push({id:uid(),date,ingredientId:item.id,name:item.name,qty,unit:item.unit,total,unitCost,supplier,note});
- item.stock=n(item.stock)+qty;
- if(unitCost!==n(item.cost)){db.priceHistory.push({id:uid(),ingredientId:item.id,name:item.name,date,oldCost:n(item.cost),newCost:unitCost,source:'purchase'});item.cost=unitCost}
- db.stockMoves.push({id:uid(),date,ingredientId:item.id,name:item.name,qty,unit:item.unit,source:'purchase',note:`Pembelian ${supplier}`});
+ const item=ing($('purchaseIngredient').value),qtyValue=$('purchaseQty').value.trim(),qty=qtyValue===''?0:Number(qtyValue),total=Number($('purchaseTotal').value),date=$('purchaseDate').value;
+ if(!item||!date||!Number.isFinite(qty)||qty<0||!Number.isFinite(total)||total<=0)return;
+ const supplier=$('purchaseSupplier').value.trim(),note=$('purchaseNote').value.trim(),hasQty=qty>0,unitCost=hasQty?total/qty:0;
+ db.purchases.push({id:uid(),date,ingredientId:item.id,name:item.name,qty,unit:item.unit,total,unitCost,supplier,note,quantityRecorded:hasQty});
+ if(hasQty){
+  item.stock=n(item.stock)+qty;
+  if(unitCost!==n(item.cost)){db.priceHistory.push({id:uid(),ingredientId:item.id,name:item.name,date,oldCost:n(item.cost),newCost:unitCost,source:'purchase'});item.cost=unitCost}
+  db.stockMoves.push({id:uid(),date,ingredientId:item.id,name:item.name,qty,unit:item.unit,source:'purchase',note:`Pembelian ${supplier}`});
+ }
  save();closePurchaseModal();renderPurchases();renderInventory();renderHPP();renderDashboard();
- alert('Pembelian tersimpan, stok bertambah, dan harga bahan diperbarui.');
+ alert(hasQty?'Belanja tersimpan, stok dan harga bahan diperbarui.':'Belanja tersimpan sebagai pengeluaran arus kas. Stok tidak berubah karena jumlah tidak dicatat.');
 });
 function renderExpenses(){$('expenseList').innerHTML=db.expenses.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<div class="line"><span>${esc(x.date)} · ${esc(x.category)}<small class="muted">${esc(x.note||'')}</small></span><b>${fmt(x.amount)}</b></div>`).join('')||'<div class="empty">Belum ada pengeluaran tambahan.</div>'}
 function openExpenseModal(){
