@@ -1551,7 +1551,7 @@ function expandRecipeLines(lines,factor=1,stack=[]){
 }
 function cost(m){const raw=expandRecipeLines(m.recipe||[]).reduce((sum,line)=>sum+n(ing(line.ingredientId)?.cost)*line.qty,0);return raw+n(m.extra)}
 function activeMenus(){return db.menus.filter(m=>m.active!==false)}function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function totalOps(o){return Object.values(o||{}).reduce((s,v)=>s+n(v),0)}function recItems(r){return Array.isArray(r.items)?r.items:Object.values(r.items||{})}
-function tab(id){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.page===id));({dashboard:renderDashboard,sales:renderSales,hpp:renderHPP,inventory:renderInventory,purchases:renderPurchases,expenses:renderExpenses,reports:renderReports,calendar:renderCalendar,settings:renderSettings}[id]||(()=>{}))()}
+function tab(id){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.page===id));if(id==='sales'){renderSales();window.resetSalesCategories?.();return}({dashboard:renderDashboard,sales:renderSales,hpp:renderHPP,inventory:renderInventory,purchases:renderPurchases,expenses:renderExpenses,reports:renderReports,calendar:renderCalendar,settings:renderSettings}[id]||(()=>{}))()}
 $('nav').addEventListener('click',e=>{const more=e.target.closest('[data-more]');if(more){$('moreMenu').classList.toggle('open');return}const b=e.target.closest('[data-page]');if(b){$('moreMenu').classList.remove('open');tab(b.dataset.page)}});document.addEventListener('click',e=>{if(!e.target.closest('#nav'))$('moreMenu')?.classList.remove('open')});
 function renderDashboard(){
  const low=db.ingredients.filter(i=>n(i.minStock)>0&&n(i.stock)<=n(i.minStock));
@@ -2112,7 +2112,7 @@ init();window.supabaseReady=initializeCloudSession();if('serviceWorker'in naviga
  if(!box)return;
  var search=document.getElementById('saleSearch'),chip=document.getElementById('saleFilledOnly'),none=document.getElementById('saleNoResult'),tools=document.getElementById('saleTools');
  var st={}; /* status buka/tutup per kategori: true=buka, false=tutup */
- var allBtn=document.createElement('button');allBtn.type='button';allBtn.className='sale-chip';allBtn.id='saleToggleAll';allBtn.textContent='Buka semua';
+ var allBtn=document.createElement('button');allBtn.type='button';allBtn.className='sale-chip';allBtn.id='saleToggleAll';allBtn.textContent='Buka semua';allBtn.setAttribute('aria-expanded','false');allBtn.setAttribute('aria-controls','salesInputs');allBtn.setAttribute('aria-label','Buka semua kategori menu');
  if(tools)tools.appendChild(allBtn);
 
  function qtyInputs(root){return root.querySelectorAll('.sale-offline-qty,.sale-grab-qty')}
@@ -2163,7 +2163,7 @@ init();window.supabaseReady=initializeCloudSession();if('serviceWorker'in naviga
    var h=g.querySelector('.menu-category-heading');if(h)h.setAttribute('aria-expanded',open?'true':'false');
    if(any){visible++;if(open)openCount++}
   });
-  allBtn.textContent=(visible&&openCount===visible)?'Tutup semua':'Buka semua';
+  var allOpen=visible>0&&openCount===visible;allBtn.textContent=allOpen?'Tutup semua':'Buka semua';allBtn.setAttribute('aria-expanded',allOpen?'true':'false');allBtn.setAttribute('aria-label',allOpen?'Tutup semua kategori menu':'Buka semua kategori menu');
   none.classList.toggle('show',shown===0&&box.querySelector('.sale-menu-card')!==null);
   sums();
  }
@@ -2190,10 +2190,12 @@ init();window.supabaseReady=initializeCloudSession();if('serviceWorker'in naviga
  search.addEventListener('input',function(){st={};apply()});
  chip.addEventListener('click',function(){chip.setAttribute('aria-pressed',chip.getAttribute('aria-pressed')==='true'?'false':'true');st={};apply()});
  allBtn.addEventListener('click',function(){
-  var open=allBtn.textContent==='Buka semua';
-  box.querySelectorAll('.sale-category-group:not(.sale-hide)').forEach(function(g){st[gname(g)]=open});
+  var open=allBtn.getAttribute('aria-expanded')!=='true';
+  box.querySelectorAll('.sale-category-group').forEach(function(g){st[gname(g)]=open});
   apply();
  });
+ function resetCategories(){st={};search.value='';chip.setAttribute('aria-pressed','false');apply()}
+ window.resetSalesCategories=resetCategories;
  /* tandai kartu terisi + total porsi per kategori saat jumlah berubah */
  box.addEventListener('input',function(e){
   var card=e.target.closest&&e.target.closest('.sale-menu-card');if(!card)return;
