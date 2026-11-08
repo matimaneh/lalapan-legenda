@@ -1254,6 +1254,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--pos-accent)!important
 #sales .sale-menu-card{border-bottom:2px solid rgba(133,18,18,.42)!important;padding-bottom:16px!important}
 #sales .sale-channel .sale-promo-field{margin-top:7px}
 #sales .sale-channel .sale-promo-help{display:block;margin-top:4px;font-size:10px;line-height:1.35;color:var(--pos-ink2)}
+#sales .sale-grab-promo::-webkit-inner-spin-button,#sales .sale-grab-promo::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+#sales .sale-grab-promo{-moz-appearance:textfield;appearance:textfield}
 #sales .sale-menu-card:last-child{border-bottom:0!important}
 #sales .sale-category-group{border-bottom:2px solid rgba(133,18,18,.72)!important}
 #sales .sale-category-group:last-child{border-bottom:0!important}
@@ -1832,10 +1834,10 @@ function renderSales(){
  $('dailyExtra').value=old?.dailyExtra||0;
  const menuCategories=db.menuCategories;
  $('salesInputs').innerHTML=menuCategories.map(category=>{const categoryMenus=activeMenus().filter(m=>(m.category||'Lainnya')===category);if(!categoryMenus.length)return '';const cards=categoryMenus.map(m=>{
-  const saved=recItems(old||{}).find(x=>x.id===m.id),promoPercent=saved&&saved.grabPromoPercent!==undefined?n(saved.grabPromoPercent):(old?0:n(m.grabPromoPercent)),groups=saved?.variants||[];
+  const saved=recItems(old||{}).find(x=>x.id===m.id),promoPercent=Math.max(0,Math.min(100,Math.round((saved&&saved.grabPromoPercent!==undefined?n(saved.grabPromoPercent):(old?0:n(m.grabPromoPercent)))/5)*5)),groups=saved?.variants||[];
   const recipeOptions=db.subrecipes.map(r=>`<option value="${esc(r.id)}">${esc(r.name)} (${esc(r.outputUnit)})</option>`).join('');
   const groupRows=groups.map(g=>saleVariantRow(m.id,g.subrecipeId,g.qty)).join('');
-  return `<div class="item sale-menu-card"><div class="row sale-menu-heading"><b>${esc(m.name)}</b><span class="badge sale-grab-hpp-badge" data-grab-hpp-id="${m.id}">Selisih laba Grab ${fmt((n(saved?.grabGrossPrice??m.grabGrossPrice)*.8)-n(saved?.offlinePrice??saved?.price??m.price))}/porsi</span></div><div class="sale-channel-list"><section class="sale-channel offline"><h4>Offline</h4><div class="sale-price-field"><div class="sale-price-label"><span>Harga jual per porsi</span><button type="button" class="sale-price-lock" aria-label="${m.offlinePriceLocked?'Buka kunci harga Offline':'Kunci harga Offline'}" title="${m.offlinePriceLocked?'Buka kunci harga':'Kunci harga'}" aria-pressed="${!!m.offlinePriceLocked}">${m.offlinePriceLocked?'🔒':'🔓'}</button></div><input class="sale-offline-price" data-id="${m.id}" ${m.offlinePriceLocked?'readonly':''} type="number" min="0" step="500" placeholder="0" value="${saved?.offlinePrice??saved?.price??m.price}"></div><label>Porsi terjual<input class="sale-offline-qty" data-id="${m.id}" type="number" min="0" step="1" placeholder="0" value="${saved?.offlineQty??saved?.qty??0}"></label></section><section class="sale-channel grab"><h4>Grab <small>Harga dasar · PPN 10%, potongan 20%</small></h4><div class="sale-price-field"><div class="sale-price-label"><span>Harga jual per porsi</span><button type="button" class="sale-price-lock" aria-label="${m.grabPriceLocked?'Buka kunci harga Grab':'Kunci harga Grab'}" title="${m.grabPriceLocked?'Buka kunci harga':'Kunci harga'}" aria-pressed="${!!m.grabPriceLocked}">${m.grabPriceLocked?'🔒':'🔓'}</button></div><input class="sale-grab-price" data-id="${m.id}" ${m.grabPriceLocked?'readonly':''} type="number" min="0" step="500" placeholder="0" value="${saved?.grabGrossPrice??m.grabGrossPrice??""}"></div><label class="sale-promo-field">Potongan promosi (%)<input class="sale-grab-promo" data-id="${m.id}" type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="0" value="${promoPercent}"><small class="muted sale-promo-help" data-promo-help-id="${m.id}">Dihitung dari harga Grab + PPN 10%</small></label><label>Porsi terjual<input class="sale-grab-qty" data-id="${m.id}" type="number" min="0" step="1" placeholder="0" value="${saved?.grabQty??0}"></label></section></div>
+  return `<div class="item sale-menu-card"><div class="row sale-menu-heading"><b>${esc(m.name)}</b><span class="badge sale-grab-hpp-badge" data-grab-hpp-id="${m.id}">Selisih laba Grab ${fmt((n(saved?.grabGrossPrice??m.grabGrossPrice)*.8)-n(saved?.offlinePrice??saved?.price??m.price))}/porsi</span></div><div class="sale-channel-list"><section class="sale-channel offline"><h4>Offline</h4><div class="sale-price-field"><div class="sale-price-label"><span>Harga jual per porsi</span><button type="button" class="sale-price-lock" aria-label="${m.offlinePriceLocked?'Buka kunci harga Offline':'Kunci harga Offline'}" title="${m.offlinePriceLocked?'Buka kunci harga':'Kunci harga'}" aria-pressed="${!!m.offlinePriceLocked}">${m.offlinePriceLocked?'🔒':'🔓'}</button></div><input class="sale-offline-price" data-id="${m.id}" ${m.offlinePriceLocked?'readonly':''} type="number" min="0" step="500" placeholder="0" value="${saved?.offlinePrice??saved?.price??m.price}"></div><label>Porsi terjual<input class="sale-offline-qty" data-id="${m.id}" type="number" min="0" step="1" placeholder="0" value="${saved?.offlineQty??saved?.qty??0}"></label></section><section class="sale-channel grab"><h4>Grab <small>Harga dasar · PPN 10%, potongan 20%</small></h4><div class="sale-price-field"><div class="sale-price-label"><span>Harga jual per porsi</span><button type="button" class="sale-price-lock" aria-label="${m.grabPriceLocked?'Buka kunci harga Grab':'Kunci harga Grab'}" title="${m.grabPriceLocked?'Buka kunci harga':'Kunci harga'}" aria-pressed="${!!m.grabPriceLocked}">${m.grabPriceLocked?'🔒':'🔓'}</button></div><input class="sale-grab-price" data-id="${m.id}" ${m.grabPriceLocked?'readonly':''} type="number" min="0" step="500" placeholder="0" value="${saved?.grabGrossPrice??m.grabGrossPrice??""}"></div><label class="sale-promo-field">Potongan promosi (%)<input class="sale-grab-promo" data-id="${m.id}" type="number" min="0" max="100" step="5" inputmode="decimal" placeholder="0" value="${promoPercent}"><small class="muted sale-promo-help" data-promo-help-id="${m.id}">Dihitung dari harga Grab + PPN 10%</small></label><label>Porsi terjual<input class="sale-grab-qty" data-id="${m.id}" type="number" min="0" step="1" placeholder="0" value="${saved?.grabQty??0}"></label></section></div>
   <div class="sale-variant-panel" data-menu-id="${m.id}"><div class="sale-variant-head"><b>Varian sambal / racikan</b><small>Opsional · hanya untuk statistik pilihan sambal, tidak menambah HPP atau stok</small></div><div class="sale-variant-rows">${groupRows}</div>${db.subrecipes.length?`<button type="button" class="secondary sale-add-variant" data-menu-id="${m.id}">+ Tambah kelompok sambal</button>`:'<small class="muted">Buat resep racikan terlebih dahulu di halaman HPP & Menu.</small>'}</div></div>`;
  }).join('');return cards?`<section class="menu-category-group sale-category-group"><div class="menu-category-heading"><h3>${esc(category)}</h3><span>${categoryMenus.length} menu</span></div><div class="menu-category-grid">${cards}</div></section>`:''}).join('')||'<div class="empty">Belum ada menu aktif. Tambahkan menu terlebih dahulu di halaman HPP & Menu.</div>';
  const status=$('saleStatus');if(status){status.className='sale-status'+(old?' is-saved':'');status.textContent=old?'Transaksi tersimpan untuk tanggal ini. Form memuat snapshot terakhir; simpan ulang akan menggantinya setelah konfirmasi.':'Belum ada transaksi tersimpan untuk tanggal ini.';}
@@ -1848,7 +1850,7 @@ function saleVariantRow(menuId,subId='',qty=1){
 }
 $('saleDate').addEventListener('change',renderSales);function saleItems(){
  return activeMenus().map(m=>{
-  const offlineQty=n(document.querySelector(`.sale-offline-qty[data-id="${m.id}"]`)?.value),grabQty=n(document.querySelector(`.sale-grab-qty[data-id="${m.id}"]`)?.value),offlinePrice=n(document.querySelector(`.sale-offline-price[data-id="${m.id}"]`)?.value??m.price),grabGrossPrice=n(document.querySelector(`.sale-grab-price[data-id="${m.id}"]`)?.value),grabPromoPercent=Math.max(0,Math.min(100,n(document.querySelector(`.sale-grab-promo[data-id="${m.id}"]`)?.value??m.grabPromoPercent))),grabPromoAmount=grabGrossPrice*1.1*grabPromoPercent/100,grabNetPrice=grabGrossPrice*1.1-grabGrossPrice*.2-grabPromoAmount,qty=offlineQty+grabQty,revenue=offlineQty*offlinePrice+grabQty*grabNetPrice,price=qty?revenue/qty:offlinePrice;
+  const offlineQty=n(document.querySelector(`.sale-offline-qty[data-id="${m.id}"]`)?.value),grabQty=n(document.querySelector(`.sale-grab-qty[data-id="${m.id}"]`)?.value),offlinePrice=n(document.querySelector(`.sale-offline-price[data-id="${m.id}"]`)?.value??m.price),grabGrossPrice=n(document.querySelector(`.sale-grab-price[data-id="${m.id}"]`)?.value),grabPromoPercent=Math.max(0,Math.min(100,Math.round(n(document.querySelector(`.sale-grab-promo[data-id="${m.id}"]`)?.value??m.grabPromoPercent)/5)*5)),grabPromoAmount=grabGrossPrice*1.1*grabPromoPercent/100,grabNetPrice=grabGrossPrice*1.1-grabGrossPrice*.2-grabPromoAmount,qty=offlineQty+grabQty,revenue=offlineQty*offlinePrice+grabQty*grabNetPrice,price=qty?revenue/qty:offlinePrice;
   const baseExpanded=expandRecipeLines(m.recipe||[]);
   // Sambal variant is analytics-only. Recipe/HPP and stock are exclusively from the menu recipe.
   const variants=[...document.querySelectorAll(`.sale-variant-row[data-menu-id="${m.id}"]`)].map(row=>{
@@ -1873,7 +1875,7 @@ $('salesInputs').addEventListener('click',e=>{
  if(remove){remove.closest('.sale-variant-row').remove();previewSale()}
 });
 $('salesInputs').addEventListener('input',e=>{if(e.target.matches('.sale-variant-qty,.sale-variant-id'))previewSale()});
-$('salesInputs').addEventListener('change',e=>{const promo=e.target.closest('.sale-grab-promo');if(promo){const menu=db.menus.find(m=>m.id===promo.dataset.id);if(menu){menu.grabPromoPercent=Math.max(0,Math.min(100,n(promo.value)));promo.value=menu.grabPromoPercent;save();previewSale()}return}const input=e.target.closest('.sale-grab-price');if(!input)return;const menu=db.menus.find(m=>m.id===input.dataset.id);if(!menu)return;menu.grabGrossPrice=input.value===''?'':n(input.value);save()});
+$('salesInputs').addEventListener('change',e=>{const promo=e.target.closest('.sale-grab-promo');if(promo){const menu=db.menus.find(m=>m.id===promo.dataset.id);if(menu){menu.grabPromoPercent=Math.max(0,Math.min(100,Math.round(n(promo.value)/5)*5));promo.value=menu.grabPromoPercent;save();previewSale()}return}const input=e.target.closest('.sale-grab-price');if(!input)return;const menu=db.menus.find(m=>m.id===input.dataset.id);if(!menu)return;menu.grabGrossPrice=input.value===''?'':n(input.value);save()});
 function saleOps(){const o={};document.querySelectorAll('.daily-op').forEach(x=>o[x.dataset.id]=n(x.value));return o}function previewSale(){
  if(!$("salePreview"))return;
  const items=saleItems();
@@ -2128,12 +2130,12 @@ init();window.supabaseReady=initializeCloudSession();if('serviceWorker'in naviga
  function isOpen(g){var n=gname(g);return st[n]!==undefined?st[n]:searching()}
 
  function steppers(){
-  qtyInputs(box).forEach(function(inp){
+  box.querySelectorAll('.sale-offline-qty,.sale-grab-qty,.sale-grab-promo').forEach(function(inp){
    if(inp.closest('.qty-stepper'))return;
-   var w=document.createElement('div');w.className='qty-stepper';
+   var promo=inp.classList.contains('sale-grab-promo'),w=document.createElement('div');w.className='qty-stepper'+(promo?' promo-stepper':'');
    var mk=function(cls,txt,label){var b=document.createElement('button');b.type='button';b.className='qty-btn '+cls;b.textContent=txt;b.setAttribute('aria-label',label);return b};
    inp.parentNode.insertBefore(w,inp);
-   w.appendChild(mk('qty-minus','\u2212','Kurangi porsi'));w.appendChild(inp);w.appendChild(mk('qty-plus','+','Tambah porsi'));
+   w.appendChild(mk('qty-minus','\u2212',promo?'Kurangi biaya promosi 5%':'Kurangi porsi'));w.appendChild(inp);w.appendChild(mk('qty-plus','+',promo?'Tambah biaya promosi 5%':'Tambah porsi'));
    inp.setAttribute('inputmode','numeric');
   });
  }
@@ -2184,9 +2186,9 @@ init();window.supabaseReady=initializeCloudSession();if('serviceWorker'in naviga
   var b=e.target.closest&&e.target.closest('.qty-btn');if(!b)return;
   e.preventDefault();
   var inp=b.parentNode.querySelector('input');if(!inp)return;
-  var v=Math.floor(parseFloat(inp.value)||0)+(b.classList.contains('qty-plus')?1:-1);
-  inp.value=Math.max(0,v);
-  inp.dispatchEvent(new Event('input',{bubbles:true}));
+  var promo=inp.classList.contains('sale-grab-promo'),step=parseFloat(inp.step)||1,min=parseFloat(inp.min)||0,max=inp.max===''?Infinity:parseFloat(inp.max),v=(parseFloat(inp.value)||0)+(b.classList.contains('qty-plus')?step:-step);
+  inp.value=String(Math.max(min,Math.min(max,v)));
+  inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}));
  });
  box.addEventListener('keydown',function(e){
   if(e.key!=='Enter'&&e.key!==' ')return;
