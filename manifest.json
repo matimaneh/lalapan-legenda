@@ -11,6 +11,29 @@
   "theme_color": "#ffffff",
   "lang": "id",
   "icons": [
-    { "src": "icons/icon.jpeg", "sizes": "1024x1024", "type": "image/jpeg", "purpose": "any" }
-  ]
+    {
+      "src": "icons/icon.jpeg",
+      "sizes": "1024x1024",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ],
+  "share_target": {
+    "action": "./?share-target=grab",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": [
+            "image/*"
+          ]
+        }
+      ]
+    }
+  }
 }
