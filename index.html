@@ -1868,7 +1868,8 @@ function cashierParseGrabText(raw){
   if(!name||/^(?:subtotal|harga total|total|pajak|diskon|minum|makanan|menu|pesanan|barang untuk|gf[- ]?\d+)/i.test(name))return;
   const menu=cashierFindMenu(name);if(!menu)return;
   const promo=String(after).match(/Diskon\s*(\d{1,2})\s*%/i);
-  const parsed={name,quantity:Math.max(1,Number(quantity)||1),listedPrice:cashierParseMoney(price),promoPercent:promo?Number(promo[1]):0,menuId:menu.id};
+  const parsedQuantity=Math.max(1,Number(quantity)||1),linePrice=cashierParseMoney(price);
+  const parsed={name,quantity:parsedQuantity,listedPrice:linePrice/parsedQuantity,promoPercent:promo?Number(promo[1]):0,menuId:menu.id};
   if(parsed.listedPrice<=0)return;
   const duplicate=items.find(item=>item.menuId===parsed.menuId&&item.listedPrice===parsed.listedPrice&&item.promoPercent===parsed.promoPercent);
   if(duplicate)duplicate.quantity+=parsed.quantity;else items.push(parsed);
@@ -1901,7 +1902,7 @@ function cashierImportMenuOptions(selected){
 }
 function renderCashierImportRows(){
  const host=$('cashierImportRows');
- host.innerHTML=cashierImportItems.map((item,index)=>'<div class="cashier-import-row" data-import-index="'+index+'"><label>Menu<select data-import-field="menuId"><option value="">Pilih menu…</option>'+cashierImportMenuOptions(item.menuId)+'</select></label><label>Jumlah<input data-import-field="quantity" type="number" min="1" step="1" value="'+Math.max(1,n(item.quantity))+'"></label><label>Harga Grab termasuk PPN<input data-import-field="listedPrice" type="number" min="0" step="100" value="'+n(item.listedPrice)+'"></label><label>Promosi (%)<input data-import-field="promoPercent" type="number" min="0" max="100" step="5" value="'+n(item.promoPercent)+'"></label><button type="button" class="secondary smallbtn cashier-import-remove" data-import-remove="'+index+'" aria-label="Hapus item">Hapus</button><small class="muted">Terbaca: '+esc(item.name||'Item manual')+'</small></div>').join('');
+ host.innerHTML=cashierImportItems.map((item,index)=>'<div class="cashier-import-row" data-import-index="'+index+'"><label>Menu<select data-import-field="menuId"><option value="">Pilih menu…</option>'+cashierImportMenuOptions(item.menuId)+'</select></label><label>Jumlah<input data-import-field="quantity" type="number" min="1" step="1" value="'+Math.max(1,n(item.quantity))+'"></label><label>Harga Grab / porsi termasuk PPN<input data-import-field="listedPrice" type="number" min="0" step="100" value="'+n(item.listedPrice)+'"></label><label>Promosi (%)<input data-import-field="promoPercent" type="number" min="0" max="100" step="5" value="'+n(item.promoPercent)+'"></label><button type="button" class="secondary smallbtn cashier-import-remove" data-import-remove="'+index+'" aria-label="Hapus item">Hapus</button><small class="muted">Terbaca: '+esc(item.name||'Item manual')+'</small></div>').join('');
  const qty=cashierImportItems.reduce((sum,item)=>sum+Math.max(1,n(item.quantity)),0),subtotal=cashierImportItems.reduce((sum,item)=>sum+n(item.listedPrice)*Math.max(1,n(item.quantity)),0);
  $('cashierImportTotals').innerHTML='<span>'+qty+' porsi · Harga menu sebelum promosi termasuk PPN</span><b>'+fmt(subtotal)+'</b>';
  const valid=cashierImportItems.length>0&&cashierImportItems.every(item=>item.menuId&&n(item.quantity)>0&&n(item.listedPrice)>0&&n(item.promoPercent)>=0&&n(item.promoPercent)<=100);
