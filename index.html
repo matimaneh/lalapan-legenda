@@ -1908,7 +1908,7 @@ $('cashierImportRows').addEventListener('input',event=>{const field=event.target
 $('cashierImportAddRow').addEventListener('click',()=>{cashierImportItems.push({name:'Item manual',quantity:1,listedPrice:0,promoPercent:0,menuId:''});renderCashierImportRows()});
 $('cashierImportConfirm').addEventListener('click',confirmCashierImport);
 
-function closeCashierModals(){function closeCashierModals(){
+function closeCashierModals(){
  $('cashierItemModal').classList.remove('open');$('cashierCheckoutModal').classList.remove('open');$('cashierImportModal')?.classList.remove('open');cashierSelection=null;
 }
 $('cashierSearch').addEventListener('input',renderCashier);
