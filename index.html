@@ -1732,7 +1732,7 @@ function cashierItemUnit(menu){
  const selection=cashierSelection,quantity=Math.max(1,Math.floor(n(selection.quantity)||1)),hpp=cost(menu);
  const gross=selection.channel==='grab'?n(selection.grabPrice):0;
  const promoPct=selection.channel==='grab'&&selection.promo?Math.max(0,Math.min(100,n(selection.promoPercent))):0;
- const tax=gross*.1,appFee=gross*.2,promoAmount=(gross+tax)*promoPct/100;
+ const tax=gross*.1,promoAmount=(gross+tax)*promoPct/100,appFee=Math.max(0,gross+tax-promoAmount)/1.1*.2;
  const unitRevenue=selection.channel==='grab'?gross+tax-appFee-promoAmount:n(menu.price);
  return {quantity,hpp,gross,promoPct,tax,appFee,promoAmount,unitRevenue,profit:unitRevenue-hpp};
 }
@@ -1914,7 +1914,7 @@ function cashierImportMenuOptions(selected){
 function updateCashierImportSummary(){
  const totals=cashierImportItems.reduce((sum,item)=>{
   const quantity=Math.max(0,n(item.quantity)),price=Math.max(0,n(item.listedPrice)),promoPct=Math.max(0,Math.min(100,n(item.promoPercent))),menu=db.menus.find(entry=>String(entry.id)===String(item.menuId));
-  const gross=price*quantity,promo=gross*promoPct/100,grabNet=gross-(gross/1.1*.2)-promo,hpp=menu?cost(menu)*quantity:0;
+  const gross=price*quantity,promo=gross*promoPct/100,appFee=Math.max(0,gross-promo)/1.1*.2,grabNet=gross-promo-appFee,hpp=menu?cost(menu)*quantity:0;
   sum.portions+=quantity;sum.grabGross+=gross;sum.grabAfterPromo+=gross-promo;sum.grabNet+=grabNet;sum.hpp+=hpp;sum.promo+=promo;return sum;
  },{portions:0,grabGross:0,grabAfterPromo:0,grabNet:0,hpp:0,promo:0});
  [...$('cashierImportRows').querySelectorAll('[data-import-promo-detail]')].forEach((detail,index)=>{const item=cashierImportItems[index];if(!item)return;const perPortion=Math.max(0,n(item.listedPrice))*Math.max(0,n(item.promoPercent))/100;detail.textContent='Potongan '+fmt(perPortion)+' / porsi · '+fmt(perPortion*Math.max(0,n(item.quantity)))+' total'});
@@ -1948,7 +1948,7 @@ function confirmCashierImport(){
  for(const row of rows){
   const fields=Object.fromEntries([...row.querySelectorAll('[data-import-field]')].map(input=>[input.dataset.importField,input.value])),menu=db.menus.find(item=>String(item.id)===String(fields.menuId));if(!menu)continue;
   const quantity=Math.max(1,Math.floor(n(fields.quantity))),listedPrice=n(fields.listedPrice),promoPercent=Math.max(0,Math.min(100,n(fields.promoPercent)));
-  const grossPrice=listedPrice/1.1,promoAmount=listedPrice*promoPercent/100,unitRevenue=listedPrice-grossPrice*.2-promoAmount,hpp=cost(menu);
+  const grossPrice=listedPrice/1.1,promoAmount=listedPrice*promoPercent/100,appFee=Math.max(0,listedPrice-promoAmount)/1.1*.2,unitRevenue=listedPrice-promoAmount-appFee,hpp=cost(menu);
   imported.push({key:[menu.id,'grab',promoPercent,unitRevenue,hpp].join('|'),menuId:menu.id,menuName:menu.name,groupName:cashierVariantBase(menu),variantLabel:cashierVariantLabel(menu),category:menu.category||'Lainnya',channel:'grab',promo:promoPercent>0,promoPercent,quantity,unitRevenue,grossPrice,promoAmount,hpp,recipeSnapshot:cashierRecipeSnapshot(menu)});
  }
  if(!imported.length)return;
@@ -2286,7 +2286,7 @@ function saleVariantRow(menuId,subId='',qty=1){
 function syncSaleDateDisplay(){const value=$('saleDate').value;if(!value)return;const [year,month,day]=value.split('-');$('saleDateDisplay').value=day+'/'+month+'/'+year}
 $('saleDate').addEventListener('change',()=>{syncSaleDateDisplay();renderSales()});$('saleDateDisplay').addEventListener('change',()=>{const match=$('saleDateDisplay').value.trim().match(new RegExp("^([0-9]{1,2})[/.-]([0-9]{1,2})[/.-]([0-9]{4})$"));if(!match){$('saleDateDisplay').setCustomValidity('Masukkan tanggal dengan format DD/MM/YYYY.');$('saleDateDisplay').reportValidity();return}const day=Number(match[1]),month=Number(match[2]),year=Number(match[3]),check=new Date(year,month-1,day);if(check.getFullYear()!==year||check.getMonth()!==month-1||check.getDate()!==day){$('saleDateDisplay').setCustomValidity('Tanggal yang dimasukkan tidak valid.');$('saleDateDisplay').reportValidity();return}$('saleDateDisplay').setCustomValidity('');$('saleDate').value=year+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0');$('saleDate').dispatchEvent(new Event('change',{bubbles:true}))});$('saleDatePicker').addEventListener('click',()=>{const input=$('saleDate');try{if(typeof input.showPicker==='function')input.showPicker();else{input.focus();input.click()}}catch(e){input.focus();input.click()}});function saleItems(){
  return activeMenus().map(m=>{
-  const offlineQty=n(document.querySelector(`.sale-offline-qty[data-id="${m.id}"]`)?.value),grabPromoQty=n(document.querySelector(`.sale-grab-promo-qty[data-id="${m.id}"]`)?.value),grabRegularQty=n(document.querySelector(`.sale-grab-qty[data-id="${m.id}"]`)?.value),grabQty=grabPromoQty+grabRegularQty,offlinePrice=n(document.querySelector(`.sale-offline-price[data-id="${m.id}"]`)?.value??m.price),grabGrossPrice=n(document.querySelector(`.sale-grab-price[data-id="${m.id}"]`)?.value),grabPromoPercent=Math.max(0,Math.min(100,Math.round(n(document.querySelector(`.sale-grab-promo[data-id="${m.id}"]`)?.value??m.grabPromoPercent)/5)*5)),grabPromoAmount=grabGrossPrice*1.1*grabPromoPercent/100,grabNetPrice=grabGrossPrice*1.1-grabGrossPrice*.2-grabPromoAmount,grabRegularNetPrice=grabGrossPrice*1.1-grabGrossPrice*.2,qty=offlineQty+grabQty,revenue=offlineQty*offlinePrice+grabPromoQty*grabNetPrice+grabRegularQty*grabRegularNetPrice,price=qty?revenue/qty:offlinePrice;
+  const offlineQty=n(document.querySelector(`.sale-offline-qty[data-id="${m.id}"]`)?.value),grabPromoQty=n(document.querySelector(`.sale-grab-promo-qty[data-id="${m.id}"]`)?.value),grabRegularQty=n(document.querySelector(`.sale-grab-qty[data-id="${m.id}"]`)?.value),grabQty=grabPromoQty+grabRegularQty,offlinePrice=n(document.querySelector(`.sale-offline-price[data-id="${m.id}"]`)?.value??m.price),grabGrossPrice=n(document.querySelector(`.sale-grab-price[data-id="${m.id}"]`)?.value),grabPromoPercent=Math.max(0,Math.min(100,Math.round(n(document.querySelector(`.sale-grab-promo[data-id="${m.id}"]`)?.value??m.grabPromoPercent)/5)*5)),grabPromoAmount=grabGrossPrice*1.1*grabPromoPercent/100,grabNetPrice=grabGrossPrice*1.1-grabPromoAmount-Math.max(0,grabGrossPrice*1.1-grabPromoAmount)/1.1*.2,grabRegularNetPrice=grabGrossPrice*1.1-grabGrossPrice*.2,qty=offlineQty+grabQty,revenue=offlineQty*offlinePrice+grabPromoQty*grabNetPrice+grabRegularQty*grabRegularNetPrice,price=qty?revenue/qty:offlinePrice;
   const baseExpanded=expandRecipeLines(m.recipe||[]);
   // Sambal variant is analytics-only. Recipe/HPP and stock are exclusively from the menu recipe.
   const variants=[...document.querySelectorAll(`.sale-variant-row[data-menu-id="${m.id}"]`)].map(row=>{
