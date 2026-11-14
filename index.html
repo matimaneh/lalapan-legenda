@@ -1419,6 +1419,12 @@ body.night-mode .mobile-home-shortcuts button span{background:#332321!important;
 
 /* Transaction-level report and cashier order references */
 .cashier-order-reference{display:grid;gap:6px;padding:11px 0 8px;border-bottom:1px solid var(--line)}
+.cashier-order-adjustment{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;padding:10px 0 4px}
+.cashier-order-adjustment label{display:grid;gap:5px;font-size:11px;font-weight:750;color:var(--muted)}
+.cashier-order-adjustment select,.cashier-order-adjustment input{width:100%;min-width:0;min-height:38px}
+.cashier-discount-hint{display:block;min-height:30px;padding:2px 0 8px;color:var(--muted);font-size:10px;line-height:1.45}
+@media(max-width:700px){.cashier-order-adjustment{grid-template-columns:1fr 1fr}.cashier-order-adjustment label:first-child{grid-column:1/-1}}
+body.night-mode .cashier-order-adjustment select,body.night-mode .cashier-order-adjustment input{background:var(--pos-surface);color:var(--ink)}
 .cashier-order-reference label,.cashier-import-order-reference{font-size:11px;font-weight:750;color:var(--muted)}
 .cashier-order-reference input,.cashier-import-order-reference input{width:100%;min-height:40px}
 .cashier-import-order-reference{display:grid;gap:6px;margin:10px 0 14px}
@@ -1485,7 +1491,7 @@ body.night-mode .report-order-lines{border-color:var(--pos-line)}
  </div>
  <aside class="cashier-side-column"><div class="card cashier-cart-panel">
   <div class="cashier-cart-head"><div><small>ORDER AKTIF</small><h2>Keranjang</h2></div><div class="cashier-cart-actions"><span id="cashierCartCount" class="cashier-cart-count">0 porsi</span><button id="cashierClearCart" type="button" class="secondary smallbtn" hidden>Kosongkan</button></div></div>
-  <div class="cashier-order-reference"><label for="cashierOrderTitle">Judul transaksi / No. Grab</label><input id="cashierOrderTitle" type="text" placeholder="Contoh: GF-824 · bisa dikosongkan"></div><div id="cashierCartList" class="cashier-cart-list"></div>
+  <div class="cashier-order-reference"><label for="cashierOrderTitle">Judul transaksi / No. Grab</label><input id="cashierOrderTitle" type="text" placeholder="Contoh: GF-824 · bisa dikosongkan"></div><div class="cashier-order-adjustment"><label for="cashierDiscountType">Jenis potongan<select id="cashierDiscountType"><option value="">Tanpa potongan</option><option value="Promosi">Promosi</option><option value="Diskon">Diskon</option><option value="Lain-lain">Lain-lain</option></select></label><label for="cashierDiscountMode">Dasar nilai<select id="cashierDiscountMode"><option value="amount">Rupiah (Rp)</option><option value="percent">Persentase (%)</option></select></label><label for="cashierDiscountValue">Nilai potongan<input id="cashierDiscountValue" type="number" min="0" step="100" inputmode="decimal" value="0"></label></div><small id="cashierDiscountHint" class="cashier-discount-hint">Potongan dihitung dari subtotal keranjang setelah harga menu, promosi menu, dan biaya Grab.</small><div id="cashierCartList" class="cashier-cart-list"></div>
   <div id="cashierCartSummary" class="cashier-cart-summary"></div>
   <div class="cashier-cart-footer"><div class="cashier-cart-total"><span>Total pesanan</span><strong id="cashierCartTotal">Rp0</strong></div><button id="cashierCheckoutButton" class="primary cashier-checkout-button" type="button" disabled>Checkout</button><small id="cashierStatus" class="cashier-status" role="status"></small></div>
  </div><div class="card cashier-today-panel"><div class="cashier-cart-head"><div><small>RIWAYAT HARIAN</small><h2>Transaksi hari ini</h2></div><span id="cashierTodayOrderCount" class="cashier-cart-count">0 transaksi</span></div><div id="cashierTodayTransactions" class="cashier-today-transactions"></div></div></aside>
@@ -1807,7 +1813,7 @@ function activeMenus(){return db.menus.filter(m=>m.active!==false)}function esc(
 
 const CASHIER_DRAFT_KEY='lalapanLegendaCashierDraftV1';
 const CASHIER_SHARE_CACHE='ll-shared-grab-images-v1';
-let cashierCart=[],cashierDraftRestored=false,cashierSelection=null,cashierEditingOrderId=null,cashierPendingOrderNo='';
+let cashierCart=[],cashierDraftRestored=false,cashierSelection=null,cashierEditingOrderId=null,cashierPendingOrderNo='';let cashierDiscountType='',cashierDiscountMode='amount',cashierDiscountValue=0;
 function cashierVariantKind(menu){
  const category=String(menu.category||'').toLowerCase(),name=String(menu.name||'');
  if(category.includes('tanpa nasi')||/\btanpa nasi\s*$/i.test(name))return 'without';
@@ -1848,6 +1854,8 @@ function cashierTodayLabel(){
  const date=today();
  return new Date(date+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
+function cashierDiscountAmount(subtotal){const type=String(cashierDiscountType||'').trim(),value=Math.max(0,n(cashierDiscountValue));if(!type||subtotal<=0)return 0;return Math.min(subtotal,cashierDiscountMode==='percent'?subtotal*Math.min(100,value)/100:value)}
+function syncCashierDiscountInputs(){const type=$('cashierDiscountType'),mode=$('cashierDiscountMode'),value=$('cashierDiscountValue');if(type&&document.activeElement!==type)type.value=cashierDiscountType;if(mode&&document.activeElement!==mode)mode.value=cashierDiscountMode;if(value&&document.activeElement!==value)value.value=String(cashierDiscountValue||0);if(value){value.step=cashierDiscountMode==='percent'?'1':'100';if(cashierDiscountMode==='percent')value.max='100';else value.removeAttribute('max')}}
 function restoreCashierDraft(){
  if(cashierDraftRestored)return;
  cashierDraftRestored=true;
@@ -1855,14 +1863,14 @@ function restoreCashierDraft(){
   const saved=JSON.parse(localStorage.getItem(CASHIER_DRAFT_KEY)||'null');
   if(saved&&Array.isArray(saved.items)){
    const editing=saved.editingOrderId?(db.cashierOrders||[]).find(order=>order.id===saved.editingOrderId):null;
-   if(saved.editingOrderId?!!editing&&editing.date===saved.date:saved.date===today()){cashierCart=saved.items;cashierEditingOrderId=editing?.id||null;cashierPendingOrderNo=String(saved.orderNo||'')}
+   if(saved.editingOrderId?!!editing&&editing.date===saved.date:saved.date===today()){cashierCart=saved.items;cashierEditingOrderId=editing?.id||null;cashierPendingOrderNo=String(saved.orderNo||'');cashierDiscountType=String(saved.discountType||'');cashierDiscountMode=saved.discountMode==='percent'?'percent':'amount';cashierDiscountValue=Math.max(0,n(saved.discountValue))}
    else localStorage.removeItem(CASHIER_DRAFT_KEY);
   }
  }catch(e){cashierCart=[];cashierEditingOrderId=null;cashierPendingOrderNo=''}
 }
 function saveCashierDraft(){
  try{
-  if(cashierCart.length){const editing=(db.cashierOrders||[]).find(order=>order.id===cashierEditingOrderId);localStorage.setItem(CASHIER_DRAFT_KEY,JSON.stringify({date:editing?.date||today(),items:cashierCart,editingOrderId:cashierEditingOrderId||null,orderNo:cashierPendingOrderNo}))}
+  if(cashierCart.length){const editing=(db.cashierOrders||[]).find(order=>order.id===cashierEditingOrderId);localStorage.setItem(CASHIER_DRAFT_KEY,JSON.stringify({date:editing?.date||today(),items:cashierCart,editingOrderId:cashierEditingOrderId||null,orderNo:cashierPendingOrderNo,discountType:cashierDiscountType,discountMode:cashierDiscountMode,discountValue:cashierDiscountValue}))}
   else localStorage.removeItem(CASHIER_DRAFT_KEY);
  }catch(e){}
 }
@@ -1884,10 +1892,10 @@ function renderCashierTransactions(){
  const legacyItems=record?recItems(record).filter(item=>!item.cashierKey):[],legacyPortions=legacyItems.reduce((sum,item)=>sum+n(item.qty),0),legacyRevenue=Math.max(0,n(record?.revenue)-orderRevenue),legacyHpp=Math.max(0,n(record?.recipeCost)-orderHpp);
  const cards=orders.map((order,index)=>{
   const lines=(order.items||[]).map(item=>{
-   const qty=n(item.quantity),amount=n(item.unitRevenue)*qty,description=(item.groupName||item.menuName||'Menu')+' · '+(item.variantLabel||'')+' · '+cashierLineChannel(item)+' × '+qty;
+   const qty=n(item.quantity),amount=n(item.recordUnitRevenue??item.unitRevenue)*qty,description=(item.groupName||item.menuName||'Menu')+' · '+(item.variantLabel||'')+' · '+cashierLineChannel(item)+' × '+qty;
    return '<div class="cashier-tx-item"><span>'+esc(description)+'</span><b>'+fmt(amount)+'</b></div>'
   }).join('');
-  return '<article class="cashier-tx-card"><div class="cashier-tx-head"><b>'+esc(order.orderNo||('Pesanan '+(orders.length-index)))+' · '+cashierOrderTime(order)+'</b><strong>'+fmt(order.revenue)+'</strong></div>'+lines+'<div class="cashier-tx-meta">'+n(order.portions)+' porsi · HPP '+fmt(order.recipeCost)+' · laba sebelum operasional '+fmt(n(order.profitBeforeOps))+'</div></article>'
+  return '<article class="cashier-tx-card"><div class="cashier-tx-head"><b>'+esc(order.orderNo||('Pesanan '+(orders.length-index)))+' · '+cashierOrderTime(order)+'</b><strong>'+fmt(order.revenue)+'</strong></div>'+lines+'<div class="cashier-tx-meta">'+n(order.portions)+' porsi · HPP '+fmt(order.recipeCost)+' · keuntungan bersih '+fmt(n(order.profitBeforeOps))+'</div></article>'
  }).join('');
  const legacyCard=legacyItems.length||legacyRevenue>0?'<article class="cashier-tx-card cashier-legacy-tx"><div class="cashier-tx-head"><b>Rekap tersimpan sebelumnya</b><strong>'+fmt(legacyRevenue)+'</strong></div>'+legacyItems.map(item=>'<div class="cashier-tx-item"><span>'+esc(item.name)+' · '+n(item.qty)+' porsi</span><b>'+fmt(n(item.revenue)||n(item.qty)*n(item.price))+'</b></div>').join('')+'<div class="cashier-tx-meta">'+legacyPortions+' porsi · HPP '+fmt(legacyHpp)+' · rincian per order belum tersedia</div></article>':'';
  const host=$('cashierTodayTransactions');
@@ -1900,21 +1908,21 @@ function cashierLineChannel(line){return line.channel==='grab'?(line.promo?'Grab
 function renderCashierCart(){
  const host=$('cashierCartList');
  if(!host)return;
- const count=cashierCart.reduce((sum,line)=>sum+n(line.quantity),0),total=cashierCart.reduce((sum,line)=>sum+n(line.unitRevenue)*n(line.quantity),0);
+ const count=cashierCart.reduce((sum,line)=>sum+n(line.quantity),0),subtotal=cashierCart.reduce((sum,line)=>sum+n(line.unitRevenue)*n(line.quantity),0),discount=cashierDiscountAmount(subtotal),discountType=String(cashierDiscountType||'').trim();
  const orderSummary=cashierCart.reduce((sum,line)=>{
   const quantity=n(line.quantity),grab=line.channel==='grab';
   if(grab){sum.grabGross+=n(line.grossPrice)*1.1*quantity;sum.grabPromo+=n(line.promoAmount)*quantity;sum.grabNet+=n(line.unitRevenue)*quantity}
-  sum.profit+=(n(line.unitRevenue)-n(line.hpp))*quantity;
+  sum.profit+=(n(line.unitRevenue)-n(line.hpp))*quantity;sum.subtotal+=n(line.unitRevenue)*quantity;if(grab)sum.grabBaseNet+=n(line.unitRevenue)*quantity;
   return sum;
- },{grabGross:0,grabPromo:0,grabNet:0,profit:0});
+ },{grabGross:0,grabPromo:0,grabNet:0,grabBaseNet:0,subtotal:0,profit:0});
  $('cashierCartCount').textContent=count+' porsi';
- $('cashierCartTotal').textContent=fmt(total);
+ $('cashierCartTotal').textContent=fmt(Math.max(0,subtotal-discount));syncCashierDiscountInputs();const hint=$('cashierDiscountHint');if(hint)hint.textContent=discount?('Potongan '+(discountType||'transaksi')+': '+fmt(discount)+(cashierDiscountMode==='percent'?' ('+Math.min(100,n(cashierDiscountValue))+'% dari '+fmt(subtotal)+')':' dari subtotal '+fmt(subtotal))+'.'):('Potongan dihitung dari subtotal '+fmt(subtotal)+' setelah harga menu, promosi menu, dan biaya Grab.');
  $('cashierCheckoutButton').disabled=cashierCart.length===0;$('cashierCheckoutButton').textContent=cashierEditingOrderId?'Simpan perubahan':'Checkout';
  $('cashierClearCart').hidden=cashierCart.length===0;$('cashierClearCart').textContent=cashierEditingOrderId?'Batalkan edit':'Kosongkan';
  const titleInput=$('cashierOrderTitle');if(titleInput&&document.activeElement!==titleInput)titleInput.value=cashierPendingOrderNo;
  host.innerHTML=cashierCart.length?cashierCart.map((line,index)=>'<div class="cashier-cart-line"><div class="cashier-cart-line-main"><b>'+esc(line.groupName)+'</b><small>'+esc(line.variantLabel)+' · '+esc(cashierLineChannel(line))+'</small><small>'+fmt(line.unitRevenue)+' × '+line.quantity+'</small></div><div class="cashier-cart-line-side"><strong>'+fmt(line.unitRevenue*line.quantity)+'</strong><div class="cashier-cart-stepper"><button type="button" data-cart-action="minus" data-index="'+index+'" aria-label="Kurangi satu porsi">−</button><span>'+line.quantity+'</span><button type="button" data-cart-action="plus" data-index="'+index+'" aria-label="Tambah satu porsi">+</button><button type="button" class="cashier-remove-line" data-cart-action="remove" data-index="'+index+'" aria-label="Hapus dari keranjang">×</button></div></div></div>').join(''):'<div class="cashier-empty-cart"><span>Keranjang masih kosong</span><small>Pilih nama menu untuk mulai mencatat pesanan.</small></div>';
  const summary=$('cashierCartSummary');
- if(summary)summary.innerHTML='<div class="cashier-cart-summary-row is-grab-price"><span>Total harga Grab · setelah promosi</span><b>'+fmt(orderSummary.grabGross-orderSummary.grabPromo)+'</b></div><div class="cashier-cart-summary-row"><span>Total Grab bersih</span><b>'+fmt(orderSummary.grabNet)+'</b></div><div class="cashier-cart-summary-row"><span>Estimasi laba bersih</span><b>'+fmt(orderSummary.profit)+'</b></div>';
+ if(summary){const grabDiscount=orderSummary.subtotal?discount*orderSummary.grabBaseNet/orderSummary.subtotal:0;summary.innerHTML='<div class="cashier-cart-summary-row is-grab-price"><span>Total harga Grab · setelah promosi</span><b>'+fmt(orderSummary.grabGross-orderSummary.grabPromo)+'</b></div><div class="cashier-cart-summary-row"><span>Total Grab bersih</span><b>'+fmt(Math.max(0,orderSummary.grabNet-grabDiscount))+'</b></div>'+(discount?'<div class="cashier-cart-summary-row"><span>Potongan '+esc(discountType||'transaksi')+'</span><b>− '+fmt(discount)+'</b></div>':'')+'<div class="cashier-cart-summary-row"><span>Estimasi laba bersih</span><b>'+fmt(orderSummary.profit-discount)+'</b></div>';}
 }
 function openCashierItem(key){
  const group=cashierMenuGroups().find(x=>x.key===key);
@@ -1998,12 +2006,12 @@ function updateCashierCart(index,action){
 }
 function openCashierCheckout(){
  if(!cashierCart.length)return;
- const total=cashierCart.reduce((sum,x)=>sum+x.unitRevenue*x.quantity,0),hpp=cashierCart.reduce((sum,x)=>sum+x.hpp*x.quantity,0),promo=cashierCart.reduce((sum,x)=>sum+x.promoAmount*x.quantity,0);
- $('cashierCheckoutSummary').innerHTML='<div class="cashier-checkout-stat"><span>Jumlah porsi</span><b>'+cashierCart.reduce((sum,x)=>sum+x.quantity,0)+'</b></div><div class="cashier-checkout-stat"><span>Omzet bersih</span><b>'+fmt(total)+'</b></div><div class="cashier-checkout-stat"><span>HPP resep</span><b>'+fmt(hpp)+'</b></div><div class="cashier-checkout-stat"><span>Biaya promosi Grab</span><b>'+fmt(promo)+'</b></div><div class="cashier-checkout-total"><span>Total pesanan</span><b>'+fmt(total)+'</b></div>';
+ const subtotal=cashierCart.reduce((sum,x)=>sum+x.unitRevenue*x.quantity,0),discount=cashierDiscountAmount(subtotal),total=Math.max(0,subtotal-discount),hpp=cashierCart.reduce((sum,x)=>sum+x.hpp*x.quantity,0),promo=cashierCart.reduce((sum,x)=>sum+x.promoAmount*x.quantity,0);
+ $('cashierCheckoutSummary').innerHTML='<div class="cashier-checkout-stat"><span>Jumlah porsi</span><b>'+cashierCart.reduce((sum,x)=>sum+x.quantity,0)+'</b></div><div class="cashier-checkout-stat"><span>Omzet bersih</span><b>'+fmt(total)+'</b></div><div class="cashier-checkout-stat"><span>HPP resep</span><b>'+fmt(hpp)+'</b></div><div class="cashier-checkout-stat"><span>Biaya promosi Grab</span><b>'+fmt(promo)+'</b></div>'+(discount?'<div class="cashier-checkout-stat"><span>Potongan '+esc(cashierDiscountType||'transaksi')+'</span><b>− '+fmt(discount)+'</b></div>':'')+'<div class="cashier-checkout-total"><span>Total pesanan</span><b>'+fmt(total)+'</b></div>';
  $('cashierCheckoutTitle').textContent=cashierEditingOrderId?'Simpan perubahan transaksi':'Selesaikan pesanan';$('cashierConfirmCheckout').textContent=cashierEditingOrderId?'Simpan perubahan':'Selesaikan pesanan';$('cashierCheckoutNote').textContent=cashierEditingOrderId?'Perubahan akan mengganti rincian pesanan tersimpan. Rekap harian akan dihitung ulang otomatis.':'Transaksi akan ditambahkan ke rekap hari ini. Riwayat penjualan sebelumnya tetap tersimpan.';
  $('cashierCheckoutModal').classList.add('open');
 }
-function cashierOrderItemKey(line){const promo=line.channel==='grab'&&line.promo;return [line.menuId,line.channel,promo?line.promoPercent:0,line.unitRevenue,line.hpp].join('|')}
+function cashierOrderItemKey(line){const promo=line.channel==='grab'&&line.promo;return [line.menuId,line.channel,promo?line.promoPercent:0,line.recordUnitRevenue??line.unitRevenue,line.hpp].join('|')}
 function cashierLocalClock(date){const d=date instanceof Date?date:new Date(date||'');return Number.isNaN(d.getTime())?'00:00':String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
 function recordCashierCheckout(){
  if(!cashierCart.length)return;
@@ -2011,14 +2019,14 @@ function recordCashierCheckout(){
  if(cashierEditingOrderId&&!editingOrder){showAppToast('Transaksi yang akan diedit tidak ditemukan.','error');cashierEditingOrderId=null;return}
  const checkoutMoment=new Date(),date=editingOrder?.date||[checkoutMoment.getFullYear(),String(checkoutMoment.getMonth()+1).padStart(2,'0'),String(checkoutMoment.getDate()).padStart(2,'0')].join('-'),now=checkoutMoment.toISOString(),eventMoment=editingOrder?new Date(editingOrder.createdAt||now):checkoutMoment,orderHour=cashierLocalClock(eventMoment),hasGrabOrder=cashierCart.some(line=>line.channel==='grab'),previous=db.records[date]||null,previousItems=previous?recItems(previous).map(x=>({...x})):[],defaultOps=Object.fromEntries(db.ops.map(op=>[op.id,n(op.value)])),originalPortions=previous?(n(previous.portions)||previousItems.reduce((sum,x)=>sum+n(x.qty),0)):0;
  const usePreviousOps=!!previous&&originalPortions>0,ops=usePreviousOps?(previous.ops||defaultOps):defaultOps,dailyExtra=usePreviousOps?n(previous.dailyExtra):0;
- const oldRevenue=editingOrder?n(editingOrder.revenue):(editingOrder?.items||[]).reduce((sum,line)=>sum+n(line.unitRevenue)*n(line.quantity),0),oldHpp=editingOrder?n(editingOrder.recipeCost):(editingOrder?.items||[]).reduce((sum,line)=>sum+n(line.hpp)*n(line.quantity),0),oldPortions=editingOrder?n(editingOrder.portions):(editingOrder?.items||[]).reduce((sum,line)=>sum+n(line.quantity),0);
+ const oldRevenue=editingOrder?n(editingOrder.revenue):0,oldHpp=editingOrder?n(editingOrder.recipeCost):0,oldPortions=editingOrder?n(editingOrder.portions):0;
  if(editingOrder){
   (editingOrder.items||[]).forEach(line=>(line.recipeSnapshot||[]).forEach(ingredientLine=>{const ingredient=ing(ingredientLine.ingredientId),used=n(ingredientLine.qty)*n(line.quantity);if(ingredient&&used>0)ingredient.stock=n(ingredient.stock)+used}));
   db.stockMoves=(db.stockMoves||[]).filter(move=>!(move.source==='sale'&&String(move.note||'').includes('order '+editingOrder.id)));
   (editingOrder.items||[]).forEach(line=>{
    const key=cashierOrderItemKey(line),rowIndex=previousItems.findIndex(item=>item.cashierKey===key);
    if(rowIndex<0)return;
-   const row=previousItems[rowIndex],qty=n(line.quantity),revenue=n(line.unitRevenue)*qty;
+   const row=previousItems[rowIndex],qty=n(line.quantity),revenue=n(line.recordUnitRevenue??line.unitRevenue)*qty;
    row.qty=Math.max(0,n(row.qty)-qty);row.revenue=Math.max(0,n(row.revenue)-revenue);
    if(line.channel==='offline')row.offlineQty=Math.max(0,n(row.offlineQty)-qty);
    else{row.grabQty=Math.max(0,n(row.grabQty)-qty);if(line.promo)row.grabPromoQty=Math.max(0,n(row.grabPromoQty)-qty);else row.grabRegularQty=Math.max(0,n(row.grabRegularQty)-qty)}
@@ -2026,33 +2034,35 @@ function recordCashierCheckout(){
   })
  }
  const baselineRevenue=Math.max(0,n(previous?.revenue)-oldRevenue),baselineHpp=Math.max(0,n(previous?.recipeCost)-oldHpp),baselinePortions=Math.max(0,originalPortions-oldPortions);
- let addedRevenue=0,addedHpp=0,addedPortions=0,promoCost=0;
- const orderId=editingOrder?.id||uid(),orderItems=[];
- cashierCart.forEach(line=>{
-  const quantity=n(line.quantity),revenue=n(line.unitRevenue)*quantity,recipeCost=n(line.hpp)*quantity,isOffline=line.channel==='offline',isPromo=!isOffline&&line.promo;
+ const subtotal=cashierCart.reduce((sum,line)=>sum+n(line.unitRevenue)*n(line.quantity),0),discountAmount=cashierDiscountAmount(subtotal),discountType=String(cashierDiscountType||'').trim(),discountMode=cashierDiscountMode==='percent'?'percent':'amount',discountValue=Math.max(0,cashierDiscountMode==='percent'?Math.min(100,n(cashierDiscountValue)):n(cashierDiscountValue));
+ let addedRevenue=0,addedHpp=0,addedPortions=0,promoCost=0,allocatedDiscount=0;
+ const opsTotal=totalOps(ops),orderId=editingOrder?.id||uid(),orderItems=[];
+ cashierCart.forEach((line,index)=>{
+  const quantity=n(line.quantity),baseRevenue=n(line.unitRevenue)*quantity,share=index===cashierCart.length-1?discountAmount-allocatedDiscount:(subtotal?discountAmount*(baseRevenue/subtotal):0);
+  allocatedDiscount+=share;
+  const revenue=Math.max(0,baseRevenue-share),recordUnitRevenue=quantity?revenue/quantity:0,recipeCost=n(line.hpp)*quantity,isOffline=line.channel==='offline',isPromo=!isOffline&&line.promo;
   addedRevenue+=revenue;addedHpp+=recipeCost;addedPortions+=quantity;if(isPromo)promoCost+=n(line.promoAmount)*quantity;
-  const cashierKey=cashierOrderItemKey(line);
+  const savedLine={...line,recordUnitRevenue,transactionDiscountShare:share,orderId,createdAt:editingOrder?.createdAt||now},cashierKey=cashierOrderItemKey(savedLine);
   let row=previousItems.find(x=>x.cashierKey===cashierKey);
-  if(!row){row={id:line.menuId,name:line.menuName,cashierGroupName:line.groupName,category:line.category,variantLabel:line.variantLabel,cashierChannel:line.channel,cashierPromo:isPromo,cashierKey,qty:0,price:line.unitRevenue,revenue:0,hpp:line.hpp,offlineQty:0,offlinePrice:isOffline?line.unitRevenue:0,grabQty:0,grabPromoQty:0,grabRegularQty:0,grabGrossPrice:line.grossPrice,grabPromoPercent:isPromo?line.promoPercent:0,grabPromoAmount:isPromo?line.promoAmount:0,grabNetPrice:line.unitRevenue,grabRegularNetPrice:line.grossPrice*.9,recipeSnapshot:line.recipeSnapshot};previousItems.push(row)}
+  if(!row){row={id:line.menuId,name:line.menuName,cashierGroupName:line.groupName,category:line.category,variantLabel:line.variantLabel,cashierChannel:line.channel,cashierPromo:isPromo,cashierKey,qty:0,price:recordUnitRevenue,revenue:0,hpp:line.hpp,offlineQty:0,offlinePrice:isOffline?recordUnitRevenue:0,grabQty:0,grabPromoQty:0,grabRegularQty:0,grabGrossPrice:line.grossPrice,grabPromoPercent:isPromo?line.promoPercent:0,grabPromoAmount:isPromo?line.promoAmount:0,grabNetPrice:recordUnitRevenue,grabRegularNetPrice:line.grossPrice*.9,recipeSnapshot:line.recipeSnapshot};previousItems.push(row)}
   row.qty=n(row.qty)+quantity;row.revenue=n(row.revenue)+revenue;row.price=row.qty?row.revenue/row.qty:0;row.profitBeforeOps=row.revenue-row.qty*n(row.hpp);
-  if(isOffline){row.offlineQty=n(row.offlineQty)+quantity;row.offlinePrice=line.unitRevenue}
-  else{row.grabQty=n(row.grabQty)+quantity;row.grabGrossPrice=line.grossPrice;row.grabNetPrice=line.grossPrice*.9;if(isPromo){row.grabPromoQty=n(row.grabPromoQty)+quantity;row.grabPromoPercent=line.promoPercent;row.grabPromoAmount=line.promoAmount;row.grabNetPrice=line.unitRevenue}else row.grabRegularQty=n(row.grabRegularQty)+quantity}
-  orderItems.push({...line,orderId,createdAt:editingOrder?.createdAt||now});
+  if(isOffline){row.offlineQty=n(row.offlineQty)+quantity;row.offlinePrice=recordUnitRevenue}
+  else{row.grabQty=n(row.grabQty)+quantity;row.grabGrossPrice=line.grossPrice;row.grabNetPrice=recordUnitRevenue;if(isPromo){row.grabPromoQty=n(row.grabPromoQty)+quantity;row.grabPromoPercent=line.promoPercent;row.grabPromoAmount=line.promoAmount}else row.grabRegularQty=n(row.grabRegularQty)+quantity}
+  orderItems.push(savedLine);
   (line.recipeSnapshot||[]).forEach(ingredientLine=>{const used=n(ingredientLine.qty)*quantity,ingredient=ing(ingredientLine.ingredientId);if(ingredient&&used>0){ingredient.stock=n(ingredient.stock)-used;db.stockMoves.push({id:uid(),date,ingredientId:ingredient.id,name:ingredient.name,qty:-used,unit:ingredient.unit,source:'sale',note:'Kasir '+line.groupName+' · '+quantity+' porsi · order '+orderId})}});
  });
- const opsTotal=totalOps(ops),revenue=baselineRevenue+addedRevenue,recipeCostTotal=baselineHpp+addedHpp,orderNo=String(cashierPendingOrderNo||$('cashierOrderTitle')?.value||'').trim().toUpperCase(),ordersCount=(db.cashierOrders||[]).filter(order=>order.date===date).length+(editingOrder?0:1);
- const nextOrder={...(editingOrder||{}),id:orderId,date,orderNo,createdAt:editingOrder?.createdAt||now,updatedAt:now,items:orderItems,portions:addedPortions,revenue:addedRevenue,recipeCost:addedHpp,promoCost,profitBeforeOps:addedRevenue-addedHpp};
+ const revenue=baselineRevenue+addedRevenue,recipeCostTotal=baselineHpp+addedHpp,orderNo=String(cashierPendingOrderNo||$('cashierOrderTitle')?.value||'').trim().toUpperCase(),ordersCount=(db.cashierOrders||[]).filter(order=>order.date===date).length+(editingOrder?0:1);
+ const nextOrder={...(editingOrder||{}),id:orderId,date,orderNo,createdAt:editingOrder?.createdAt||now,updatedAt:now,items:orderItems,portions:addedPortions,revenue:addedRevenue,recipeCost:addedHpp,promoCost,discountType,discountMode,discountValue,discountAmount,subtotal,profitBeforeOps:addedRevenue-addedHpp};
  db.cashierOrders=Array.isArray(db.cashierOrders)?db.cashierOrders:[];
  if(editingOrder){const index=db.cashierOrders.findIndex(order=>order.id===orderId);if(index>=0)db.cashierOrders[index]=nextOrder;else db.cashierOrders.push(nextOrder)}else db.cashierOrders.push(nextOrder);
- db.records[date]={...(previous||{}),date,items:previousItems,portions:baselinePortions+addedPortions,revenue,recipeCost:recipeCostTotal,ops,opsTotal,dailyExtra,profit:revenue-recipeCostTotal-opsTotal-dailyExtra,createdAt:previous?.createdAt||now,updatedAt:now,snapshotVersion:3,cashierOrderCount:ordersCount};
+ db.records[date]={...(previous||{}),date,items:previousItems,portions:baselinePortions+addedPortions,revenue,recipeCost:recipeCostTotal,ops,opsTotal,dailyExtra,profit:revenue-recipeCostTotal-opsTotal-dailyExtra,createdAt:previous?.createdAt||now,updatedAt:now,snapshotVersion:4,cashierOrderCount:ordersCount};
  db.adOrders=Array.isArray(db.adOrders)?db.adOrders:[];
  const autoAdIndex=db.adOrders.findIndex(order=>order.cashierOrderId===orderId);
  if(hasGrabOrder){const adTime=autoAdIndex>=0?db.adOrders[autoAdIndex].time:orderHour,adRecord={id:autoAdIndex>=0?db.adOrders[autoAdIndex].id:uid(),date,time:adTime,orders:1,note:'',source:'cashier',cashierOrderId:orderId,createdAt:autoAdIndex>=0?db.adOrders[autoAdIndex].createdAt:nextOrder.createdAt,updatedAt:now};if(autoAdIndex>=0)db.adOrders[autoAdIndex]=adRecord;else db.adOrders.push(adRecord)}
  else if(autoAdIndex>=0)db.adOrders.splice(autoAdIndex,1);
- save();cashierCart=[];cashierEditingOrderId=null;cashierPendingOrderNo='';saveCashierDraft();$('cashierCheckoutModal').classList.remove('open');$('cashierStatus').textContent=editingOrder?'Perubahan transaksi '+(orderNo||'kasir')+' tersimpan.':'Pesanan tersimpan dan ditambahkan ke rekap hari ini.';
+ save();cashierCart=[];cashierEditingOrderId=null;cashierPendingOrderNo='';cashierDiscountType='';cashierDiscountMode='amount';cashierDiscountValue=0;saveCashierDraft();$('cashierCheckoutModal').classList.remove('open');$('cashierStatus').textContent=editingOrder?'Perubahan transaksi '+(orderNo||'kasir')+' tersimpan.':'Pesanan tersimpan dan ditambahkan ke rekap hari ini.';
  if($('reportTransactionDate'))$('reportTransactionDate').value=date;renderCashier();renderDashboard();renderReports();if(typeof showAppToast==='function')showAppToast(editingOrder?'Perubahan transaksi tersimpan.':'Pesanan kasir tersimpan.');
 }
-
 let cashierImportItems=[],cashierOcrPromise=null;
 async function consumeSharedGrabImage(){
  const params=new URLSearchParams(location.search),id=params.get('shared');
@@ -2198,7 +2208,10 @@ $('cashierSearch').addEventListener('input',renderCashier);
 $('cashierMenuGrid').addEventListener('click',e=>{const button=e.target.closest('[data-cashier-menu]');if(button)openCashierItem(button.dataset.cashierMenu)});
 $('cashierCartList').addEventListener('click',e=>{const button=e.target.closest('[data-cart-action]');if(button)updateCashierCart(Number(button.dataset.index),button.dataset.cartAction)});
 $('cashierOrderTitle').addEventListener('input',event=>{cashierPendingOrderNo=event.currentTarget.value;saveCashierDraft()});
-$('cashierClearCart').addEventListener('click',()=>{const wasEditing=!!cashierEditingOrderId;cashierCart=[];cashierEditingOrderId=null;cashierPendingOrderNo='';saveCashierDraft();renderCashierCart();$('cashierStatus').textContent=wasEditing?'Edit transaksi dibatalkan. Pesanan tersimpan tidak berubah.':'Keranjang dikosongkan.'});
+$('cashierDiscountType').addEventListener('change',event=>{cashierDiscountType=event.currentTarget.value;saveCashierDraft();renderCashierCart()});
+$('cashierDiscountMode').addEventListener('change',event=>{cashierDiscountMode=event.currentTarget.value==='percent'?'percent':'amount';saveCashierDraft();renderCashierCart()});
+$('cashierDiscountValue').addEventListener('input',event=>{cashierDiscountValue=Math.max(0,n(event.currentTarget.value));if(cashierDiscountMode==='percent'&&cashierDiscountValue>100){cashierDiscountValue=100;event.currentTarget.value='100'}saveCashierDraft();renderCashierCart()});
+$('cashierClearCart').addEventListener('click',()=>{const wasEditing=!!cashierEditingOrderId;cashierCart=[];cashierEditingOrderId=null;cashierPendingOrderNo='';cashierDiscountType='';cashierDiscountMode='amount';cashierDiscountValue=0;saveCashierDraft();renderCashierCart();$('cashierStatus').textContent=wasEditing?'Edit transaksi dibatalkan. Pesanan tersimpan tidak berubah.':'Keranjang dikosongkan.'});
 $('cashierCheckoutButton').addEventListener('click',openCashierCheckout);
 $('cashierConfirmCheckout').addEventListener('click',recordCashierCheckout);
 $('cashierItemModal').addEventListener('click',e=>{
@@ -2668,14 +2681,14 @@ function reportGrabTotals(record){
  },{gross:0,net:0});
 }
 function reportOrderGrabTotals(order){
- return (order.items||[]).reduce((sum,item)=>{if(item.channel==='grab'){const qty=n(item.quantity);sum.gross+=n(item.grossPrice)*1.1*qty;sum.net+=n(item.unitRevenue)*qty}return sum},{gross:0,net:0});
+ return (order.items||[]).reduce((sum,item)=>{if(item.channel==='grab'){const qty=n(item.quantity);sum.gross+=n(item.grossPrice)*1.1*qty;sum.net+=(n(item.unitRevenue)*qty-n(item.transactionDiscountShare))}return sum},{gross:0,net:0});
 }
 function renderReportTransactions(){
  const date=$('reportTransactionDate')?.value||today(),record=db.records[date]||null,orders=(db.cashierOrders||[]).filter(order=>order.date===date).sort((a,b)=>String(a.createdAt||'').localeCompare(String(b.createdAt||''))),grab=reportGrabTotals(record),portions=n(record?.portions)||recItems(record||{}).reduce((sum,item)=>sum+n(item.qty),0);
  $('reportTransactionMetrics').innerHTML='<div class="report-day-metrics"><div class="report-day-metric"><span>Omzet Grab · termasuk PPN, sebelum promo</span><b>'+fmt(grab.gross)+'</b></div><div class="report-day-metric"><span>Grab bersih · setelah biaya dan promo</span><b>'+fmt(grab.net)+'</b></div><div class="report-day-metric"><span>Total HPP resep</span><b>'+fmt(record?.recipeCost)+'</b></div><div class="report-day-metric is-highlight"><span>Laba bersih setelah biaya</span><b>'+fmt(record?.profit)+'</b></div></div>';
  const cards=orders.map(order=>{
-  const orderGrab=reportOrderGrabTotals(order),lines=(order.items||[]).map(item=>'<div class="report-order-line"><span>'+esc(item.groupName||item.menuName||'Menu')+' · '+esc(item.variantLabel||'')+' · '+esc(cashierLineChannel(item))+' × '+n(item.quantity)+'</span><b>'+fmt(n(item.unitRevenue)*n(item.quantity))+'</b></div>').join(''),title=String(order.orderNo||'Pesanan Kasir');
-  return '<article class="report-order-card"><div class="report-order-head"><div class="report-order-title"><b>'+esc(title)+'</b><small>'+cashierOrderTime(order)+' · '+n(order.portions)+' porsi</small></div><button type="button" class="secondary smallbtn" onclick="editCashierOrder(\''+esc(order.id)+'\')">Edit transaksi</button></div><div class="report-order-lines">'+(lines||'<small class="muted">Tidak ada rincian menu pada transaksi ini.</small>')+'</div><div class="report-order-stats"><span>Omzet Grab '+fmt(orderGrab.gross)+'</span><span>Grab bersih '+fmt(orderGrab.net)+'</span><span>HPP '+fmt(order.recipeCost)+'</span><span>Laba sebelum biaya operasional '+fmt(order.profitBeforeOps)+'</span></div></article>';
+  const orderGrab=reportOrderGrabTotals(order),lines=(order.items||[]).map(item=>'<div class="report-order-line"><span>'+esc(item.groupName||item.menuName||'Menu')+' · '+esc(item.variantLabel||'')+' · '+esc(cashierLineChannel(item))+' × '+n(item.quantity)+'</span><b>'+fmt(n(item.recordUnitRevenue??item.unitRevenue)*n(item.quantity))+'</b></div>').join(''),title=String(order.orderNo||'Pesanan Kasir');
+  return '<article class="report-order-card"><div class="report-order-head"><div class="report-order-title"><b>'+esc(title)+'</b><small>'+cashierOrderTime(order)+' · '+n(order.portions)+' porsi</small></div><button type="button" class="secondary smallbtn" onclick="editCashierOrder(\''+esc(order.id)+'\')">Edit transaksi</button></div><div class="report-order-lines">'+(lines||'<small class="muted">Tidak ada rincian menu pada transaksi ini.</small>')+'</div><div class="report-order-stats"><span>Omzet Grab '+fmt(orderGrab.gross)+'</span><span>Grab bersih '+fmt(orderGrab.net)+'</span><span>HPP '+fmt(order.recipeCost)+'</span>'+(n(order.discountAmount)?'<span>Potongan '+esc(order.discountType||'transaksi')+' −'+fmt(order.discountAmount)+'</span>':'')+'<span>Keuntungan bersih '+fmt(order.profitBeforeOps)+'</span></div></article>';
  }).join('');
  const legacy=record&&(!orders.length||recItems(record).some(item=>!item.cashierKey))?'<article class="report-order-card"><div class="report-order-title"><b>Rekap harian tersimpan</b><small>'+portions+' porsi · '+fmt(record.revenue)+' omzet total</small></div><p class="muted">Transaksi pada tanggal ini tersimpan sebagai rekap harian lama, bukan rincian per order, jadi tidak dapat diedit satu per satu.</p></article>':'';
  $('reportTransactions').innerHTML=orders.length||legacy?'<div class="report-order-list">'+cards+legacy+'</div>':'<div class="report-order-empty">Belum ada transaksi pada tanggal ini.</div>';
@@ -2685,7 +2698,7 @@ function editCashierOrder(orderId){
  const order=(db.cashierOrders||[]).find(item=>item.id===orderId);if(!order){showAppToast('Transaksi tidak ditemukan.','error');return}
  if(cashierCart.length){showAppToast('Selesaikan atau kosongkan keranjang yang sedang aktif sebelum mengedit transaksi ini.','warning');return}
  const items=Array.isArray(order.items)?order.items:[];if(!items.length){showAppToast('Rincian menu transaksi ini tidak tersedia untuk diedit.','warning');return}
- cashierEditingOrderId=order.id;cashierPendingOrderNo=String(order.orderNo||'');cashierCart=items.map(item=>({...item,key:item.key||cashierOrderItemKey(item)}));cashierDraftRestored=true;saveCashierDraft();tab('sales');
+ cashierEditingOrderId=order.id;cashierPendingOrderNo=String(order.orderNo||'');cashierDiscountType=String(order.discountType||'');cashierDiscountMode=order.discountMode==='percent'?'percent':'amount';cashierDiscountValue=Math.max(0,n(order.discountValue));cashierCart=items.map(item=>({...item,key:item.key||cashierOrderItemKey(item)}));cashierDraftRestored=true;saveCashierDraft();tab('sales');
  $('cashierDateLabel').textContent='Mengedit transaksi '+(order.orderNo||cashierOrderTime(order))+' · '+new Date(order.date+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
  $('cashierStatus').textContent='Edit menu, jumlah, kanal, atau nomor Grab di keranjang, lalu pilih Simpan perubahan.';
 }
