@@ -1,4 +1,4 @@
-const CACHE_NAME = "lalapan-legenda-grab-share-20261114-notifications";
+const CACHE_NAME = "lalapan-legenda-grab-share-20261115-green-highlights";
 const SHARE_CACHE_NAME = "ll-shared-grab-images-v1";
 const APP_FILES = ["./", "./index.html", "./manifest.json", "./icons/icon.jpeg"];
 function sharedFileKey(id){return new Request(new URL("./__shared_grab_image__?id="+encodeURIComponent(id),self.registration.scope).href)}
