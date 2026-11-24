@@ -1515,66 +1515,69 @@ body.night-mode .calendar-dot.has-sale{background:#83c996!important}
  #cashierCartPanel{scroll-margin-top:calc(var(--pos-hh,70px) + 190px)}
 }
 
+
 /* Lalapan Legenda · refined visual system (presentation only) */
 @media screen{
-  :root{
-    --pos-ink:#24231f;--pos-ink2:#4b4942;--pos-muted:#716e65;--pos-faint:#99958a;
-    --pos-bg:#f4f2ec;--pos-surface:#fffefa;--pos-sunk:#f8f6f0;
-    --pos-line:#e8e3d8;--pos-line2:#d8d0c2;
-    --pos-side:#552023;--pos-side2:#6b292d;--pos-side-ink:#ead8c1;
-    --pos-accent:#79272c;--pos-accent-d:#601d22;--pos-accent-t:#f5ebe7;
-    --pos-sambal:#a84b3b;--pos-sambal-t:#f9ede8;
-    --pos-amber:#96702c;--pos-amber-t:#f5efdf;
-    --g:#552023;--g2:#79272c;--gold:#b38b42;--bg:#f4f2ec;--paper:#fffefa;--ink:#24231f;--muted:#716e65;--line:#e8e3d8;--red:#a84b3b;
-    --shadow:0 1px 2px rgba(38,30,19,.045),0 8px 22px rgba(38,30,19,.035)
-  }
-  body{background:var(--pos-bg)!important;color:var(--pos-ink)!important}
-  main.wrap{background:transparent!important}
-  .app-header{background:var(--pos-surface)!important;border-bottom:1px solid var(--pos-line)!important;box-shadow:0 1px 3px rgba(34,28,19,.035)!important}
-  .brand-mark{border-color:rgba(179,139,66,.36)!important;box-shadow:0 1px 4px rgba(34,28,19,.08)!important}
-  .brand-copy h1{color:var(--pos-accent-d)!important;letter-spacing:1.15px}
-  .brand-copy p{color:var(--pos-muted)!important}
-  .connection-controls{background:rgba(255,254,250,.97)!important;border-color:var(--pos-line)!important;box-shadow:0 3px 12px rgba(34,28,19,.09)!important}
-  .connection-controls .cloud-status{color:var(--pos-ink2)!important}
-  nav#nav{background:var(--pos-surface)!important;border-color:var(--pos-line)!important}
-  nav#nav .tab{color:var(--pos-ink2)!important;border-radius:10px!important}
-  nav#nav .tab:hover{background:var(--pos-sunk)!important;color:var(--pos-accent-d)!important}
-  nav#nav .tab.active,nav#nav .more-menu .tab.active{background:var(--pos-accent-t)!important;color:var(--pos-accent-d)!important}
-  nav#nav .tab.active:before{background:var(--pos-accent)!important}
-  nav#nav .tab.active .nav-icon{color:var(--pos-accent)!important}
-  .card,.metric-card,.report-order-card,.report-day-metric,.cashier-tx-card,.purchase-card{
-    border-color:var(--pos-line)!important;border-radius:14px!important;
-    box-shadow:0 1px 2px rgba(38,30,19,.04),0 5px 15px rgba(38,30,19,.025)
-  }
-  .card h2,.card h3,.section-head h2,.cashier-page-head h2{color:var(--pos-ink)!important;letter-spacing:-.2px}
-  .hero,#sales .sale-profit-box,.sale-dock{background:linear-gradient(135deg,#552023,#6b292d)!important}
-  .hero small,.sale-dock-info small{color:#f0dfd1!important}
-  button.primary,.modal-save{background:var(--pos-accent)!important;border-color:var(--pos-accent)!important;color:#fff!important;box-shadow:0 1px 2px rgba(62,20,23,.18)!important}
-  button.primary:hover,.modal-save:hover{background:var(--pos-accent-d)!important}
-  button.secondary,button:not(.primary):not(.tab){border-color:var(--pos-line2)}
-  button.secondary{background:var(--pos-surface)!important;color:var(--pos-accent-d)!important}
-  button.secondary:hover{background:var(--pos-sunk)!important;border-color:var(--pos-accent)!important}
-  input:not([type=checkbox]):not([type=radio]),select,textarea{
-    border-color:var(--pos-line2);border-radius:10px;background:var(--pos-surface);color:var(--pos-ink)
-  }
-  input:focus,select:focus,textarea:focus{border-color:var(--pos-accent)!important;box-shadow:0 0 0 3px rgba(121,39,44,.12)!important;outline:0}
-  button:focus-visible,.tab:focus-visible{outline:2px solid var(--pos-accent)!important;outline-offset:2px}
-  table th,table tfoot{background:var(--pos-sunk)!important;color:var(--pos-ink2)!important}
-  table td,table th{border-color:var(--pos-line)!important}
-  .metric-card,.stat{border-color:var(--pos-line)}
-  .metric-card strong,.report-metric b,.report-day-metric b,.cashier-day-summary b{font-variant-numeric:tabular-nums}
-  .badge{background:var(--pos-accent-t)!important;color:var(--pos-accent-d)!important}
-  .good,.cash-in{color:#257044!important}
-  .stock-ok{background:#eaf4ec!important;color:#28623e!important}
-  .monthgrid .calendar-day.has-sale{background:#edf6ef!important;border-color:#c9dfcf!important;color:#27613c!important}
-  .calendar-dot.has-sale{background:#398457!important}
-  .report-metric.report-profit,.report-day-metric.is-net,.report-day-metric.is-profit{background:#edf6ef!important;border-color:#c9dfcf!important}
-  .report-metric.report-profit b,.report-day-metric.is-net b,.report-day-metric.is-profit b{color:#27613c!important}
-  .report-order-stat-highlight,.cashier-tx-grab-net{border-color:#c9dfcf}
-  .report-order-line-net{background:#edf6ef!important;border-color:#76a985!important;color:#356044!important}
+ :root{
+  --pos-ink:#24221f;--pos-ink2:#48453f;--pos-muted:#706c62;--pos-faint:#999487;
+  --pos-bg:#f2efe8;--pos-surface:#fffefa;--pos-sunk:#f7f4ed;
+  --pos-line:#e3ddd1;--pos-line2:#d2c8b8;
+  --pos-side:#4d1b20;--pos-side2:#622329;--pos-side-ink:#ead8c1;
+  --pos-accent:#74272d;--pos-accent-d:#5c1d23;--pos-accent-t:#f3e7e1;
+  --pos-sambal:#a84b3b;--pos-sambal-t:#f9ede8;
+  --pos-amber:#94702f;--pos-amber-t:#f5efdf;
+  --g:#4d1b20;--g2:#74272d;--gold:#b28c49;--bg:#f2efe8;--paper:#fffefa;--ink:#24221f;--muted:#706c62;--line:#e3ddd1;--red:#a84b3b;
+  --shadow:0 1px 2px rgba(36,27,18,.05),0 7px 20px rgba(36,27,18,.055)
+ }
+ body{background:var(--pos-bg)!important;color:var(--pos-ink)!important}
+ main.wrap{background:transparent!important}
+ .app-header{background:var(--pos-surface)!important;border-bottom:1px solid var(--pos-line)!important;box-shadow:0 1px 4px rgba(36,27,18,.055)!important}
+ .brand-mark{border-color:rgba(178,140,73,.42)!important;box-shadow:0 2px 7px rgba(36,27,18,.1)!important}
+ .brand-copy h1{color:var(--pos-accent-d)!important;letter-spacing:1.15px}
+ .brand-copy p{color:var(--pos-muted)!important}
+ .connection-controls{background:#fffefa!important;border-color:var(--pos-line)!important;box-shadow:0 3px 14px rgba(36,27,18,.1)!important}
+ .connection-controls .cloud-status{color:var(--pos-ink2)!important}
+ nav#nav{background:var(--pos-surface)!important;border-color:var(--pos-line)!important}
+ nav#nav .tab{color:var(--pos-ink2)!important;border-radius:10px!important}
+ nav#nav .tab:hover{background:var(--pos-sunk)!important;color:var(--pos-accent-d)!important}
+ nav#nav .tab.active,nav#nav .more-menu .tab.active{background:var(--pos-accent)!important;color:#fff!important}
+ nav#nav .tab.active:before{background:#d1b36e!important}
+ nav#nav .tab.active .nav-icon{color:#fff!important}
+ .card,.metric-card,.report-order-card,.report-day-metric,.cashier-tx-card,.purchase-card{
+  background:var(--pos-surface)!important;border-color:var(--pos-line)!important;border-radius:15px!important;
+  box-shadow:0 1px 2px rgba(36,27,18,.05),0 6px 18px rgba(36,27,18,.045)!important
+ }
+ .card h2,.card h3,.section-head h2,.cashier-page-head h2{color:var(--pos-ink)!important;letter-spacing:-.2px}
+ .metric-revenue{border-top:3px solid var(--pos-accent)!important}
+ .metric-profit{border-top:3px solid #398458!important}
+ .metric-portions{border-top:3px solid #b28c49!important}
+ .metric-stock{border-top:3px solid #d6d0c3!important}
+ .metric-icon{border-radius:11px!important}
+ .hero,#sales .sale-profit-box,.sale-dock{background:linear-gradient(135deg,#4d1b20,#74272d)!important}
+ .hero small,.sale-dock-info small{color:#f0dfd1!important}
+ button.primary,.modal-save{background:var(--pos-accent)!important;border-color:var(--pos-accent)!important;color:#fff!important;box-shadow:0 2px 4px rgba(62,20,23,.2)!important}
+ button.primary:hover,.modal-save:hover{background:var(--pos-accent-d)!important}
+ button.secondary{background:var(--pos-surface)!important;color:var(--pos-accent-d)!important;border-color:var(--pos-line2)!important}
+ button.secondary:hover{background:var(--pos-sunk)!important;border-color:#b8a995!important}
+ input:not([type=checkbox]):not([type=radio]),select,textarea{border-color:var(--pos-line2);border-radius:10px;background:var(--pos-surface);color:var(--pos-ink)}
+ input:focus,select:focus,textarea:focus{border-color:var(--pos-accent)!important;box-shadow:0 0 0 3px rgba(116,39,45,.13)!important;outline:0}
+ button:focus-visible,.tab:focus-visible{outline:2px solid var(--pos-accent)!important;outline-offset:2px}
+ table th,table tfoot{background:var(--pos-sunk)!important;color:var(--pos-ink2)!important}
+ table td,table th{border-color:var(--pos-line)!important}
+ .badge{background:var(--pos-accent-t)!important;color:var(--pos-accent-d)!important}
+ .good,.cash-in{color:#257044!important}
+ .stock-ok{background:#eaf4ec!important;color:#28623e!important}
+ .monthgrid .calendar-day.has-sale{background:#edf6ef!important;border-color:#c9dfcf!important;color:#27613c!important}
+ .calendar-dot.has-sale{background:#398457!important}
+ .report-metric.report-profit,.report-day-metric.is-net,.report-day-metric.is-profit{background:#edf6ef!important;border-color:#c9dfcf!important}
+ .report-metric.report-profit b,.report-day-metric.is-net b,.report-day-metric.is-profit b{color:#27613c!important}
+ .report-order-stat-highlight,.cashier-tx-grab-net{border-color:#c9dfcf}
+ .report-order-line-net{background:#edf6ef!important;border-color:#76a985!important;color:#356044!important}
+ .metric-card strong,.report-metric b,.report-day-metric b,.cashier-day-summary b{font-variant-numeric:tabular-nums}
 }
 @media screen{
-body.night-mode{
+ body.night-mode{
+  color-scheme:dark;
   --pos-ink:#f3efdf;--pos-ink2:#ded7c3;--pos-muted:#b5ad99;--pos-faint:#918975;
   --pos-bg:#0c0d0b;--pos-surface:#171815;--pos-sunk:#20211d;--pos-line:#37362e;--pos-line2:#504a38;
   --pos-side:#0b0c0a;--pos-side2:#181914;--pos-side-ink:#ead8a2;
@@ -1582,44 +1585,45 @@ body.night-mode{
   --pos-sambal:#d47763;--pos-sambal-t:#35221f;--pos-amber:#d1ac60;--pos-amber-t:#302917;
   --g:#0b0c0a;--g2:#181914;--gold:#c7a452;--bg:#0c0d0b;--paper:#171815;--ink:#f3efdf;--muted:#b5ad99;--line:#37362e;--red:#d47763;
   background:var(--pos-bg)!important;color:var(--pos-ink)!important
-}
-body.night-mode main.wrap,body.night-mode .page{background:var(--pos-bg)!important;color:var(--pos-ink)!important}
-body.night-mode .app-header{background:#11120f!important;border-color:#37362e!important;box-shadow:0 1px 3px rgba(0,0,0,.25)!important}
-body.night-mode .brand-copy h1{color:#e1c274!important}
-body.night-mode .brand-copy p,body.night-mode .muted{color:var(--pos-muted)!important}
-body.night-mode .connection-controls{background:#171815!important;border-color:#504a38!important;color:var(--pos-ink2)!important}
-body.night-mode .connection-controls .cloud-status,body.night-mode .theme-switch{color:var(--pos-ink2)!important}
-body.night-mode nav#nav,body.night-mode nav#nav .more-menu{background:#11120f!important;border-color:var(--pos-line)!important}
-body.night-mode nav#nav .tab{color:var(--pos-ink2)!important}
-body.night-mode nav#nav .tab.active,body.night-mode nav#nav .more-menu .tab.active{background:var(--pos-accent-t)!important;color:var(--pos-accent-d)!important;box-shadow:inset 0 2px var(--pos-accent)!important}
-body.night-mode .card,body.night-mode .metric-card,body.night-mode .report-order-card,body.night-mode .report-day-metric,body.night-mode .cashier-tx-card,body.night-mode .purchase-card{
-  background:var(--pos-surface)!important;color:var(--pos-ink)!important;border-color:var(--pos-line)!important;
-  box-shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.16)!important
-}
-body.night-mode .card h2,body.night-mode .card h3,body.night-mode .section-head h2{color:var(--pos-ink)!important}
-body.night-mode .hero,body.night-mode #sales .sale-profit-box,body.night-mode .sale-dock{background:linear-gradient(135deg,#171815,#242116)!important;border:1px solid #3b3422!important}
-body.night-mode .hero small,body.night-mode .sale-dock-info small{color:#d8c99f!important}
-body.night-mode button.primary,body.night-mode .modal-save{background:#c7a452!important;border-color:#c7a452!important;color:#17150e!important;box-shadow:0 1px 2px rgba(0,0,0,.25)!important}
-body.night-mode button.primary:hover,body.night-mode .modal-save:hover{background:#d7b664!important}
-body.night-mode button.secondary,body.night-mode button:not(.primary):not(.tab){border-color:var(--pos-line2)}
-body.night-mode button.secondary{background:#20211d!important;color:#e1c274!important}
-body.night-mode input:not([type=checkbox]):not([type=radio]),body.night-mode select,body.night-mode textarea{background:#20211d!important;border-color:var(--pos-line2)!important;color:var(--pos-ink)!important}
-body.night-mode input::placeholder,body.night-mode textarea::placeholder{color:#938d7c!important}
-body.night-mode input:focus,body.night-mode select:focus,body.night-mode textarea:focus{border-color:#c7a452!important;box-shadow:0 0 0 3px rgba(199,164,82,.16)!important}
-body.night-mode table th,body.night-mode table tfoot{background:var(--pos-sunk)!important;color:var(--pos-ink2)!important}
-body.night-mode table td,body.night-mode table th{background:var(--pos-surface)!important;border-color:var(--pos-line)!important;color:var(--pos-ink)!important}
-body.night-mode table th,body.night-mode table tfoot{background:var(--pos-sunk)!important;color:var(--pos-ink2)!important}
-body.night-mode .good,body.night-mode .cash-in{color:#82c79a!important}
-body.night-mode .monthgrid .calendar-day.has-sale{background:#203328!important;border-color:#42674c!important;color:#c8ebd0!important}
-body.night-mode .report-metric.report-profit,body.night-mode .report-day-metric.is-net,body.night-mode .report-day-metric.is-profit{background:#203328!important;border-color:#42674c!important}
-body.night-mode .report-metric.report-profit b,body.night-mode .report-day-metric.is-net b,body.night-mode .report-day-metric.is-profit b{color:#c8ebd0!important}
-body.night-mode .cashier-menu-button,body.night-mode #sales .sale-menu-card{background:var(--pos-surface)!important;border-color:var(--pos-line)!important;color:var(--pos-ink)!important}
-body.night-mode #sales .sale-menu-card.has-qty{background:#2b2618!important;border-color:#66552c!important}
-body.night-mode .report-order-line-net,body.night-mode .cashier-tx-grab-net{background:#203328!important;border-color:#42674c!important;color:#c0dec8!important}
+ }
+ body.night-mode main.wrap,body.night-mode .page{background:var(--pos-bg)!important;color:var(--pos-ink)!important}
+ body.night-mode .app-header{background:#11120f!important;border-color:#37362e!important;box-shadow:0 1px 4px rgba(0,0,0,.3)!important}
+ body.night-mode .brand-copy h1{color:#e1c274!important}
+ body.night-mode .brand-copy p,body.night-mode .muted{color:var(--pos-muted)!important}
+ body.night-mode .connection-controls{background:#171815!important;border-color:#504a38!important;color:var(--pos-ink2)!important}
+ body.night-mode .connection-controls .cloud-status,body.night-mode .theme-switch{color:var(--pos-ink2)!important}
+ body.night-mode nav#nav,body.night-mode nav#nav .more-menu{background:#11120f!important;border-color:var(--pos-line)!important}
+ body.night-mode nav#nav .tab{color:var(--pos-ink2)!important}
+ body.night-mode nav#nav .tab.active,body.night-mode nav#nav .more-menu .tab.active{background:#2b2618!important;color:#e1c274!important;box-shadow:inset 0 2px #c7a452!important}
+ body.night-mode .card,body.night-mode .metric-card,body.night-mode .report-order-card,body.night-mode .report-day-metric,body.night-mode .cashier-tx-card,body.night-mode .purchase-card{
+  background:var(--pos-surface)!important;color:var(--pos-ink)!important;border-color:var(--pos-line)!important;box-shadow:0 1px 2px rgba(0,0,0,.32),0 6px 18px rgba(0,0,0,.17)!important
+ }
+ body.night-mode .metric-revenue{border-top-color:#c7a452!important}
+ body.night-mode .metric-profit{border-top-color:#74b989!important}
+ body.night-mode .metric-portions{border-top-color:#a88b52!important}
+ body.night-mode .metric-stock{border-top-color:#504a38!important}
+ body.night-mode .card h2,body.night-mode .card h3,body.night-mode .section-head h2{color:var(--pos-ink)!important}
+ body.night-mode .hero,body.night-mode #sales .sale-profit-box,body.night-mode .sale-dock{background:linear-gradient(135deg,#171815,#242116)!important;border:1px solid #3b3422!important}
+ body.night-mode .hero small,body.night-mode .sale-dock-info small{color:#d8c99f!important}
+ body.night-mode button.primary,body.night-mode .modal-save{background:#c7a452!important;border-color:#c7a452!important;color:#17150e!important;box-shadow:0 2px 4px rgba(0,0,0,.28)!important}
+ body.night-mode button.primary:hover,body.night-mode .modal-save:hover{background:#d7b664!important}
+ body.night-mode button.secondary{background:#20211d!important;color:#e1c274!important;border-color:var(--pos-line2)!important}
+ body.night-mode input:not([type=checkbox]):not([type=radio]),body.night-mode select,body.night-mode textarea{background:#20211d!important;border-color:var(--pos-line2)!important;color:var(--pos-ink)!important}
+ body.night-mode input::placeholder,body.night-mode textarea::placeholder{color:#938d7c!important}
+ body.night-mode input:focus,body.night-mode select:focus,body.night-mode textarea:focus{border-color:#c7a452!important;box-shadow:0 0 0 3px rgba(199,164,82,.16)!important}
+ body.night-mode table th,body.night-mode table tfoot{background:var(--pos-sunk)!important;color:var(--pos-ink2)!important}
+ body.night-mode table td,body.night-mode table th{background:var(--pos-surface)!important;border-color:var(--pos-line)!important;color:var(--pos-ink)!important}
+ body.night-mode .good,body.night-mode .cash-in{color:#82c79a!important}
+ body.night-mode .monthgrid .calendar-day.has-sale{background:#203328!important;border-color:#42674c!important;color:#c8ebd0!important}
+ body.night-mode .report-metric.report-profit,body.night-mode .report-day-metric.is-net,body.night-mode .report-day-metric.is-profit{background:#203328!important;border-color:#42674c!important}
+ body.night-mode .report-metric.report-profit b,body.night-mode .report-day-metric.is-net b,body.night-mode .report-day-metric.is-profit b{color:#c8ebd0!important}
+ body.night-mode .cashier-menu-button,body.night-mode #sales .sale-menu-card{background:var(--pos-surface)!important;border-color:var(--pos-line)!important;color:var(--pos-ink)!important}
+ body.night-mode #sales .sale-menu-card.has-qty{background:#2b2618!important;border-color:#66552c!important}
+ body.night-mode .report-order-line-net,body.night-mode .cashier-tx-grab-net{background:#203328!important;border-color:#42674c!important;color:#c0dec8!important}
 }
 @media screen and (max-width:850px){
-  nav#nav{background:var(--pos-surface)!important;border-color:var(--pos-line)!important}
-  nav#nav .more-menu{background:var(--pos-surface)!important;border-color:var(--pos-line)!important}
+ nav#nav{background:var(--pos-surface)!important;border-color:var(--pos-line)!important}
+ nav#nav .more-menu{background:var(--pos-surface)!important;border-color:var(--pos-line)!important}
 }
 </style></head><body>
 <header class="app-header"><img class="brand-mark" src="./icons/icon.jpeg" alt="Logo Lalapan Legenda"><div class="brand-copy"><h1>LALAPAN LEGENDA</h1><p>Ruang kendali usaha · HPP · Stok · Penjualan · Keuangan</p></div></header><div class="header-meta connection-controls"><span class="live-dot"></span><span class="cloud-status" id="cloudStatus">Belum login</span><label class="theme-switch" for="themeModeSwitch" title="Mode malam"><input type="checkbox" id="themeModeSwitch" role="switch" aria-label="Mode malam"><span class="theme-switch-track" aria-hidden="true"><i></i></span><span class="theme-switch-caption">Malam</span></label><button id="logoutBtn" class="secondary smallbtn hidden" style="margin-left:5px">Keluar</button></div>
