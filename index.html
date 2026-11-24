@@ -1514,6 +1514,113 @@ body.night-mode .calendar-dot.has-sale{background:#83c996!important}
  #sales #cashierJumpCart{min-height:44px;padding:8px 11px;white-space:nowrap}
  #cashierCartPanel{scroll-margin-top:calc(var(--pos-hh,70px) + 190px)}
 }
+
+/* Lalapan Legenda · refined visual system (presentation only) */
+@media screen{
+  :root{
+    --pos-ink:#24231f;--pos-ink2:#4b4942;--pos-muted:#716e65;--pos-faint:#99958a;
+    --pos-bg:#f4f2ec;--pos-surface:#fffefa;--pos-sunk:#f8f6f0;
+    --pos-line:#e8e3d8;--pos-line2:#d8d0c2;
+    --pos-side:#552023;--pos-side2:#6b292d;--pos-side-ink:#ead8c1;
+    --pos-accent:#79272c;--pos-accent-d:#601d22;--pos-accent-t:#f5ebe7;
+    --pos-sambal:#a84b3b;--pos-sambal-t:#f9ede8;
+    --pos-amber:#96702c;--pos-amber-t:#f5efdf;
+    --g:#552023;--g2:#79272c;--gold:#b38b42;--bg:#f4f2ec;--paper:#fffefa;--ink:#24231f;--muted:#716e65;--line:#e8e3d8;--red:#a84b3b;
+    --shadow:0 1px 2px rgba(38,30,19,.045),0 8px 22px rgba(38,30,19,.035)
+  }
+  body{background:var(--pos-bg)!important;color:var(--pos-ink)!important}
+  main.wrap{background:transparent!important}
+  .app-header{background:var(--pos-surface)!important;border-bottom:1px solid var(--pos-line)!important;box-shadow:0 1px 3px rgba(34,28,19,.035)!important}
+  .brand-mark{border-color:rgba(179,139,66,.36)!important;box-shadow:0 1px 4px rgba(34,28,19,.08)!important}
+  .brand-copy h1{color:var(--pos-accent-d)!important;letter-spacing:1.15px}
+  .brand-copy p{color:var(--pos-muted)!important}
+  .connection-controls{background:rgba(255,254,250,.97)!important;border-color:var(--pos-line)!important;box-shadow:0 3px 12px rgba(34,28,19,.09)!important}
+  .connection-controls .cloud-status{color:var(--pos-ink2)!important}
+  nav#nav{background:var(--pos-surface)!important;border-color:var(--pos-line)!important}
+  nav#nav .tab{color:var(--pos-ink2)!important;border-radius:10px!important}
+  nav#nav .tab:hover{background:var(--pos-sunk)!important;color:var(--pos-accent-d)!important}
+  nav#nav .tab.active,nav#nav .more-menu .tab.active{background:var(--pos-accent-t)!important;color:var(--pos-accent-d)!important}
+  nav#nav .tab.active:before{background:var(--pos-accent)!important}
+  nav#nav .tab.active .nav-icon{color:var(--pos-accent)!important}
+  .card,.metric-card,.report-order-card,.report-day-metric,.cashier-tx-card,.purchase-card{
+    border-color:var(--pos-line)!important;border-radius:14px!important;
+    box-shadow:0 1px 2px rgba(38,30,19,.04),0 5px 15px rgba(38,30,19,.025)
+  }
+  .card h2,.card h3,.section-head h2,.cashier-page-head h2{color:var(--pos-ink)!important;letter-spacing:-.2px}
+  .hero,#sales .sale-profit-box,.sale-dock{background:linear-gradient(135deg,#552023,#6b292d)!important}
+  .hero small,.sale-dock-info small{color:#f0dfd1!important}
+  button.primary,.modal-save{background:var(--pos-accent)!important;border-color:var(--pos-accent)!important;color:#fff!important;box-shadow:0 1px 2px rgba(62,20,23,.18)!important}
+  button.primary:hover,.modal-save:hover{background:var(--pos-accent-d)!important}
+  button.secondary,button:not(.primary):not(.tab){border-color:var(--pos-line2)}
+  button.secondary{background:var(--pos-surface)!important;color:var(--pos-accent-d)!important}
+  button.secondary:hover{background:var(--pos-sunk)!important;border-color:var(--pos-accent)!important}
+  input:not([type=checkbox]):not([type=radio]),select,textarea{
+    border-color:var(--pos-line2);border-radius:10px;background:var(--pos-surface);color:var(--pos-ink)
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--pos-accent)!important;box-shadow:0 0 0 3px rgba(121,39,44,.12)!important;outline:0}
+  button:focus-visible,.tab:focus-visible{outline:2px solid var(--pos-accent)!important;outline-offset:2px}
+  table th,table tfoot{background:var(--pos-sunk)!important;color:var(--pos-ink2)!important}
+  table td,table th{border-color:var(--pos-line)!important}
+  .metric-card,.stat{border-color:var(--pos-line)}
+  .metric-card strong,.report-metric b,.report-day-metric b,.cashier-day-summary b{font-variant-numeric:tabular-nums}
+  .badge{background:var(--pos-accent-t)!important;color:var(--pos-accent-d)!important}
+  .good,.cash-in{color:#257044!important}
+  .stock-ok{background:#eaf4ec!important;color:#28623e!important}
+  .monthgrid .calendar-day.has-sale{background:#edf6ef!important;border-color:#c9dfcf!important;color:#27613c!important}
+  .calendar-dot.has-sale{background:#398457!important}
+  .report-metric.report-profit,.report-day-metric.is-net,.report-day-metric.is-profit{background:#edf6ef!important;border-color:#c9dfcf!important}
+  .report-metric.report-profit b,.report-day-metric.is-net b,.report-day-metric.is-profit b{color:#27613c!important}
+  .report-order-stat-highlight,.cashier-tx-grab-net{border-color:#c9dfcf}
+  .report-order-line-net{background:#edf6ef!important;border-color:#76a985!important;color:#356044!important}
+}
+@media screen{
+body.night-mode{
+  --pos-ink:#f3efdf;--pos-ink2:#ded7c3;--pos-muted:#b5ad99;--pos-faint:#918975;
+  --pos-bg:#0c0d0b;--pos-surface:#171815;--pos-sunk:#20211d;--pos-line:#37362e;--pos-line2:#504a38;
+  --pos-side:#0b0c0a;--pos-side2:#181914;--pos-side-ink:#ead8a2;
+  --pos-accent:#c7a452;--pos-accent-d:#e1c274;--pos-accent-t:#2b2618;
+  --pos-sambal:#d47763;--pos-sambal-t:#35221f;--pos-amber:#d1ac60;--pos-amber-t:#302917;
+  --g:#0b0c0a;--g2:#181914;--gold:#c7a452;--bg:#0c0d0b;--paper:#171815;--ink:#f3efdf;--muted:#b5ad99;--line:#37362e;--red:#d47763;
+  background:var(--pos-bg)!important;color:var(--pos-ink)!important
+}
+body.night-mode main.wrap,body.night-mode .page{background:var(--pos-bg)!important;color:var(--pos-ink)!important}
+body.night-mode .app-header{background:#11120f!important;border-color:#37362e!important;box-shadow:0 1px 3px rgba(0,0,0,.25)!important}
+body.night-mode .brand-copy h1{color:#e1c274!important}
+body.night-mode .brand-copy p,body.night-mode .muted{color:var(--pos-muted)!important}
+body.night-mode .connection-controls{background:#171815!important;border-color:#504a38!important;color:var(--pos-ink2)!important}
+body.night-mode .connection-controls .cloud-status,body.night-mode .theme-switch{color:var(--pos-ink2)!important}
+body.night-mode nav#nav,body.night-mode nav#nav .more-menu{background:#11120f!important;border-color:var(--pos-line)!important}
+body.night-mode nav#nav .tab{color:var(--pos-ink2)!important}
+body.night-mode nav#nav .tab.active,body.night-mode nav#nav .more-menu .tab.active{background:var(--pos-accent-t)!important;color:var(--pos-accent-d)!important;box-shadow:inset 0 2px var(--pos-accent)!important}
+body.night-mode .card,body.night-mode .metric-card,body.night-mode .report-order-card,body.night-mode .report-day-metric,body.night-mode .cashier-tx-card,body.night-mode .purchase-card{
+  background:var(--pos-surface)!important;color:var(--pos-ink)!important;border-color:var(--pos-line)!important;
+  box-shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.16)!important
+}
+body.night-mode .card h2,body.night-mode .card h3,body.night-mode .section-head h2{color:var(--pos-ink)!important}
+body.night-mode .hero,body.night-mode #sales .sale-profit-box,body.night-mode .sale-dock{background:linear-gradient(135deg,#171815,#242116)!important;border:1px solid #3b3422!important}
+body.night-mode .hero small,body.night-mode .sale-dock-info small{color:#d8c99f!important}
+body.night-mode button.primary,body.night-mode .modal-save{background:#c7a452!important;border-color:#c7a452!important;color:#17150e!important;box-shadow:0 1px 2px rgba(0,0,0,.25)!important}
+body.night-mode button.primary:hover,body.night-mode .modal-save:hover{background:#d7b664!important}
+body.night-mode button.secondary,body.night-mode button:not(.primary):not(.tab){border-color:var(--pos-line2)}
+body.night-mode button.secondary{background:#20211d!important;color:#e1c274!important}
+body.night-mode input:not([type=checkbox]):not([type=radio]),body.night-mode select,body.night-mode textarea{background:#20211d!important;border-color:var(--pos-line2)!important;color:var(--pos-ink)!important}
+body.night-mode input::placeholder,body.night-mode textarea::placeholder{color:#938d7c!important}
+body.night-mode input:focus,body.night-mode select:focus,body.night-mode textarea:focus{border-color:#c7a452!important;box-shadow:0 0 0 3px rgba(199,164,82,.16)!important}
+body.night-mode table th,body.night-mode table tfoot{background:var(--pos-sunk)!important;color:var(--pos-ink2)!important}
+body.night-mode table td,body.night-mode table th{background:var(--pos-surface)!important;border-color:var(--pos-line)!important;color:var(--pos-ink)!important}
+body.night-mode table th,body.night-mode table tfoot{background:var(--pos-sunk)!important;color:var(--pos-ink2)!important}
+body.night-mode .good,body.night-mode .cash-in{color:#82c79a!important}
+body.night-mode .monthgrid .calendar-day.has-sale{background:#203328!important;border-color:#42674c!important;color:#c8ebd0!important}
+body.night-mode .report-metric.report-profit,body.night-mode .report-day-metric.is-net,body.night-mode .report-day-metric.is-profit{background:#203328!important;border-color:#42674c!important}
+body.night-mode .report-metric.report-profit b,body.night-mode .report-day-metric.is-net b,body.night-mode .report-day-metric.is-profit b{color:#c8ebd0!important}
+body.night-mode .cashier-menu-button,body.night-mode #sales .sale-menu-card{background:var(--pos-surface)!important;border-color:var(--pos-line)!important;color:var(--pos-ink)!important}
+body.night-mode #sales .sale-menu-card.has-qty{background:#2b2618!important;border-color:#66552c!important}
+body.night-mode .report-order-line-net,body.night-mode .cashier-tx-grab-net{background:#203328!important;border-color:#42674c!important;color:#c0dec8!important}
+}
+@media screen and (max-width:850px){
+  nav#nav{background:var(--pos-surface)!important;border-color:var(--pos-line)!important}
+  nav#nav .more-menu{background:var(--pos-surface)!important;border-color:var(--pos-line)!important}
+}
 </style></head><body>
 <header class="app-header"><img class="brand-mark" src="./icons/icon.jpeg" alt="Logo Lalapan Legenda"><div class="brand-copy"><h1>LALAPAN LEGENDA</h1><p>Ruang kendali usaha · HPP · Stok · Penjualan · Keuangan</p></div></header><div class="header-meta connection-controls"><span class="live-dot"></span><span class="cloud-status" id="cloudStatus">Belum login</span><label class="theme-switch" for="themeModeSwitch" title="Mode malam"><input type="checkbox" id="themeModeSwitch" role="switch" aria-label="Mode malam"><span class="theme-switch-track" aria-hidden="true"><i></i></span><span class="theme-switch-caption">Malam</span></label><button id="logoutBtn" class="secondary smallbtn hidden" style="margin-left:5px">Keluar</button></div>
 <nav id="nav"><button class="tab active" data-page="dashboard"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span><span class="nav-label">Dashboard</span></button><button class="tab" data-page="sales"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h12l1 4H5z"/><path d="M5 6v14l2-1.2 2 1.2 2-1.2 2 1.2 2-1.2 2 1.2V6"/><path d="M9 11h6M9 14.5h4"/></svg></span><span class="nav-label">Kasir</span></button><button class="tab" data-page="hpp"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M8.5 7h7"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/></svg></span><span class="nav-label">HPP & Menu</span></button><button class="tab" data-page="inventory"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 8 12 3 3 8l9 5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span><span class="nav-label">Persediaan</span></button><button class="tab more-tab" type="button" data-more><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg></span><span class="nav-label">Lainnya</span></button><div class="more-menu" id="moreMenu" aria-label="Menu lainnya"><button class="tab" data-page="purchases"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 7h12l1 13H5z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></span><span class="nav-label">Belanja Bahan</span></button><button class="tab" data-page="expenses"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg></span><span class="nav-label">Pengeluaran</span></button><button class="tab" data-page="cashflow"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z"/><circle cx="16.5" cy="14.5" r="1.1"/></svg></span><span class="nav-label">Arus kas</span></button><button class="tab" data-page="printing"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><rect x="7" y="14" width="10" height="7" rx="1"/></svg></span><span class="nav-label">Cetak Struk</span></button><button class="tab" data-page="reports"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></span><span class="nav-label">Laporan</span></button><button class="tab" data-page="advertising"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="nav-label">Periklanan</span></button><button class="tab" data-page="calendar"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 10h18M8 2.5v4M16 2.5v4"/></svg></span><span class="nav-label">Kalender</span></button><button class="tab" data-page="settings"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span><span class="nav-label">Pengaturan</span></button></div></nav>
